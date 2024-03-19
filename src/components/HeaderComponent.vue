@@ -1,0 +1,39 @@
+<template>
+  <div class="toolbar">
+    <el-icon><Setting /></el-icon>
+    <el-icon>
+      <Plus/>
+    </el-icon>
+    <el-icon>
+      <Minus/>
+    </el-icon>
+    <el-icon>
+      <VideoPlay/>
+    </el-icon>
+    <el-icon>
+      <VideoPause/>
+    </el-icon><el-icon><Refresh /></el-icon>
+  </div>
+</template>
+<script setup lang="ts">
+
+const item = {
+  date: '2016-05-02',
+  name: 'Tom',
+  address: 'No. 189, Grove St, Los Angeles',
+}
+</script>
+
+<style scoped>
+.toolbar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: large;
+}
+
+.el-icon{
+  margin-right: 20px;
+}
+</style>
