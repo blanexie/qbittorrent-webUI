@@ -1,6 +1,8 @@
 <template>
   <div class="toolbar">
-    <el-icon><Setting /></el-icon>
+    <el-icon>
+      <Setting/>
+    </el-icon>
     <el-icon>
       <Plus/>
     </el-icon>
@@ -12,16 +14,14 @@
     </el-icon>
     <el-icon>
       <VideoPause/>
-    </el-icon><el-icon><Refresh /></el-icon>
+    </el-icon>
+    <el-icon>
+      <Refresh/>
+    </el-icon>
   </div>
 </template>
 <script setup lang="ts">
-
-const item = {
-  date: '2016-05-02',
-  name: 'Tom',
-  address: 'No. 189, Grove St, Los Angeles',
-}
+import {Minus, Plus, Refresh, Setting, VideoPause, VideoPlay} from "@element-plus/icons-vue";
 </script>
 
 <style scoped>
@@ -33,7 +33,7 @@ const item = {
   font-size: large;
 }
 
-.el-icon{
+.el-icon {
   margin-right: 20px;
 }
 </style>
