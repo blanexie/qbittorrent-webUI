@@ -1,5 +1,5 @@
 <template>
-  <el-container class="layout-container-demo" >
+  <el-container class="layout-container-demo">
     <el-aside width="200px">
       <AsideComponent></AsideComponent>
     </el-aside>
@@ -9,7 +9,7 @@
       </el-header>
       <el-main>
         <el-scrollbar>
-<!--         <RouterView></RouterView>-->
+          <!--         <RouterView></RouterView>-->
           <TorrentList/>
         </el-scrollbar>
       </el-main>
@@ -21,6 +21,15 @@
 import AsideComponent from "@/components/AsideComponent.vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import TorrentList from "@/views/TorrentList.vue";
+import {TransferInfo} from "@/requests";
+
+/**
+ * 设置全局定时任务
+ */
+const intervalId = setInterval(() => {
+  TransferInfo.info()
+}, 2000)
+
 
 </script>
 
