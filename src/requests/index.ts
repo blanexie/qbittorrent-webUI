@@ -1,12 +1,9 @@
 import axios from 'axios'
-import {useAuthStore, useTransferInfoStore} from '@/stores/pinia'
 import {ElMessage} from 'element-plus'
 
-const useTransferInfo = useTransferInfoStore()
-const useAuth = useAuthStore()
 
 const service = axios.create({
-    baseURL: "/api",
+    baseURL: "http://localhost:8080",
     timeout: 30000,// request timeout
     // withCredentials:true
 })
@@ -17,7 +14,6 @@ service.interceptors.request.use(
     config => {
         // const token = store.state.token;
         // token && (config.headers.Authorization = token);
-
 
         return config;
     },
@@ -36,22 +32,18 @@ service.interceptors.response.use(
         }
     },
     error => {
-        alert(`异常请求：${JSON.stringify(error.message)}`)
+        ElMessage.error(`异常请求：${JSON.stringify(error.message)}`)
     }
 );
 
 
-const Authentication = {
-    login: (username: string, password: string) => {
-        service.get('/api/v2/auth/login?username=' + username + '&password=' + password)
-            .then(resp => {
-                useAuth.setCookie(resp.data)
-            })
-            .catch(error => {
-                ElMessage.error('登录失败.' + error)
-            })
-    },
-    logout: () => {
+const Authentication = (useAuth: any) => {
+
+    const login = (username: string, password: string) => {
+      return   service.get('/api/v2/auth/login?username=' + username + '&password=' + password)
+    }
+
+    const logout = () => {
         service.get('/api/v2/auth/logout')
             .then(resp => {
                 console.log(resp.data)
@@ -61,6 +53,8 @@ const Authentication = {
                 ElMessage.error('退出失败. ' + error)
             })
     }
+
+    return {login, logout}
 }
 
 const Application = {
@@ -81,17 +75,87 @@ const Application = {
     },
 }
 
-const TransferInfo = {
-    info: () => {
+const TransferInfo = (useTransferInfo: any) => {
+    /**
+     * 获取全局速度等信息
+     */
+    const info = () => {
         service.get("/api/v2/transfer/info")
             .then(resp => {
-                const data = resp.data
-                useTransferInfo.refresh(data)
+                useTransferInfo.refresh(resp.data)
             })
             .catch(error => {
                 ElMessage.error(' 获取全局速度异常.' + error)
             })
     }
+    /**
+     *  获取全局速度限制状态
+     */
+    const speedLimitsMode = () => {
+        service.get("/api/v2/transfer/speedLimitsMode")
+            .then(resp => {
+                const enable = resp.data
+                useTransferInfo.setSpeedLimitsMode(enable)
+            })
+            .catch(error => {
+                ElMessage.error(' 请求异常.' + error)
+            })
+    }
+
+    /**
+     * toggleSpeedLimitsMode
+     * 全局速度限制开启的 开关， 点击一下就是切换状态
+     */
+    const toggleSpeedLimitsMode = () => {
+        service.get("/api/v2/transfer/toggleSpeedLimitsMode")
+            .then(resp => {
+                if (useTransferInfo.infoState.speedLimitsMode) {
+                    useTransferInfo.setSpeedLimitsMode(0)
+                } else {
+                    useTransferInfo.setSpeedLimitsMode(1)
+                }
+            })
+            .catch(error => {
+                ElMessage.error(' 请求异常.' + error)
+            })
+    }
+    const getDownloadLimit = () => {
+        service.get("/api/v2/transfer/downloadLimit")
+            .then(resp => {
+                useTransferInfo.setDownloadLimit(resp.data)
+            })
+            .catch(error => {
+                ElMessage.error(' 请求异常.' + error)
+            })
+    }
+    const setDownloadLimit = (limit: number) => {
+        service.get("/api/v2/transfer/setDownloadLimit?limit=" + limit)
+            .then(resp => {
+                useTransferInfo.setDownloadLimit(limit)
+            })
+            .catch(error => {
+                ElMessage.error(' 请求异常.' + error)
+            })
+    }
+    const getUploadLimit = () => {
+        service.get("/api/v2/transfer/uploadLimit")
+            .then(resp => {
+                useTransferInfo.setUploadLimit(resp.data)
+            })
+            .catch(error => {
+                ElMessage.error(' 请求异常.' + error)
+            })
+    }
+    const setUploadLimit = (limit: number) => {
+        service.get("/api/v2/transfer/setUploadLimit?limit=" + limit)
+            .then(resp => {
+                useTransferInfo.setUploadLimit(limit)
+            })
+            .catch(error => {
+                ElMessage.error(' 请求异常.' + error)
+            })
+    }
+    return {info, setUploadLimit}
 }
 
 

@@ -1,53 +1,79 @@
-import {computed, ref, reactive} from 'vue'
-import {defineStore} from 'pinia'
+import { computed, reactive, ref } from 'vue'
+import { defineStore } from 'pinia'
+import { GlobalSpeedLimit, Info } from '@/util'
+
 
 /**
  * 全局速度相关
  */
 const useTransferInfoStore = defineStore('info', () => {
-        //state
-        const info = reactive({
-            connection_status: 'connected',
-            dht_nodes: 0,
-            dl_info_data: 0,
-            dl_info_speed: 0,
-            dl_rate_limit: 0,
-            up_info_data: 0,
-            up_info_speed: 0,
-            up_rate_limit: 0
-        })
-        //get方法
-        const infoState = computed(() => info)
-        //actions
-        const refresh = (infoV: any) => {
-            info.dl_info_data = infoV.dl_info_data
-            info.dht_nodes = infoV.dht_nodes
-            info.dl_info_data = infoV.dl_info_data
-            info.dl_info_speed = infoV.dl_info_speed
-            info.dl_rate_limit = infoV.dl_rate_limit
-            info.up_info_data = infoV.up_info_data
-            info.up_info_speed = infoV.up_info_speed
-            info.up_rate_limit = infoV.up_rate_limit
-        }
-        return {info, infoState, refresh}
-    }
+    //state
+
+    const store = ref({
+      intervalId: 0,
+      globalInfo: new Info(),
+      globalSpeedLimit: new GlobalSpeedLimit()
+    })
+
+    //get方法
+    const infoState = computed(() => store.value)
+   // const speedLimit = computed(() => store.globalSpeedLimit)
+
+    // const setIntervalId = (intervalId: number) => {
+    //     clearInterval(globalInfo.intervalId)
+    //     globalInfo.intervalId = intervalId
+    // }
+
+    //actions
+    // const refresh = (infoV: any) => {
+    //     const info = globalInfo.info
+    //     info.dht_nodes = infoV.dht_nodes
+    //     info.dl_info_data.setBytes(infoV.dl_info_data)
+    //     info.dl_info_speed.setBytes(infoV.dl_info_speed)
+    //     info.dl_rate_limit = infoV.dl_rate_limit
+    //     info.up_info_data.setBytes(infoV.up_info_data)
+    //     info.up_info_speed.setBytes(infoV.up_info_speed)
+    //     info.up_rate_limit = infoV.up_rate_limit
+    // }
+    // const setSpeedLimitsMode = (enable: number) => {
+    //     const globalSpeedLimit = globalInfo.globalSpeedLimit
+    //     globalSpeedLimit.speedLimitsMode = enable
+    // }
+    // const setDownloadLimit = (downloadLimit: number) => {
+    //     const globalSpeedLimit = globalInfo.globalSpeedLimit
+    //     globalSpeedLimit.downloadLimit.setBytes(downloadLimit)
+    // }
+    //
+    // const setUploadLimit = (uploadLimit: number) => {
+    //     const globalSpeedLimit = globalInfo.globalSpeedLimit
+    //     globalSpeedLimit.uploadLimit.setBytes(uploadLimit)
+    // }
+    return { infoState  }
+  }
 )
 
 /**
  * 登录鉴权的cookie
  */
 const useAuthStore = defineStore('info', () => {
-        //state
-        const cookie = ref("")
-        //get方法
-        const cookieState = computed(() => cookie.value)
-        //actions
-        const setCookie = (cookieV: string) => {
-            cookie.value = cookieV
-        }
-        return {cookie, cookieState, setCookie}
+    //state
+    const cookie = ref('')
+    const login = ref(false)
+    //get方法
+    const cookieState = computed(() => cookie.value)
+    const loginShow = computed(() => login.value)
+
+    //actions
+    const setCookie = (cookieV: string) => {
+      cookie.value = cookieV
     }
+    const setLoginShow = (show: boolean) => {
+      login.value = show
+    }
+
+    return { loginShow, cookieState, setCookie, setLoginShow }
+  }
 )
 
 
-export {useTransferInfoStore, useAuthStore}
+export { useTransferInfoStore, useAuthStore }

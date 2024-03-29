@@ -24,9 +24,11 @@
       </p>
     </li>
   </ul>
+  <TorrentDetail/>
 </template>
 <script setup lang="ts">
 import {Bottom, Close, Magnet, Timer, Top, VideoPause, VideoPlay} from "@element-plus/icons-vue";
+import TorrentDetail from "@/views/TorrentDetail.vue";
 
 const tableData = [
   {
@@ -49,8 +51,8 @@ ul {
 
   li {
     margin: 5px 0;
-    border: 1px solid red;
-    border-radius: 5px;
+    border: 1px solid #909399;
+    border-radius: 10px;
     padding: 10px;
 
     p {
