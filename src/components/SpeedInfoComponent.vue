@@ -4,15 +4,13 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Download Speed</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_speed.getSize() }}
-            {{ transferInfoStore.globalInfo.dl_info_speed.getSizeUnit() }}</p>
+          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_speed.getSpeedStr() }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Upload Speed</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.up_info_speed.getSize() }}
-            {{ transferInfoStore.globalInfo.up_info_speed.getSizeUnit() }}</p>
+          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.up_info_speed.getSpeedStr() }}</p>
         </div>
       </el-col>
     </el-row>
@@ -21,15 +19,13 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Download Data</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_data.getSize() }}
-            {{ transferInfoStore.globalInfo.dl_info_data.getSizeUnit() }}</p>
+          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_data.getSizeStr() }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Upload Data</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_data.getSize() }}
-            {{ transferInfoStore.globalInfo.up_info_data.getSizeUnit() }}</p>
+          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_data.getSizeStr() }}</p>
         </div>
       </el-col>
     </el-row>

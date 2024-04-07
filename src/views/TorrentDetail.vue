@@ -1,27 +1,43 @@
 <template>
-  <el-drawer
-      v-model="show"
-      :title="torrentInfo?.name"
-      direction="rtl"
-      size="50%"
-  >
-    {{ torrentInfo?.hash}}
+  <el-drawer v-model="show" :with-header="false" direction="rtl" size="50%">
+    <el-text size="large" truncated>
+      {{ torrentInfo?.name }}
+    </el-text>
+
+    <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tab-pane label="Props" name="first">
+        <TorrentPropsComponent v-model="torrentInfo"></TorrentPropsComponent>
+      </el-tab-pane>
+      <el-tab-pane label="Setting" name="second">
+        Config
+      </el-tab-pane>
+      <el-tab-pane label="Files" name="third">Role</el-tab-pane>
+      <el-tab-pane label="Other" name="fourth">Task</el-tab-pane>
+    </el-tabs>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import {ref, reactive, inject} from 'vue'
-import type {TorrentInfo} from "@/util/class";
+import { TorrentInfo } from '@/util'
+import { ref } from 'vue'
+import type { TabsPaneContext } from 'element-plus'
+import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue'
 
-const show = inject<boolean>("torrentInfoShow")
-const torrentInfo = inject<TorrentInfo>("torrentInfo")
+const show = defineModel<boolean>('show')
+const torrentInfo = defineModel<TorrentInfo>('torrentInfo')
 
+const activeName = ref('first')
 
-
-
-
-
-
+const handleClick = (tab: TabsPaneContext, event: Event) => {
+  console.log(tab, event)
+}
 
 
 </script>
+<style scoped>
+.el_drawer__body {
+  padding-top: 0;
+
+}
+
+</style>

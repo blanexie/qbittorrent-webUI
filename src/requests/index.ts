@@ -159,5 +159,5 @@ const TransferInfo = (useTransferInfo: any) => {
 }
 
 
-export {Authentication, Application, TransferInfo}
+export {service as axios, Authentication, Application, TransferInfo}
 

@@ -36,6 +36,18 @@ class ByteData {
     this._bytes = bytes
   }
 
+  public getBytes(): number {
+    return this._bytes
+  }
+
+  public getSpeedStr(): string {
+    return this.getSize() + this.getSpeedUnit()
+  }
+
+  public getSizeStr(): string {
+    return this.getSize() + this.getSizeUnit()
+  }
+
   public getSpeedUnit(): string {
     if (this._bytes < this.KB) {
       return 'B/s'
@@ -90,8 +102,12 @@ class ByteData {
 class TorrentInfo {
   hash = '8c212779b4abde7c6bc608063a0d008b7e40ce32'
   name = 'debian-8.1.0-amd64-CD-1.iso'
-  size = 657457152
-  dlspeed = 9681262
+  size: ByteData = new ByteData(657457152)
+  progress = 0.16108787059783936
+  dlspeed = new ByteData(9681262)
+  downloaded = new ByteData(9681262)
+  upspeed = new ByteData(4507841)
+  seeding_time: number = 3 * 60 * 60 + 69
   eta = 87
   f_l_piece_prio = false
   force_start = false
@@ -102,13 +118,29 @@ class TorrentInfo {
   num_leechs = 2
   num_seeds = 54
   priority = 1
-  progress = 0.16108787059783936
   ratio = 0
   seq_dl = false
   state = 'downloading'
   super_seeding = false
-  upspeed = 0
+
   properties = new TorrentProperties()
+
+
+  public getProgress(): number {
+    return Math.floor(this.progress * 100)
+  }
+
+  public getSeedNeedTime() {
+    if (this.seeding_time > 3600) {
+      const h = Math.floor(this.seeding_time / 3600)
+      const m = Math.floor((this.seeding_time - (3600 * h)) / 60)
+      return h + 'h ' + m + 'm '
+    } else {
+      const m = Math.floor(this.seeding_time / 60)
+      const s = this.seeding_time - (m * 60)
+      return +s + 's'
+    }
+  }
 
 }
 
@@ -149,4 +181,42 @@ class TorrentProperties {
   up_speed_avg = 410
 }
 
-export { Info, GlobalSpeedLimit, ByteData, TorrentInfo, TorrentProperties }
+
+class TorrentListReq {
+  filter: string = 'all'
+  category: string | undefined = undefined
+  tag: string | undefined = undefined
+  sort: string | undefined = undefined
+  reverse: boolean = false
+  limit: number = 10
+  offset: number = 0
+  hashes: string | undefined = undefined
+
+  public getReqStr(): string {
+    let path = this.filter
+    if (this.category) {
+      path = `${path}&category=${this.category}`
+    }
+    if (this.tag) {
+      path = `${path}&tag=${this.tag}`
+    }
+    if (this.sort) {
+      path = `${path}&sort=${this.sort}`
+    }
+    if (this.reverse) {
+      path = `${path}&reverse=${this.reverse}`
+    }
+    if (this.limit) {
+      path = `${path}&limit =${this.limit}`
+    }
+    if (this.offset) {
+      path = `${path}&limit =${this.offset}`
+    }
+    if (this.hashes) {
+      path = `${path}&limit =${this.hashes}`
+    }
+    return path
+  }
+}
+
+export { TorrentListReq, Info, GlobalSpeedLimit, ByteData, TorrentInfo, TorrentProperties }
