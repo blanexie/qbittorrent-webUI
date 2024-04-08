@@ -4,13 +4,13 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Download Speed</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_speed.getSpeedStr() }}</p>
+          <p class="speed-limit-content">{{ storeDefinition.globalInfo.dl_info_speed.getSpeedStr() }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Upload Speed</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.up_info_speed.getSpeedStr() }}</p>
+          <p class="speed-limit-content">{{ storeDefinition.globalInfo.up_info_speed.getSpeedStr() }}</p>
         </div>
       </el-col>
     </el-row>
@@ -19,13 +19,13 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Download Data</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_data.getSizeStr() }}</p>
+          <p class="speed-limit-content">{{ storeDefinition.globalInfo.dl_info_data.getSizeStr() }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Upload Data</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dl_info_data.getSizeStr() }}</p>
+          <p class="speed-limit-content">{{ storeDefinition.globalInfo.up_info_data.getSizeStr() }}</p>
         </div>
       </el-col>
     </el-row>
@@ -34,15 +34,15 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">DHT Nodes</p>
-          <p class="speed-limit-content">{{ transferInfoStore.globalInfo.dht_nodes }}</p>
+          <p class="speed-limit-content">{{ storeDefinition.globalInfo.dht_nodes }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">Speed Limit</p>
-          <el-switch v-model="transferInfoStore.globalInfo.dht_nodes" />&nbsp;
+          <el-switch v-model="storeDefinition.globalInfo.dht_nodes"/>&nbsp;
           <el-icon>
-            <Setting />
+            <Setting/>
           </el-icon>
         </div>
       </el-col>
@@ -73,28 +73,9 @@
 
 </style>
 <script lang="ts" setup>
+import StoreDefinition from '@/stores'
+import {Setting} from '@element-plus/icons-vue'
 
-
-import { TransferInfo } from '@/requests'
-import { useTransferInfoStore } from '@/stores/pinia'
-import { Setting } from '@element-plus/icons-vue'
-
-const transferInfoStore = useTransferInfoStore()
-const transferInfoRequest = TransferInfo(transferInfoStore)
-
-
-transferInfoStore.interval(() => {
-  transferInfoStore.refresh({
-    connection_status: 'connected',
-    dht_nodes: Math.ceil(Math.random() * 100),
-    dl_info_data: 1000001,
-    dl_info_speed: Math.ceil(Math.random() * 10000000),
-    dl_rate_limit: Math.ceil(Math.random() * 10),
-    up_info_data: Math.ceil(Math.random() * 10000000),
-    up_info_speed: Math.ceil(Math.random() * 10000000),
-    up_rate_limit: Math.ceil(Math.random() * 10)
-  })
-}, 2000)
-
+const storeDefinition = StoreDefinition()
 
 </script>

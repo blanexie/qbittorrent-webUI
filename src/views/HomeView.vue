@@ -22,6 +22,24 @@ import AsideComponent from "@/components/AsideComponent.vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import TorrentList from "@/views/TorrentList.vue";
 
+import {axios} from '@/requests'
+import StoreDefinition from '@/stores'
+
+const storeDefinition = StoreDefinition()
+
+let rid = 0
+
+storeDefinition.interval(() => {
+  axios.get('/api/v2/sync/maindata?rid=' + rid).then(resp => {
+    storeDefinition.refresh(resp.data.server_state)
+    storeDefinition.refreshTorrentInfos(resp.data.torrents)
+    rid++
+  }).catch(err => {
+    console.log(err)
+  })
+
+}, 3000)
+
 </script>
 
 <style scoped>

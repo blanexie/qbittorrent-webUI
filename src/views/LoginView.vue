@@ -37,10 +37,10 @@
 import {reactive} from "vue";
 import {ElMessage} from "element-plus";
 import {Authentication} from "@/requests";
-import {useAuthStore} from "@/stores/pinia";
 
-const authStore = useAuthStore()
-const auth = Authentication(authStore)
+const loginShow = defineModel()
+
+const auth = Authentication()
 
 
 const fromValue = reactive({
@@ -64,13 +64,17 @@ const loginReq = () => {
   //2. 请求服务端
   auth.login(fromValue.name, fromValue.password)
       .then(resp => {
-        authStore.setCookie(resp.data)
-        authStore.setLoginShow(false)
+        console.log(resp)
+        if (resp.data == "Fails.") {
+          ElMessage.error("用户名或者密码错误")
+        } else {
+          localStorage.setItem("cookie", resp.data)
+          loginShow.value = true
+        }
       })
       .catch(error => {
         ElMessage.error("登录失败，" + error)
       })
-
 }
 
 
