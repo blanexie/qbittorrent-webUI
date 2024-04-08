@@ -1,4 +1,87 @@
-class Info {
+class ByteData {
+  /**
+   *
+   * @param bytes  字节数
+   */
+  constructor(bytes: number) {
+    this.bytes = bytes
+  }
+
+  bytes: number
+
+  private readonly KB = 1024
+  private readonly MB = 1024 * 1024
+  private readonly GB = 1024 * 1024 * 1024
+  private readonly TB = 1024 * 1024 * 1024 * 1024
+
+  public setBytes(bytes: number) {
+    this.bytes = bytes
+  }
+
+  public getBytes(): number {
+    return this.bytes
+  }
+
+  public getSpeedStr(): string {
+    return this.getSize() + this.getSpeedUnit()
+  }
+
+  public getSizeStr(): string {
+    return this.getSize() + this.getSizeUnit()
+  }
+
+  public getSpeedUnit(): string {
+    if (this.bytes < this.KB) {
+      return 'B/s'
+    }
+    if (this.bytes < this.MB) {
+      return 'KB/s'
+    }
+    if (this.bytes < this.GB) {
+      return 'MB/s'
+    }
+    if (this.bytes < this.TB) {
+      return 'GB/s'
+    }
+    return 'TB/s'
+  }
+
+  public getSizeUnit(): string {
+    if (this.bytes < this.KB) {
+      return 'B'
+    }
+    if (this.bytes < this.MB) {
+      return 'KB'
+    }
+    if (this.bytes < this.GB) {
+      return 'MB'
+    }
+    if (this.bytes < this.TB) {
+      return 'GB'
+    }
+    return 'TB'
+  }
+
+  public getSize(): number {
+    if (this.bytes < this.KB) {
+      return this.bytes
+    }
+    if (this.bytes < this.MB) {
+      return Math.round((this.bytes / this.KB) * 10) / 10
+    }
+    if (this.bytes < this.GB) {
+      return Math.round((this.bytes / this.MB) * 10) / 10
+    }
+    if (this.bytes < this.TB) {
+      return Math.round((this.bytes / this.GB) * 100) / 100
+    }
+    return Math.round((this.bytes / this.TB) * 100) / 100
+  }
+
+}
+
+
+class GlobalInfo {
   public connection_status = 'connected'
   public dht_nodes = 0
   public dl_info_data = new ByteData(421)
@@ -13,89 +96,6 @@ class GlobalSpeedLimit {
   speedLimitsMode = 0  //全局速度限制是否启用
   downloadLimit = new ByteData(0)   //全局下载速度限制， 0表示没限制
   uploadLimit = new ByteData(0)   //全局上传速度限制 ， 0 没有限制
-}
-
-
-class ByteData {
-  /**
-   *
-   * @param bytes  字节数
-   */
-  constructor(bytes: number) {
-    this._bytes = bytes
-  }
-
-  private _bytes: number
-
-  private readonly KB = 1024
-  private readonly MB = 1024 * 1024
-  private readonly GB = 1024 * 1024 * 1024
-  private readonly TB = 1024 * 1024 * 1024 * 1024
-
-  public setBytes(bytes: number) {
-    this._bytes = bytes
-  }
-
-  public getBytes(): number {
-    return this._bytes
-  }
-
-  public getSpeedStr(): string {
-    return this.getSize() + this.getSpeedUnit()
-  }
-
-  public getSizeStr(): string {
-    return this.getSize() + this.getSizeUnit()
-  }
-
-  public getSpeedUnit(): string {
-    if (this._bytes < this.KB) {
-      return 'B/s'
-    }
-    if (this._bytes < this.MB) {
-      return 'KB/s'
-    }
-    if (this._bytes < this.GB) {
-      return 'MB/s'
-    }
-    if (this._bytes < this.TB) {
-      return 'GB/s'
-    }
-    return 'TB/s'
-  }
-
-  public getSizeUnit(): string {
-    if (this._bytes < this.KB) {
-      return 'B'
-    }
-    if (this._bytes < this.MB) {
-      return 'KB'
-    }
-    if (this._bytes < this.GB) {
-      return 'MB'
-    }
-    if (this._bytes < this.TB) {
-      return 'GB'
-    }
-    return 'TB'
-  }
-
-  public getSize(): number {
-    if (this._bytes < this.KB) {
-      return this._bytes
-    }
-    if (this._bytes < this.MB) {
-      return Math.round((this._bytes / this.KB) * 10) / 10
-    }
-    if (this._bytes < this.GB) {
-      return Math.round((this._bytes / this.MB) * 10) / 10
-    }
-    if (this._bytes < this.TB) {
-      return Math.round((this._bytes / this.GB) * 100) / 100
-    }
-    return Math.round((this._bytes / this.TB) * 100) / 100
-  }
-
 }
 
 
@@ -125,6 +125,9 @@ class TorrentInfo {
 
   properties = new TorrentProperties()
 
+  public setProperties(props: TorrentProperties) {
+    this.properties = props
+  }
 
   public getProgress(): number {
     return Math.floor(this.progress * 100)
@@ -160,7 +163,7 @@ class TorrentProperties {
   nb_connections_limit = 250
   peers = 1
   peers_total = 89
-  piece_size = 524288
+  piece_size =  524288
   pieces_have = 1254
   pieces_num = 1254
   reannounce = 672
@@ -219,4 +222,4 @@ class TorrentListReq {
   }
 }
 
-export { TorrentListReq, Info, GlobalSpeedLimit, ByteData, TorrentInfo, TorrentProperties }
+export { TorrentListReq, GlobalInfo, GlobalSpeedLimit, ByteData, TorrentInfo, TorrentProperties }

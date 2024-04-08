@@ -4,14 +4,15 @@
     <li><span>Size:</span><span>{{ torrentInfo?.size.getSizeStr() }}</span></li>
     <li><span>Downloaded:</span><span>{{ torrentInfo?.downloaded.getSizeStr() }}</span></li>
     <li><span>progress:</span><span>{{ torrentInfo?.getProgress() }}%</span></li>
+
     <li><span>DlSpeed:</span><span>{{ torrentInfo?.dlspeed.getSpeedStr() }}</span></li>
     <li><span>UpSpeed:</span><span>{{ torrentInfo?.upspeed.getSpeedStr() }}</span></li>
+
     <li><span>Category:</span><span>{{ torrentInfo?.category }}</span></li>
     <li><span>Tags:</span><span>{{ torrentInfo?.tags }}</span></li>
-    <li><span>complete:</span><span>{{ torrentInfo?.num_complete }}</span></li>
-    <li><span>incomplete:</span><span>{{ torrentInfo?.num_incomplete }}</span></li>
     <li><span>seeds:</span><span>{{ torrentInfo?.num_seeds }}</span></li>
     <li><span>leechs:</span><span>{{ torrentInfo?.num_leechs }}</span></li>
+
     <li><span>seq_dl:</span><span>{{ torrentInfo?.seq_dl }}</span></li>
 
     <li><span>ratio:</span><span>{{ torrentInfo?.ratio }}</span></li>

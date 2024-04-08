@@ -1,6 +1,6 @@
 import { computed, reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { GlobalSpeedLimit, Info } from '@/util'
+import { GlobalSpeedLimit, GlobalInfo } from '@/util'
 
 
 /**
@@ -12,7 +12,7 @@ const useTransferInfoStore =
 
       const store = reactive({
         intervalId: 0,
-        globalInfo: new Info(),
+        globalInfo: new GlobalInfo(),
         globalSpeedLimit: new GlobalSpeedLimit()
       })
 
