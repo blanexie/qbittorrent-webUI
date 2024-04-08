@@ -10,7 +10,7 @@
         <el-input v-model="fromValue.name" placeholder="admin"/>
       </el-form-item>
       <el-form-item label="Password">
-        <el-input v-model="fromValue.password" placeholder="adminadmin"/>
+        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin"/>
       </el-form-item>
       <el-form-item label=" ">
         <el-button @click="loginReq">登录</el-button>
