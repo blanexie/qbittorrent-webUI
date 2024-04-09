@@ -37,8 +37,9 @@ storeDefinition.interval(() => {
     storeDefinition.refreshTorrentInfos(data.torrents, data.full_update ? data.full_update : false)
     rid++
   }).catch(err => {
+    console.log(err)
     document.cookie = ''
-    loginShow.value = true
+    // loginShow.value = true
     storeDefinition.stopInterval()
   })
 }, 3000)

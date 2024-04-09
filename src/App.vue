@@ -14,7 +14,9 @@ function getCookie(name: string): string | null {
   return cookieValue ? cookieValue[2] : null
 }
 
-if (getCookie('SID')) {
+const sid = getCookie('SID')
+console.log("sid", sid)
+if (sid) {
   loginShow.value = false
 }
 
