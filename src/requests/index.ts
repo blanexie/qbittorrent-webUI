@@ -14,7 +14,7 @@ service.interceptors.request.use(
     config => {
         // const token = store.state.token;
         // token && (config.headers.Authorization = token);
-        config.headers.Cookie = localStorage.getItem("cookie")
+        //config.headers.cookie = localStorage.getItem("cookie")
         return config
     },
     error => {

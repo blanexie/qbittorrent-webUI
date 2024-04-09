@@ -1,16 +1,16 @@
 <template>
   <div class="body-div">
     <el-form
-        label-width="auto"
-        :model="fromValue"
-        style="max-width: 600px"
-        class="from-card"
+      label-width="auto"
+      :model="fromValue"
+      style="max-width: 600px"
+      class="from-card"
     >
       <el-form-item label="Name">
-        <el-input v-model="fromValue.name" placeholder="admin"/>
+        <el-input v-model="fromValue.name" placeholder="admin" />
       </el-form-item>
       <el-form-item label="Password">
-        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin"/>
+        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin" />
       </el-form-item>
       <el-form-item label=" ">
         <el-button @click="loginReq">登录</el-button>
@@ -18,6 +18,51 @@
     </el-form>
   </div>
 </template>
+
+<script setup lang="ts">
+import { reactive } from 'vue'
+import { ElMessage } from 'element-plus'
+import { Authentication } from '@/requests'
+
+const loginShow = defineModel()
+
+const auth = Authentication()
+
+
+const fromValue = reactive({
+  name: '',
+  password: ''
+})
+
+/**
+ * 登录请求
+ */
+const loginReq = () => {
+  //1. 检查参数填写是否正常
+  if (fromValue.name.length >= 20 || fromValue.name.length <= 0) {
+    ElMessage.error('用户名长度限定在20以内')
+    return
+  }
+  if (fromValue.password.length >= 20 || fromValue.password.length <= 6) {
+    ElMessage.error('密码长度必须在6到20之间')
+    return
+  }
+  //2. 请求服务端
+  auth.login(fromValue.name, fromValue.password)
+    .then(resp => {
+      console.log(resp)
+      if (resp.data == 'Fails.') {
+        ElMessage.error('用户名或者密码错误')
+      } else {
+        loginShow.value = false
+      }
+    })
+    .catch(error => {
+      ElMessage.error('登录失败，' + error)
+    })
+}
+</script>
+
 <style scoped>
 .body-div {
   width: 100vw;
@@ -33,49 +78,3 @@
 }
 
 </style>
-<script setup lang="ts">
-import {reactive} from "vue";
-import {ElMessage} from "element-plus";
-import {Authentication} from "@/requests";
-
-const loginShow = defineModel()
-
-const auth = Authentication()
-
-
-const fromValue = reactive({
-  name: "",
-  password: ""
-})
-
-/**
- * 登录请求
- */
-const loginReq = () => {
-  //1. 检查参数填写是否正常
-  if (fromValue.name.length >= 20 || fromValue.name.length <= 0) {
-    ElMessage.error("用户名长度限定在20以内")
-    return
-  }
-  if (fromValue.password.length >= 20 || fromValue.password.length <= 6) {
-    ElMessage.error("密码长度必须在6到20之间")
-    return
-  }
-  //2. 请求服务端
-  auth.login(fromValue.name, fromValue.password)
-      .then(resp => {
-        console.log(resp)
-        if (resp.data == "Fails.") {
-          ElMessage.error("用户名或者密码错误")
-        } else {
-          localStorage.setItem("cookie", resp.data)
-          loginShow.value = true
-        }
-      })
-      .catch(error => {
-        ElMessage.error("登录失败，" + error)
-      })
-}
-
-
-</script>
