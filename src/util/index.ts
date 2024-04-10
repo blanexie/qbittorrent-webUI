@@ -94,9 +94,9 @@ class GlobalInfo {
 }
 
 class GlobalSpeedLimit {
-    speedLimitsMode = 0  //全局速度限制是否启用
-    downloadLimit = new ByteData(0)   //全局下载速度限制， 0表示没限制
-    uploadLimit = new ByteData(0)   //全局上传速度限制 ， 0 没有限制
+    public speedLimitsMode = 0  //全局速度限制是否启用
+    public downloadLimit = new ByteData(0)   //全局下载速度限制， 0表示没限制
+    public uploadLimit = new ByteData(0)   //全局上传速度限制 ， 0 没有限制
 }
 
 
@@ -127,6 +127,9 @@ class TorrentInfo {
 
     public properties = new TorrentProperties()
 
+    public constructor(hash: string) {
+        this.hash = hash
+    }
 
     public setProperties(props: TorrentProperties) {
         this.properties = props
@@ -160,36 +163,36 @@ class TorrentProperties {
     public addition_date = 1438429165
     public comment = 'Debian CD from cdimage.debian.org'
     public completion_date = 1438429234
-    created_by = ''
-    creation_date = 1433605214
-    dl_limit = -1
-    dl_speed = 0
-    dl_speed_avg = 9736015
-    eta = 8640000
-    last_seen = 1438430354
-    nb_connections = 3
-    nb_connections_limit = 250
-    peers = 1
-    peers_total = 89
-    piece_size = 524288
-    pieces_have = 1254
-    pieces_num = 1254
-    reannounce = 672
-    save_path = '/Downloads/debian-8.1.0-amd64-CD-1.iso'
-    seeding_time = 1128
-    seeds = 1
-    seeds_total = 254
-    share_ratio = 0.00072121022562178299
-    time_elapsed = 1197
-    total_downloaded = 681521119
-    total_downloaded_session = 681521119
-    total_size = 657457152
-    total_uploaded = 491520
-    total_uploaded_session = 491520
-    total_wasted = 23481724
-    up_limit = -1
-    up_speed = 0
-    up_speed_avg = 410
+    public created_by = ''
+    public creation_date = 1433605214
+    public dl_limit = -1
+    public dl_speed = 0
+    public dl_speed_avg = 9736015
+    public eta = 8640000
+    public last_seen = 1438430354
+    public nb_connections = 3
+    public nb_connections_limit = 250
+    public peers = 1
+    public peers_total = 89
+    public piece_size = 524288
+    public pieces_have = 1254
+    public pieces_num = 1254
+    public reannounce = 672
+    public save_path = '/Downloads/debian-8.1.0-amd64-CD-1.iso'
+    public seeding_time = 1128
+    public seeds = 1
+    public seeds_total = 254
+    public share_ratio = 0.00072121022562178299
+    public time_elapsed = 1197
+    public total_downloaded = 681521119
+    public total_downloaded_session = 681521119
+    public total_size = 657457152
+    public total_uploaded = 491520
+    public total_uploaded_session = 491520
+    public total_wasted = 23481724
+    public up_limit = -1
+    public up_speed = 0
+    public up_speed_avg = 410
 }
 
 
@@ -253,4 +256,4 @@ function mergeObj(base: any, src: any) {
 }
 
 
-export {mergeObj, TorrentListReq, GlobalInfo, GlobalSpeedLimit, ByteData, TorrentInfo, TorrentProperties}
+export { ByteData, GlobalInfo, GlobalSpeedLimit, TorrentInfo, TorrentListReq, TorrentProperties, mergeObj }

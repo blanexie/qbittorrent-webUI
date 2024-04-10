@@ -1,5 +1,6 @@
 <template>
   <div class="side">
+    <div class="header"><FlyIcon></FlyIcon> Qbittorrent </div>
     <el-menu>
       <el-menu-item index="2">
         <template #title>
@@ -41,6 +42,8 @@
 <script setup lang="ts">
 import { Download, Finished, VideoPause, Warning } from '@element-plus/icons-vue'
 import SpeedInfoComponent from '@/components/SpeedInfoComponent.vue'
+import FlyIcon from '@/components/icons/FlyIcon.vue'
+
 </script>
 <style scoped>
 .side {
@@ -49,6 +52,10 @@ import SpeedInfoComponent from '@/components/SpeedInfoComponent.vue'
 
   .el-menu {
     border-right-color: white;
+  }
+
+  .header {
+    height: 50px;
   }
 }
 </style>
