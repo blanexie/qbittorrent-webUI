@@ -125,6 +125,8 @@ class TorrentInfo {
     public state = 'downloading'
     public super_seeding = false
 
+    public isActive: boolean = false
+
     public properties = new TorrentProperties()
 
 
@@ -253,4 +255,4 @@ function mergeObj(base: any, src: any) {
 }
 
 
-export {mergeObj, TorrentListReq, GlobalInfo, GlobalSpeedLimit, ByteData, TorrentInfo, TorrentProperties}
+export { mergeObj, TorrentListReq, GlobalInfo, GlobalSpeedLimit, ByteData, TorrentInfo, TorrentProperties }

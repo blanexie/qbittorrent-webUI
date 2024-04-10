@@ -1,37 +1,45 @@
 <template>
   <ul>
-
-    <li v-for="t in storeDefinition.torrentInfos" v-bind:key="t.hash" @click="showDetail(t as TorrentInfo)">
+    <li v-for="t in storeDefinition.torrentInfos" v-bind:key="t.hash" @click="handleClick(t)"
+      :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
-        <span class="li-left">{{ t.name }} </span>
-        <span class="li-right">
-          <el-icon><Close /></el-icon>
-          <el-icon><VideoPlay /></el-icon>
-          <el-icon><VideoPause /></el-icon>
+        <span class="li-left">
+          {{ t.name }}
+        </span>
+        <span class="li-right" @click="showDetail(t as TorrentInfo)">
+          <el-icon>
+            <Close />
+          </el-icon>
+          <el-icon>
+            <VideoPlay />
+          </el-icon>
+          <el-icon>
+            <VideoPause />
+          </el-icon>
         </span>
       </div>
 
       <div class="p2">
-        <el-progress :percentage="t.getProgress()" :text-inside="true" :stroke-width="20"
-                     :status="t.progress==1 ? 'success':''">
-          <span>{{ t.downloaded.getSizeStr() }}/{{ t.total_size.getSizeStr() }}</span>
+        <el-progress :percentage="t.getProgress()" :text-inside="true" :status="t.progress == 1 ? 'success' : ''">
+          <span> </span>
         </el-progress>
       </div>
 
       <div class="p3">
-        <span class="li-left">{{ t.downloaded.getSizeStr() }} / {{ t.total_size.getSizeStr() }} </span>
+        <span class="li-left">{{ t.getProgress() + '% (' + t.downloaded.getSizeStr() + '/' + t.total_size.getSizeStr()
+      + ')' }}
+        </span>
         <span class="li-right">
-          <el-icon><Bottom /></el-icon>{{ t.dlspeed.getSpeedStr() }}
-          <el-icon><Top /></el-icon>{{ t.upspeed.getSpeedStr() }}
-           剩余时间：{{ t.getEtaStr() }}
-           做种者：{{ t.num_seeds }}
-           吸血者：{{ t.num_leechs }}
+          <span class='icon'>↓</span> {{ t.dlspeed.getSpeedStr() }}&nbsp;&nbsp;
+          <span class='icon'> ↑</span> {{ t.upspeed.getSpeedStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
+          剩余时间：{{ t.getProgress() == 100 ? 0 : t.getEtaStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
+          做种：{{ t.num_seeds }}&nbsp;&nbsp;&nbsp;&nbsp;
+          吸血：{{ t.num_leechs }}
         </span>
       </div>
 
     </li>
-
   </ul>
 
   <div> more </div>
@@ -40,12 +48,11 @@
 
 </template>
 <script setup lang="ts">
-import { Bottom, Close, Top, VideoPause, VideoPlay } from '@element-plus/icons-vue'
-import TorrentDetail from '@/views/TorrentDetail.vue'
-import { TorrentInfo } from '@/util'
-import { ref } from 'vue'
 import StoreDefinition from '@/stores'
-
+import { TorrentInfo } from '@/util'
+import TorrentDetail from '@/views/TorrentDetail.vue'
+import { Close, VideoPause, VideoPlay } from '@element-plus/icons-vue'
+import { ref } from 'vue'
 
 const storeDefinition = StoreDefinition()
 const detail = ref<TorrentInfo>()
@@ -56,17 +63,28 @@ const showDetail = (t: TorrentInfo) => {
   show.value = true
 }
 
+const handleClick = (item: any) => {
+  storeDefinition.torrentInfos.forEach(it => {
+    it.isActive = false
+  })
+
+  item.isActive = true;
+}
+
 </script>
 <style scoped>
+.border-color {
+  background-color: #ecf5ff;
+  border: 1px solid #5d5de8 !important;
+}
 
 ul {
   list-style-type: none;
   padding-inline-start: 0;
   min-width: 500px;
 
-
   li {
-    margin: 5px 0;
+    margin-bottom: 20px;
     border: 1px solid #909399;
     border-radius: 10px;
     padding: 10px;
@@ -74,7 +92,8 @@ ul {
     div {
       height: auto;
       width: 100%;
-      overflow: auto; /* 清除浮动 */
+      overflow: auto;
+      /* 清除浮动 */
 
       .el-icon {
         vertical-align: middle;
@@ -84,20 +103,23 @@ ul {
     }
 
     .p1 {
-      padding-right: 25px;
-
       .el-icon {
         margin: 0 5px;
       }
     }
 
     .p2 {
-      height: 20px;
-      margin-top: 7px;
+      padding-top: 10px;
     }
 
     .p3 {
-      padding-right: 25px;
+      margin-top: 5px;
+      padding-right: 5px;
+      font-size: 12px;
+
+      .icon {
+        font-size: 14px;
+      }
     }
 
     .li-left {
@@ -109,7 +131,10 @@ ul {
     }
 
   }
+
+  li:hover {
+    border: 1px solid #5d5de8;
+  }
+
 }
-
-
 </style>
