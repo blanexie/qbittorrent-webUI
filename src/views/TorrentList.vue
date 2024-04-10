@@ -1,40 +1,49 @@
 <template>
   <ul>
+
     <li v-for="t in storeDefinition.torrentInfos" v-bind:key="t.hash" @click="showDetail(t as TorrentInfo)">
+
       <div class="p1">
-        <span class="li-left">{{ t.name }}  <el-tag> {{ t.state }}</el-tag></span>
+        <span class="li-left">{{ t.name }} </span>
         <span class="li-right">
-          <el-icon><Close/></el-icon>
-          <el-icon><VideoPlay/></el-icon>
-          <el-icon><VideoPause/></el-icon>
+          <el-icon><Close /></el-icon>
+          <el-icon><VideoPlay /></el-icon>
+          <el-icon><VideoPause /></el-icon>
         </span>
       </div>
+
       <div class="p2">
-        <el-progress :percentage=" t.getProgress() "></el-progress>
+        <el-progress :percentage="t.getProgress()" :text-inside="true" :stroke-width="20"
+                     :status="t.progress==1 ? 'success':''">
+          <span>{{ t.downloaded.getSizeStr() }}/{{ t.total_size.getSizeStr() }}</span>
+        </el-progress>
       </div>
+
       <div class="p3">
-        <span class="li-left">{{ t.downloaded.getSizeStr() }}/{{ t.total_size.getSizeStr() }} </span>
+        <span class="li-left">{{ t.downloaded.getSizeStr() }} / {{ t.total_size.getSizeStr() }} </span>
         <span class="li-right">
-          <el-icon><Bottom/></el-icon>{{ t.dlspeed.getSpeedStr() }}
-          <el-icon><Top/></el-icon>{{ t.upspeed.getSpeedStr() }}
-          <el-icon><Timer/></el-icon> {{ t.getSeedNeedTime() }}
-          <el-icon><Magnet/></el-icon>{{ t.num_seeds }}
-          <el-icon><Link/></el-icon>{{ t.num_leechs }}
+          <el-icon><Bottom /></el-icon>{{ t.dlspeed.getSpeedStr() }}
+          <el-icon><Top /></el-icon>{{ t.upspeed.getSpeedStr() }}
+           剩余时间：{{ t.getEtaStr() }}
+           做种者：{{ t.num_seeds }}
+           吸血者：{{ t.num_leechs }}
         </span>
       </div>
+
     </li>
+
   </ul>
 
-  <div> more</div>
+  <div> more </div>
 
-  <TorrentDetail v-model:show="show" v-model:torrent-info="detail"/>
+  <TorrentDetail v-model:show="show" v-model:torrent-info="detail" />
 
 </template>
 <script setup lang="ts">
-import {Bottom, Close, Magnet, Timer, Top, VideoPause, VideoPlay} from '@element-plus/icons-vue'
+import { Bottom, Close, Top, VideoPause, VideoPlay } from '@element-plus/icons-vue'
 import TorrentDetail from '@/views/TorrentDetail.vue'
-import {TorrentInfo} from '@/util'
-import {ref} from 'vue'
+import { TorrentInfo } from '@/util'
+import { ref } from 'vue'
 import StoreDefinition from '@/stores'
 
 

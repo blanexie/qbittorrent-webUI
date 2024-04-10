@@ -1,6 +1,6 @@
 <template>
   <LoginView v-if="loginShow" v-model="loginShow"></LoginView>
-  <HomeView v-if="!loginShow" v-model="loginShow"></HomeView>
+  <HomeView v-if="!loginShow"></HomeView>
 </template>
 <script lang="ts" setup>
 import LoginView from '@/views/LoginView.vue'
@@ -15,7 +15,7 @@ function getCookie(name: string): string | null {
 }
 
 const sid = getCookie('SID')
-console.log("sid", sid)
+console.log('sid', sid)
 if (sid) {
   loginShow.value = false
 }

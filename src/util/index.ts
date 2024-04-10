@@ -136,7 +136,7 @@ class TorrentInfo {
         return Math.floor(this.progress * 100)
     }
 
-    public getSeedNeedTime() {
+    public getEtaStr() {
         const time = this.eta
         if (time > 24 * 3600) {
             const d = Math.floor(time / (3600 * 24))

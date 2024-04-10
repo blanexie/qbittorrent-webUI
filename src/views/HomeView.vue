@@ -1,6 +1,6 @@
 <template>
   <el-container class="layout-container-demo">
-    <el-aside width="230px">
+    <el-aside width="220px">
       <AsideComponent></AsideComponent>
     </el-aside>
     <el-container>
@@ -22,9 +22,7 @@ import HeaderComponent from '@/components/HeaderComponent.vue'
 import TorrentList from '@/views/TorrentList.vue'
 import StoreDefinition from '@/stores'
 import { axios } from '@/requests'
-
-
-const loginShow = defineModel()
+import { ElMessage } from 'element-plus'
 
 const storeDefinition = StoreDefinition()
 
@@ -33,13 +31,13 @@ let rid = 0
 storeDefinition.interval(() => {
   axios.get('/api/v2/sync/maindata?rid=' + rid).then(resp => {
     const data = resp.data
+    const fullUpdate = data.full_update ? data.full_update : false
     storeDefinition.refresh(data.server_state)
-    storeDefinition.refreshTorrentInfos(data.torrents, data.full_update ? data.full_update : false)
+    storeDefinition.refreshTorrentInfos(data.torrents, fullUpdate)
     rid++
   }).catch(err => {
-    console.log(err)
-    document.cookie = ''
-    // loginShow.value = true
+    ElMessage.error('/api/v2/sync/maindata error' + err)
+    rid = 0
     storeDefinition.stopInterval()
   })
 }, 3000)

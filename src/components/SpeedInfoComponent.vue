@@ -3,13 +3,13 @@
     <el-row>
       <el-col :span="12">
         <div class="speed-limit">
-          <p class="speed-limit-header">Download Speed</p>
+          <p class="speed-limit-header">下载速度</p>
           <p class="speed-limit-content">{{ storeDefinition.globalInfo.dl_info_speed.getSpeedStr() }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
-          <p class="speed-limit-header">Upload Speed</p>
+          <p class="speed-limit-header">上传速度</p>
           <p class="speed-limit-content">{{ storeDefinition.globalInfo.up_info_speed.getSpeedStr() }}</p>
         </div>
       </el-col>
@@ -18,13 +18,13 @@
     <el-row>
       <el-col :span="12">
         <div class="speed-limit">
-          <p class="speed-limit-header">Download Data</p>
+          <p class="speed-limit-header">下载量</p>
           <p class="speed-limit-content">{{ storeDefinition.globalInfo.dl_info_data.getSizeStr() }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
-          <p class="speed-limit-header">Upload Data</p>
+          <p class="speed-limit-header">上传量</p>
           <p class="speed-limit-content">{{ storeDefinition.globalInfo.up_info_data.getSizeStr() }}</p>
         </div>
       </el-col>
@@ -33,16 +33,16 @@
     <el-row>
       <el-col :span="12">
         <div class="speed-limit">
-          <p class="speed-limit-header">DHT Nodes</p>
+          <p class="speed-limit-header">DHT节点数</p>
           <p class="speed-limit-content">{{ storeDefinition.globalInfo.dht_nodes }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
-          <p class="speed-limit-header">Speed Limit</p>
-          <el-switch v-model="storeDefinition.globalInfo.dht_nodes"/>&nbsp;
+          <p class="speed-limit-header">限速</p>
+          <el-switch v-model="storeDefinition.globalInfo.dht_nodes" />&nbsp;
           <el-icon>
-            <Setting/>
+            <Setting />
           </el-icon>
         </div>
       </el-col>
@@ -57,7 +57,7 @@
 .speed-limit {
   margin: 3px;
   padding: 5px;
-  background-color: floralwhite;
+
   border: 1px #efefef solid;
   border-radius: 7px;
 }
@@ -74,7 +74,7 @@
 </style>
 <script lang="ts" setup>
 import StoreDefinition from '@/stores'
-import {Setting} from '@element-plus/icons-vue'
+import { Setting } from '@element-plus/icons-vue'
 
 const storeDefinition = StoreDefinition()
 

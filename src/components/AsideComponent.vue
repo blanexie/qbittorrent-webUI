@@ -1,69 +1,54 @@
 <template>
-  <el-menu >
-    <el-menu-item index="1">
-      <template #title>
-        <el-icon>
-          <Menu/>
-        </el-icon>
-        All
-      </template>
-    </el-menu-item>
-    <el-menu-item index="2">
-      <template #title>
-        <el-icon>
-          <Download/>
-        </el-icon>
-        Downloading
-      </template>
-    </el-menu-item>
-    <el-menu-item index="3">
-      <template #title>
-        <el-icon>
-          <Finished/>
-        </el-icon>
-        Complete
-      </template>
-    </el-menu-item>
-    <el-menu-item index="4">
-      <template #title>
-        <el-icon>
-          <VideoPause/>
-        </el-icon>
-        Stop
-      </template>
-    </el-menu-item>
-    <el-menu-item index="5">
-      <template #title>
-        <el-icon>
-          <Connection/>
-        </el-icon>
-        Active
-      </template>
-    </el-menu-item>
-    <el-menu-item index="6">
-      <template #title>
-        <el-icon>
-          <Warning/>
-        </el-icon>
-        Inactive
-      </template>
-    </el-menu-item>
-    <el-menu-item index="7">
-      <template #title>
-        <el-icon>
-          <CircleClose/>
-        </el-icon>
-        Error
-      </template>
-    </el-menu-item>
-  </el-menu>
-  <SpeedInfoComponent/>
+  <div class="side">
+    <el-menu>
+      <el-menu-item index="2">
+        <template #title>
+          <el-icon>
+            <Download />
+          </el-icon>
+          下载中
+        </template>
+      </el-menu-item>
+      <el-menu-item index="3">
+        <template #title>
+          <el-icon>
+            <Finished />
+          </el-icon>
+          已完成
+        </template>
+      </el-menu-item>
+      <el-menu-item index="4">
+        <template #title>
+          <el-icon>
+            <VideoPause />
+          </el-icon>
+          已暂停
+        </template>
+      </el-menu-item>
 
+      <el-menu-item index="7">
+        <template #title>
+          <el-icon>
+            <Warning />
+          </el-icon>
+          出错
+        </template>
+      </el-menu-item>
+    </el-menu>
+    <SpeedInfoComponent />
+  </div>
 </template>
 <script setup lang="ts">
-import {CircleClose, Connection, Download, Finished, VideoPause, Warning} from "@element-plus/icons-vue";
-import SpeedInfoComponent from "@/components/SpeedInfoComponent.vue";
+import { Download, Finished, VideoPause, Warning } from '@element-plus/icons-vue'
+import SpeedInfoComponent from '@/components/SpeedInfoComponent.vue'
 </script>
 <style scoped>
+.side {
+  border-right: 1px #efefef solid;
+  height: 95vh;
 
+  .el-menu {
+    border-right-color: white;
+  }
+}
 </style>
