@@ -3,20 +3,12 @@
   <HomeView v-if="!loginShow"></HomeView>
 </template>
 <script lang="ts" setup>
-import LoginView from '@/views/LoginView.vue'
-import HomeView from '@/views/HomeView.vue'
-import { ref } from 'vue'
+import HomeView from '@/views/HomeView.vue';
+import LoginView from '@/views/LoginView.vue';
+import { ref } from 'vue';
 
-const loginShow = ref(false)
-
-function getCookie(name: string): string | null {
-  const cookieValue = document.cookie.match(`(^|;) *${name}=(.*?)(;|$)`)
-  return cookieValue ? cookieValue[2] : null
-}
-
-const sid = getCookie('SID')
-console.log('sid', sid)
-if (sid) {
+const loginShow = ref(true)
+if (sessionStorage.getItem("loginOk") == "ok") {
   loginShow.value = false
 }
 

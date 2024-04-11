@@ -1,11 +1,6 @@
 <template>
   <div class="body-div">
-    <el-form
-      label-width="auto"
-      :model="fromValue"
-      style="max-width: 600px"
-      class="from-card"
-    >
+    <el-form label-width="auto" :model="fromValue" style="max-width: 600px" class="from-card">
       <el-form-item label="Name">
         <el-input v-model="fromValue.name" placeholder="admin" />
       </el-form-item>
@@ -54,6 +49,7 @@ const loginReq = () => {
       if (resp.data == 'Fails.') {
         ElMessage.error('用户名或者密码错误')
       } else {
+        sessionStorage.setItem("loginOk", "ok")
         loginShow.value = false
       }
     })
@@ -76,5 +72,4 @@ const loginReq = () => {
   width: 300px;
   height: 370px;
 }
-
 </style>

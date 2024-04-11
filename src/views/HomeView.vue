@@ -19,29 +19,31 @@
 <script lang="ts" setup>
 import AsideComponent from '@/components/AsideComponent.vue'
 import HeaderComponent from '@/components/HeaderComponent.vue'
-import TorrentList from '@/views/TorrentList.vue'
-import StoreDefinition from '@/stores'
 import { axios } from '@/requests'
+import StoreDefinition from '@/stores'
+import TorrentList from '@/views/TorrentList.vue'
 import { ElMessage } from 'element-plus'
 
-const storeDefinition = StoreDefinition()
+const store = StoreDefinition()
 
-let rid = 0
 
-storeDefinition.interval(() => {
+const syncInfo = store.syncInfo
+
+const syncData = () => {
+  let rid = syncInfo.rid
   axios.get('/api/v2/sync/maindata?rid=' + rid).then(resp => {
     const data = resp.data
     const fullUpdate = data.full_update ? data.full_update : false
-    storeDefinition.refreshInfo(data.server_state)
-    storeDefinition.refreshTorrents(data.torrents, fullUpdate)
-    rid++
+    store.refreshInfo(data.server_state)
+    store.refreshTorrents(data.torrents, fullUpdate)
+    syncInfo.incrementRid()
   }).catch(err => {
     ElMessage.error('/api/v2/sync/maindata error' + err)
-    rid = 0
-    storeDefinition.stopInterval()
+    syncInfo.stopInterval()
   })
-}, 3000)
+}
 
+syncInfo.startInterval(syncData, 3000)
 
 </script>
 

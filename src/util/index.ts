@@ -91,6 +91,11 @@ class GlobalInfo {
   public up_info_speed = new ByteData(1631)
   public up_rate_limit = 0
 
+  public refresh(ts: any) {
+    mergeObj(this, ts)
+  }
+
+
 }
 
 class GlobalSpeedLimit {
@@ -163,6 +168,11 @@ class TorrentInfo {
       const s = time - (m * 60)
       return m + 'm ' + s + 's'
     }
+  }
+
+  public refresh(ts: any): TorrentInfo {
+    mergeObj(this, ts)
+    return this
   }
 
 }
@@ -264,4 +274,38 @@ function mergeObj(base: any, src: any) {
 }
 
 
-export { ByteData, GlobalInfo, GlobalSpeedLimit, TorrentInfo, TorrentListReq, TorrentProperties, mergeObj }
+class SyncInfo {
+  public intervalId: number | null = null;
+  public rid = 0;
+
+  public resetRid() {
+    this.rid = 0
+  }
+
+  public stopInterval() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+    }
+    this.rid = 0
+    this.intervalId = null
+  }
+
+
+  public startInterval(fun: Function, milliseconds: number) {
+    //先停止老的定时任务
+    this.stopInterval()
+    //先执行一次
+    fun()
+    //再进行定时
+    this.intervalId = setInterval(fun, milliseconds)
+  }
+
+  public incrementRid() {
+    this.rid++
+  }
+
+}
+
+
+
+export { SyncInfo, ByteData, GlobalInfo, GlobalSpeedLimit, TorrentInfo, TorrentListReq, TorrentProperties, mergeObj }

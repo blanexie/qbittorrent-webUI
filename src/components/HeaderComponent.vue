@@ -1,27 +1,25 @@
 <template>
   <div class="toolbar">
     <el-icon>
-      <Setting/>
+      <Setting />
     </el-icon>
     <el-icon>
-      <Plus/>
+      <Plus />
+    </el-icon>
+
+    <el-icon>
+      <VideoPlay />
     </el-icon>
     <el-icon>
-      <Minus/>
+      <VideoPause />
     </el-icon>
     <el-icon>
-      <VideoPlay/>
-    </el-icon>
-    <el-icon>
-      <VideoPause/>
-    </el-icon>
-    <el-icon>
-      <Refresh/>
+      <Refresh />
     </el-icon>
   </div>
 </template>
 <script setup lang="ts">
-import {Minus, Plus, Refresh, Setting, VideoPause, VideoPlay} from "@element-plus/icons-vue";
+import { Minus, Plus, Refresh, Setting, VideoPause, VideoPlay } from "@element-plus/icons-vue";
 </script>
 
 <style scoped>

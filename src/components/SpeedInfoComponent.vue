@@ -40,9 +40,9 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">限速</p>
-          <el-switch v-model="storeDefinition.globalInfo.dht_nodes" />&nbsp;
+          <el-switch v-model="storeDefinition.globalInfo.dht_nodes" />&nbsp;&nbsp;
           <el-icon>
-            <Setting />
+            <Operation />
           </el-icon>
         </div>
       </el-col>
@@ -56,10 +56,14 @@
 
 .speed-limit {
   margin: 3px;
-  padding: 5px;
+  padding: 7px;
 
-  border: 1px #efefef solid;
-  border-radius: 7px;
+  border: 1px #dbd1d1 solid;
+  border-radius: 10px;
+}
+
+.speed-limit:hover {
+  border: 1px #5d5de8 solid;
 }
 
 .speed-limit-header {
@@ -70,7 +74,6 @@
 .speed-limit-content {
   font-size: 20px;
 }
-
 </style>
 <script lang="ts" setup>
 import StoreDefinition from '@/stores'

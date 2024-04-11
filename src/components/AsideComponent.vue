@@ -39,13 +39,14 @@
         </template>
       </el-menu-item>
     </el-menu>
+    <br />
     <SpeedInfoComponent />
   </div>
 </template>
 <script setup lang="ts">
-import { Download, Finished, VideoPause, Warning } from '@element-plus/icons-vue'
-import SpeedInfoComponent from '@/components/SpeedInfoComponent.vue'
-import FlyIcon from '@/components/icons/FlyIcon.vue'
+import SpeedInfoComponent from '@/components/SpeedInfoComponent.vue';
+import FlyIcon from '@/components/icons/FlyIcon.vue';
+import { Download, Finished, VideoPause, Warning } from '@element-plus/icons-vue';
 </script>
 <style scoped>
 .side {
