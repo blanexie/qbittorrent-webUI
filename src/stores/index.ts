@@ -36,8 +36,7 @@ const StoreDefinition =
        * @param infoV 更新全局的信息
        */
       const refreshInfo = (infoV: any) => {
-        const info = store.info
-        mergeObj(info, infoV)
+        mergeObj(store.info, infoV)
       }
 
       /**
@@ -47,19 +46,17 @@ const StoreDefinition =
        */
       const refreshTorrents = (ts: any, fullUpdate: boolean) => {
         const torrents = store.torrents
-        const keys = Object.keys(ts)
         if (fullUpdate) {
           //第一步清空
           torrents.length = 0
           //转换装载对象
-          keys.map(key => mergeObj(new TorrentInfo(key), ts[key]))
+          Object.keys(ts)
+            .map(key => mergeObj(new TorrentInfo(key), ts[key]))
             .map(it => it as TorrentInfo)
             .sort((a, b) => b.properties.addition_date - a.properties.addition_date)
             .forEach(it => torrents.push(it))
         } else {
-          for (const torrentInfo of torrents) {
-            mergeObj(torrentInfo, ts[torrentInfo.hash])
-          }
+          torrents.forEach(it => mergeObj(it, ts[it.hash]))
         }
 
         console.log('torrentInfos', torrents)
