@@ -81,7 +81,6 @@ const Application = {
 
 const TransferInfo = (store: any) => {
 
-
     /**
      *  获取全局速度限制状态
      */

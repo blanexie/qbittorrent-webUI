@@ -32,8 +32,8 @@ storeDefinition.interval(() => {
   axios.get('/api/v2/sync/maindata?rid=' + rid).then(resp => {
     const data = resp.data
     const fullUpdate = data.full_update ? data.full_update : false
-    storeDefinition.refresh(data.server_state)
-    storeDefinition.refreshTorrentInfos(data.torrents, fullUpdate)
+    storeDefinition.refreshInfo(data.server_state)
+    storeDefinition.refreshTorrents(data.torrents, fullUpdate)
     rid++
   }).catch(err => {
     ElMessage.error('/api/v2/sync/maindata error' + err)
