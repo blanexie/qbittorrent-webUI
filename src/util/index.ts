@@ -250,7 +250,6 @@ function mergeObj(base: any, src: any) {
   }
   const keysb = Object.keys(base)
   const keyss = Object.keys(src)
-
   for (const k of keyss) {
     const index = keysb.indexOf(k)
     if (index >= 0) {

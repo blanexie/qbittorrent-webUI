@@ -51,16 +51,17 @@ const StoreDefinition =
         if (fullUpdate) {
           //第一步清空
           torrents.length = 0
-          for (const key of keys) {
-            const torrent = mergeObj(new TorrentInfo(key), ts[key])
-            torrents.push(torrent)
-          }
+          //转换装载对象
+          keys.map(key => mergeObj(new TorrentInfo(key), ts[key]))
+            .map(it => it as TorrentInfo)
+            .sort((a, b) => b.properties.addition_date - a.properties.addition_date)
+            .forEach(it => torrents.push(it))
         } else {
           for (const torrentInfo of torrents) {
-            const hash = torrentInfo.hash
-            mergeObj(torrentInfo, ts[hash])
+            mergeObj(torrentInfo, ts[torrentInfo.hash])
           }
         }
+
         console.log('torrentInfos', torrents)
       }
 

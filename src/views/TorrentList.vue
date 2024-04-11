@@ -4,9 +4,7 @@
         :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
-        <span class="li-left">
-          {{ t.name }}
-        </span>
+        <span class="li-left">{{ t.name }}</span>
         <span class="li-right" @click="showDetail(t as TorrentInfo)">
           <el-icon>
             <Close />
@@ -57,16 +55,21 @@ const storeDefinition = StoreDefinition()
 const detail = ref<TorrentInfo>()
 const show = ref<boolean>(false)
 
-const showDetail = (t: TorrentInfo) => {
-  detail.value = t
+const showDetail = (item: TorrentInfo) => {
+  if (detail.value) {
+    detail.value.isActive = false
+  }
+  detail.value = item
+  item.isActive = true
+  //显示当前点击torrent的详情
   show.value = true
 }
 
 const handleClick = (item: TorrentInfo) => {
   if (detail.value) {
     detail.value.isActive = false
-    detail.value = item
   }
+  detail.value = item
   item.isActive = true
 }
 
