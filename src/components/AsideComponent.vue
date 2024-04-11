@@ -1,6 +1,9 @@
 <template>
   <div class="side">
-    <div class="header"><FlyIcon></FlyIcon> Qbittorrent </div>
+    <div class="header">
+      <FlyIcon class="fly"></FlyIcon>
+      <div class="qbt"> Qbittorrent</div>
+    </div>
     <el-menu>
       <el-menu-item index="2">
         <template #title>
@@ -43,19 +46,30 @@
 import { Download, Finished, VideoPause, Warning } from '@element-plus/icons-vue'
 import SpeedInfoComponent from '@/components/SpeedInfoComponent.vue'
 import FlyIcon from '@/components/icons/FlyIcon.vue'
-
 </script>
 <style scoped>
 .side {
   border-right: 1px #efefef solid;
   height: 95vh;
 
+  .header {
+    padding: 10px;
+
+    .fly {
+      height: 30px;
+      width: 30px;
+    }
+
+    .qbt {
+      display: inline-block;
+      height: 30px;
+      padding-bottom: 30px;
+    }
+  }
+
   .el-menu {
     border-right-color: white;
   }
 
-  .header {
-    height: 50px;
-  }
 }
 </style>

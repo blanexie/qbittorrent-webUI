@@ -1,7 +1,7 @@
 <template>
   <ul>
-    <li v-for="t in storeDefinition.torrentInfos" v-bind:key="t.hash" @click="handleClick(t)"
-      :class="{ 'border-color': t.isActive }">
+    <li v-for="t in storeDefinition.torrentInfos" v-bind:key="t.hash" @click="handleClick(t as TorrentInfo)"
+        :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
         <span class="li-left">
@@ -27,13 +27,12 @@
       </div>
 
       <div class="p3">
-        <span class="li-left">{{ t.getProgress() + '% (' + t.downloaded.getSizeStr() + '/' + t.total_size.getSizeStr()
-      + ')' }}
+        <span class="li-left">{{ t.getDownloadSizeStr() }}
         </span>
         <span class="li-right">
           <span class='icon'>↓</span> {{ t.dlspeed.getSpeedStr() }}&nbsp;&nbsp;
-          <span class='icon'> ↑</span> {{ t.upspeed.getSpeedStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
-          剩余时间：{{ t.getProgress() == 100 ? 0 : t.getEtaStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
+          <span class='icon'>↑</span> {{ t.upspeed.getSpeedStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
+          剩余时间：{{ t.getEtaStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
           做种：{{ t.num_seeds }}&nbsp;&nbsp;&nbsp;&nbsp;
           吸血：{{ t.num_leechs }}
         </span>
@@ -42,7 +41,7 @@
     </li>
   </ul>
 
-  <div> more </div>
+  <div> more</div>
 
   <TorrentDetail v-model:show="show" v-model:torrent-info="detail" />
 
@@ -63,18 +62,18 @@ const showDetail = (t: TorrentInfo) => {
   show.value = true
 }
 
-const handleClick = (item: any) => {
-  storeDefinition.torrentInfos.forEach(it => {
-    it.isActive = false
-  })
-
-  item.isActive = true;
+const handleClick = (item: TorrentInfo) => {
+  if (detail.value) {
+    detail.value.isActive = false
+    detail.value = item
+  }
+  item.isActive = true
 }
 
 </script>
 <style scoped>
 .border-color {
-  background-color: #ecf5ff;
+  background-color: #f4f1fc;
   border: 1px solid #5d5de8 !important;
 }
 
