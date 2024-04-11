@@ -32,7 +32,7 @@ const StoreDefinition =
         }
 
         /**
-         * 
+         *
          * @param infoV 更新全局的信息
          */
         const refreshInfo = (infoV: any) => {
@@ -42,7 +42,7 @@ const StoreDefinition =
 
         /**
          * 更新 torrents列表信息
-         * @param ts 
+         * @param ts
          * @param fullUpdate  是否全量替换
          */
         const refreshTorrents = (ts: any, fullUpdate: boolean) => {
