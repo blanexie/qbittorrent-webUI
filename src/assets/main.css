@@ -27,11 +27,6 @@ a,
         display: flex;
         place-items: center;
     }
-
-    .el-icon {
-        vertical-align: middle;
-        font-size: 18px;
-    }
 }
 
 
