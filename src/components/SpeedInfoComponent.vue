@@ -40,10 +40,14 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">限速</p>
-          <el-switch v-model="storeDefinition.globalInfo.dht_nodes" />&nbsp;&nbsp;
-          <el-icon>
-            <Operation />
-          </el-icon>
+          <p class=" speed-set">
+            <el-switch v-model="storeDefinition.globalInfo.dht_nodes" />&nbsp;&nbsp;
+            <el-tooltip content="全局限速设置" effect="light">
+              <el-icon>
+                <Operation />
+              </el-icon>
+            </el-tooltip>
+          </p>
         </div>
       </el-col>
     </el-row>
@@ -58,26 +62,42 @@
   margin: 3px;
   padding: 7px;
 
-  border: 1px #dbd1d1 solid;
+  border: 1px #91949a solid;
   border-radius: 10px;
 }
 
 .speed-limit:hover {
-  border: 1px #5d5de8 solid;
+  border: 1px var(--border-color) solid;
 }
 
 .speed-limit-header {
   font-size: 12px;
   padding-bottom: 4px;
+
+  .el-icon {
+    margin-top: 200px;
+  }
 }
 
 .speed-limit-content {
   font-size: 20px;
 }
+
+.speed-set {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.speed-set:hover {
+  color: var(--border-color);
+}
+
 </style>
 <script lang="ts" setup>
 import StoreDefinition from '@/stores'
-import { Setting } from '@element-plus/icons-vue'
+import { Operation } from '@element-plus/icons-vue'
 
 const storeDefinition = StoreDefinition()
 
