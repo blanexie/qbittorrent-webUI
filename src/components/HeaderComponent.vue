@@ -15,12 +15,12 @@
         <Plus />
       </el-icon>
     </el-tooltip>
-    <el-tooltip content="全部开始下载" effect="light">
+    <el-tooltip content="全部开始" effect="light">
       <el-icon>
         <VideoPlay />
       </el-icon>
     </el-tooltip>
-    <el-tooltip content="全部暂停下载" effect="light">
+    <el-tooltip content="全部暂停" effect="light">
       <el-icon>
         <VideoPause />
       </el-icon>
@@ -30,11 +30,10 @@
         <Refresh />
       </el-icon>
     </el-tooltip>
-
   </div>
 </template>
 <script setup lang="ts">
-import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from '@element-plus/icons-vue'
+import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from '@element-plus/icons-vue';
 </script>
 
 <style scoped>
