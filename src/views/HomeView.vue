@@ -9,7 +9,7 @@
       </el-header>
       <el-main>
         <el-scrollbar>
-          <TorrentList/>
+          <TorrentList />
         </el-scrollbar>
       </el-main>
     </el-container>
@@ -23,14 +23,14 @@ import StoreDefinition from '@/stores'
 import TorrentList from '@/views/TorrentList.vue'
 
 const store = StoreDefinition()
-const globalPreference = store.globalPreference
+const globalInfo = store.globalInfo
 
-globalPreference.startInterval(store.syncMainData, 3000)
+globalInfo.startInterval(store.syncMainData, 3000)
 
 </script>
 
 <style scoped>
-.layout-container-demo {
+.layout-container-demo .el-header {
   background-color: #efefef;
   color: var(--el-text-color-primary);
 }

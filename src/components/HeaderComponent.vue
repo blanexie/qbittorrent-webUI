@@ -26,14 +26,23 @@
       </el-icon>
     </el-tooltip>
     <el-tooltip content="刷新" effect="light">
-      <el-icon>
+      <el-icon @click="refreshClick">
         <Refresh />
       </el-icon>
     </el-tooltip>
   </div>
 </template>
 <script setup lang="ts">
-import { Plus, SwitchButton,Refresh, Setting, VideoPause, VideoPlay } from "@element-plus/icons-vue";
+import StoreDefinition from "@/stores";
+import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from "@element-plus/icons-vue";
+const store = StoreDefinition()
+
+
+
+const refreshClick = () => {
+  store.syncMainData(true)
+}
+
 </script>
 
 <style scoped>

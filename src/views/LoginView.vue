@@ -2,10 +2,10 @@
   <div class="body-div">
     <el-form label-width="auto" :model="fromValue" style="max-width: 600px" class="from-card">
       <el-form-item label="Name">
-        <el-input v-model="fromValue.name" placeholder="admin" />
+        <el-input v-model="fromValue.name" placeholder="admin"/>
       </el-form-item>
       <el-form-item label="Password">
-        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin" />
+        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin"/>
       </el-form-item>
       <el-form-item label=" ">
         <el-button @click="loginReq">登录</el-button>
@@ -15,11 +15,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Authentication } from '@/requests'
+import {reactive} from 'vue'
+import {ElMessage} from 'element-plus'
+import {Authentication} from '@/requests'
+import StoreDefinition from "@/stores";
 
-const loginShow = defineModel()
+const store = StoreDefinition()
 
 const auth = Authentication()
 
@@ -44,18 +45,19 @@ const loginReq = () => {
   }
   //2. 请求服务端
   auth.login(fromValue.name, fromValue.password)
-    .then(resp => {
-      console.log(resp)
-      if (resp.data == 'Fails.') {
-        ElMessage.error('用户名或者密码错误')
-      } else {
-        sessionStorage.setItem("loginOk", "ok")
-        loginShow.value = false
-      }
-    })
-    .catch(error => {
-      ElMessage.error('登录失败，' + error)
-    })
+      .then(resp => {
+        console.log(resp)
+        if (resp.data == 'Fails.') {
+          ElMessage.error('用户名或者密码错误')
+        } else {
+          sessionStorage.setItem("loginOk", "ok")
+          location.reload()
+        }
+      })
+      .catch(error => {
+        ElMessage.error('登录失败，' + error)
+        sessionStorage.removeItem("loginOk")
+      })
 }
 </script>
 

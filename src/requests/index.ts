@@ -10,8 +10,7 @@ const service = axios.create({
 
 
 //请求拦截器
-service.interceptors.request.use(
-    config => {
+service.interceptors.request.use(config => {
         // const token = store.state.token;
         // token && (config.headers.Authorization = token);
         //config.headers.cookie = localStorage.getItem("cookie")
@@ -23,8 +22,8 @@ service.interceptors.request.use(
 )
 
 //响应拦截器
-service.interceptors.response.use(
-    response => {
+service.interceptors.response.use(response => {
+        console.log(response)
         if (response.status == 200) {
             return Promise.resolve(response)
         } else {
@@ -32,6 +31,11 @@ service.interceptors.response.use(
         }
     },
     error => {
+        console.log(error)
+        if (error.response.status == 403) {
+            sessionStorage.removeItem("loginOk")
+            location.reload()
+        }
         ElMessage.error(`异常请求：${JSON.stringify(error.message)}`)
     }
 )
