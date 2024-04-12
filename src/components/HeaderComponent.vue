@@ -19,7 +19,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Minus, Plus, Refresh, Setting, VideoPause, VideoPlay } from "@element-plus/icons-vue";
+import { Plus, Refresh, Setting, VideoPause, VideoPlay } from "@element-plus/icons-vue";
 </script>
 
 <style scoped>
