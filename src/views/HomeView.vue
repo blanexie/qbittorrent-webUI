@@ -4,12 +4,12 @@
       <AsideComponent></AsideComponent>
     </el-aside>
     <el-container>
-      <el-header style="text-align: left;">
+      <el-header>
         <HeaderComponent></HeaderComponent>
       </el-header>
       <el-main>
         <el-scrollbar>
-          <TorrentList />
+          <TorrentList/>
         </el-scrollbar>
       </el-main>
     </el-container>
@@ -19,37 +19,18 @@
 <script lang="ts" setup>
 import AsideComponent from '@/components/AsideComponent.vue'
 import HeaderComponent from '@/components/HeaderComponent.vue'
-import { axios } from '@/requests'
 import StoreDefinition from '@/stores'
 import TorrentList from '@/views/TorrentList.vue'
-import { ElMessage } from 'element-plus'
 
 const store = StoreDefinition()
+const globalPreference = store.globalPreference
 
-
-const syncInfo = store.syncInfo
-
-const syncData = () => {
-  let rid = syncInfo.rid
-  axios.get('/api/v2/sync/maindata?rid=' + rid).then(resp => {
-    const data = resp.data
-    const fullUpdate = data.full_update ? data.full_update : false
-    store.refreshInfo(data.server_state)
-    store.refreshTorrents(data.torrents, fullUpdate)
-    syncInfo.incrementRid()
-  }).catch(err => {
-    ElMessage.error('/api/v2/sync/maindata error' + err)
-    syncInfo.stopInterval()
-  })
-}
-
-syncInfo.startInterval(syncData, 3000)
+globalPreference.startInterval(store.syncMainData, 3000)
 
 </script>
 
 <style scoped>
-.layout-container-demo .el-header {
-  position: relative;
+.layout-container-demo {
   background-color: #efefef;
   color: var(--el-text-color-primary);
 }

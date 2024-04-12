@@ -6,15 +6,21 @@
       <div class="p1">
         <span class="li-left">{{ t.name }}</span>
         <span class="li-right" @click="showDetail(t as TorrentInfo)">
+          <el-tooltip content="删除" effect="light">
           <el-icon>
             <Close />
           </el-icon>
-          <el-icon>
-            <VideoPlay />
-          </el-icon>
-          <el-icon>
-            <VideoPause />
-          </el-icon>
+          </el-tooltip>
+          <el-tooltip content="开始" effect="light">
+            <el-icon>
+              <VideoPlay />
+            </el-icon>
+          </el-tooltip>
+          <el-tooltip content="暂停" effect="light">
+            <el-icon>
+              <VideoPause />
+            </el-icon>
+          </el-tooltip>
         </span>
       </div>
 
@@ -76,8 +82,7 @@ const handleClick = (item: TorrentInfo) => {
 </script>
 <style scoped>
 .border-color {
-  background-color: #f4f1fc;
-  border: 1px solid #5d5de8 !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 ul {
@@ -87,9 +92,10 @@ ul {
 
   li {
     margin-bottom: 20px;
-    border: 1px solid #909399;
+    border: 1px solid #91949a;
     border-radius: 10px;
     padding: 10px;
+    cursor: pointer;
 
     div {
       height: auto;
@@ -105,8 +111,24 @@ ul {
     }
 
     .p1 {
-      .el-icon {
-        margin: 0 5px;
+      .li-right {
+        display: flex;
+        align-items: center;
+        border-radius: 15px;
+        height: 28px;
+        padding: 0 10px;
+        border: 1px solid #e4e7ea;
+
+        .el-icon {
+          margin: 0 5px;
+          height: 20px !important;
+          width: 20px !important;
+        }
+      }
+
+      .li-right:hover {
+        background-color: var(--border-color);
+        color: white;
       }
     }
 
@@ -130,12 +152,13 @@ ul {
 
     .li-right {
       float: right;
+
     }
 
   }
 
   li:hover {
-    border: 1px solid #5d5de8;
+    border: 1px solid var(--border-color);
   }
 
 }

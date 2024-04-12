@@ -274,9 +274,169 @@ function mergeObj(base: any, src: any) {
 }
 
 
-class SyncInfo {
-  public intervalId: number | null = null;
-  public rid = 0;
+class Preference {
+  public intervalId: number | null = null
+  public rid = 0
+
+  public random_port = false
+  public listen_port = 58925
+  public locale = 'en'
+  public alt_dl_limit = new ByteData(10240)
+  public alt_up_limit = new ByteData(10240)
+  public dht = true
+  public upnp = true
+  public enable_embedded_tracker = false
+  public embedded_tracker_port = 9000
+  public queueing_enabled = false
+  public up_limit = 0
+  public dl_limit = 0
+  public dont_count_slow_torrents = false
+
+  public start_paused_enabled = false
+  public temp_path = '/home/user/Downloads/temp'
+  public temp_path_enabled = false
+
+  public alternative_webui_enabled = false
+  public alternative_webui_path = '/home/user/Documents/qbit-webui'
+
+  public dyndns_domain = 'changeme.dyndns.org'
+  public dyndns_enabled = false
+  public dyndns_password = ''
+  public dyndns_service = 0
+  public dyndns_username = ''
+
+  public add_trackers = ''
+  public add_trackers_enabled = false
+  public announce_ip = ''
+  public announce_to_all_tiers = true
+  public announce_to_all_trackers = false
+  public anonymous_mode = false
+  public async_io_threads = 4
+  public auto_delete_mode = 0
+  public auto_tmm_enabled = false
+  public autorun_enabled = false
+  public autorun_program = ''
+  public banned_IPs = ''
+  public bittorrent_protocol = 0
+  public bypass_auth_subnet_whitelist = ''
+  public bypass_auth_subnet_whitelist_enabled = false
+  public bypass_local_auth = false
+  public category_changed_tmm_enabled = false
+  public checking_memory_use = 32
+  public create_subfolder_enabled = true
+  public current_interface_address = ''
+  public current_network_interface = ''
+  public disk_cache = -1
+  public disk_cache_ttl = 60
+  public enable_coalesce_read_write = false
+  public enable_multi_connections_from_same_ip = false
+  public enable_os_cache = true
+  public enable_piece_extent_affinity = false
+  public enable_upload_suggestions = false
+  public encryption = 0
+  public export_dir = '/home/user/Downloads/all'
+  public export_dir_fin = '/home/user/Downloads/completed'
+  public file_pool_size = 40
+  public incomplete_files_ext = false
+  public ip_filter_enabled = false
+  public ip_filter_path = ''
+  public ip_filter_trackers = false
+  public limit_lan_peers = true
+  public limit_tcp_overhead = false
+  public limit_utp_rate = true
+  public lsd = true
+  public mail_notification_auth_enabled = false
+  public mail_notification_email = ''
+  public mail_notification_enabled = false
+  public mail_notification_password = ''
+  public mail_notification_sender = 'qBittorrent_notification@example.com'
+  public mail_notification_smtp = 'smtp.changeme.com'
+  public mail_notification_ssl_enabled = false
+  public mail_notification_username = ''
+
+  public max_active_downloads = 3
+  public max_active_torrents = 5
+  public max_active_uploads = 3
+  public max_connec = 500
+  public max_connec_per_torrent = 100
+  public max_ratio = -1
+  public max_ratio_act = 0
+  public max_ratio_enabled = false
+  public max_seeding_time = -1
+  public max_seeding_time_enabled = false
+  public max_uploads = -1
+  public max_uploads_per_torrent = -1
+
+  public outgoing_ports_max = 0
+  public outgoing_ports_min = 0
+  public pex = true
+  public preallocate_all = false
+  public proxy_auth_enabled = false
+  public proxy_ip = '0.0.0.0'
+  public proxy_password = ''
+  public proxy_peer_connections = false
+  public proxy_port = 8080
+  public proxy_torrents_only = false
+  public proxy_type = 0
+  public proxy_username = ''
+
+
+  public recheck_completed_torrents = false
+  public resolve_peer_countries = true
+  public rss_auto_downloading_enabled = true
+  public rss_download_repack_proper_episodes = true
+  public rss_max_articles_per_feed = 50
+  public rss_processing_enabled = true
+  public rss_refresh_interval = 30
+  public rss_smart_episode_filters = 's(\\d+)e(\\d+)\n(\\d+)x(\\d+)\n(\\d{4}[.\\-]\\d{1,2}[.\\-]\\d{1,2})'
+
+  public save_path = '/home/user/Downloads/'
+  public save_path_changed_tmm_enabled = false
+  public save_resume_data_interval = 60
+
+  public schedule_from_hour = 8
+  public schedule_from_min = 0
+  public schedule_to_hour = 20
+  public schedule_to_min = 0
+  public scheduler_days = 0
+  public scheduler_enabled = false
+
+  public send_buffer_low_watermark = 10
+  public send_buffer_watermark = 500
+  public send_buffer_watermark_factor = 50
+  public slow_torrent_dl_rate_threshold = 2
+  public slow_torrent_inactive_timer = 60
+  public slow_torrent_ul_rate_threshold = 2
+  public socket_backlog_size = 30
+  public stop_tracker_timeout = 1
+
+  public torrent_changed_tmm_enabled = true
+
+  public upload_choking_algorithm = 1
+  public upload_slots_behavior = 0
+
+  public use_https = false
+  public utp_tcp_mixed_mode = 0
+  public web_ui_address = '*'
+  public web_ui_ban_duration = 3600
+  public web_ui_clickjacking_protection_enabled = true
+  public web_ui_csrf_protection_enabled = true
+  public web_ui_custom_http_headers = ''
+  public web_ui_domain_list = '*'
+  public web_ui_host_header_validation_enabled = true
+  public web_ui_https_cert_path = ''
+  public web_ui_https_key_path = ''
+  public web_ui_max_auth_fail_count = 5
+  public web_ui_port = 8080
+  public web_ui_secure_cookie_enabled = true
+  public web_ui_session_timeout = 3600
+  public web_ui_upnp = false
+  public web_ui_use_custom_http_headers_enabled = false
+  public web_ui_username = 'admin'
+  public scan_dirs = {
+    '/home/user/Downloads/incoming/games': 0,
+    '/home/user/Downloads/incoming/movies': 1
+  }
 
   public resetRid() {
     this.rid = 0
@@ -303,9 +463,13 @@ class SyncInfo {
   public incrementRid() {
     this.rid++
   }
-
 }
 
 
 
-export { SyncInfo, ByteData, GlobalInfo, GlobalSpeedLimit, TorrentInfo, TorrentListReq, TorrentProperties, mergeObj }
+export {
+  Preference, ByteData, GlobalInfo, GlobalSpeedLimit,
+  TorrentInfo,
+  TorrentListReq,
+  TorrentProperties, mergeObj
+}
