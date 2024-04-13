@@ -17,15 +17,14 @@
 </template>
 
 <script lang="ts" setup>
-import AsideComponent from '@/components/AsideComponent.vue'
-import HeaderComponent from '@/components/HeaderComponent.vue'
-import StoreDefinition from '@/stores'
-import TorrentList from '@/views/TorrentList.vue'
+import AsideComponent from '@/components/AsideComponent.vue';
+import HeaderComponent from '@/components/HeaderComponent.vue';
+import StoreDefinition from '@/stores';
+import TorrentList from '@/views/TorrentList.vue';
 
 const store = StoreDefinition()
-const globalInfo = store.globalInfo
 
-globalInfo.startInterval(store.syncMainData, 3000)
+store.syncMainData()
 
 </script>
 

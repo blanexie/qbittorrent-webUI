@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {ElMessage} from 'element-plus'
+import { ElMessage } from 'element-plus'
 
 
 const service = axios.create({
@@ -11,11 +11,11 @@ const service = axios.create({
 
 //请求拦截器
 service.interceptors.request.use(config => {
-        // const token = store.state.token;
-        // token && (config.headers.Authorization = token);
-        //config.headers.cookie = localStorage.getItem("cookie")
-        return config
-    },
+    // const token = store.state.token;
+    // token && (config.headers.Authorization = token);
+    //config.headers.cookie = localStorage.getItem("cookie")
+    return config
+},
     error => {
         return Promise.reject(error)
     }
@@ -23,15 +23,13 @@ service.interceptors.request.use(config => {
 
 //响应拦截器
 service.interceptors.response.use(response => {
-        console.log(response)
-        if (response.status == 200) {
-            return Promise.resolve(response)
-        } else {
-            return Promise.reject(response)
-        }
-    },
+    if (response.status == 200) {
+        return Promise.resolve(response)
+    } else {
+        return Promise.reject(response)
+    }
+},
     error => {
-        console.log(error)
         if (error.response.status == 403) {
             sessionStorage.removeItem("loginOk")
             location.reload()
@@ -61,7 +59,7 @@ const Authentication = () => {
             })
     }
 
-    return {login, logout}
+    return { login, logout }
 }
 
 
@@ -152,9 +150,9 @@ const TransferInfo = (store: any) => {
                 ElMessage.error(' 请求异常.' + error)
             })
     }
-    return {setUploadLimit}
+    return { setUploadLimit }
 }
 
 
-export {service as axios, Authentication, Application, TransferInfo}
+export { service as axios, Authentication, Application, TransferInfo }
 

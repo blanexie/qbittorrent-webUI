@@ -27,20 +27,27 @@ const StoreDefinition =
          * 获取同步数据
          * @param reset
          */
-        const syncMainData = (reset: boolean = false) => {
+        const scheduleSyncMainData = (reset: boolean = false, schedule: boolean = true) => {
             const info = store.info
             if (reset) {
                 info.rid = 0
             }
-            axios.get('/api/v2/sync/maindata?rid=' + info.rid).then(resp => {
+            axios.get('/api/v2/sync/maindata?rid=' + info.rid + "&" + new Date().getTime()).then(resp => {
                 const data = resp.data
                 const fullUpdate = data.full_update ? data.full_update : false
                 refreshInfo(data.server_state)
-                refreshTorrents(data.torrents, fullUpdate)
+                if (data.torrents) {
+                    refreshTorrents(data.torrents, fullUpdate)
+                }
                 info.incrementRid()
+                if (schedule) {
+                    setTimeout(scheduleSyncMainData, 1500)
+                }
             }).catch(err => {
                 ElMessage.error('/api/v2/sync/maindata error' + err)
-                info.stopInterval()
+                if (schedule) {
+                    setTimeout(scheduleSyncMainData, 1500)
+                }
             })
         }
 
@@ -70,8 +77,6 @@ const StoreDefinition =
             } else {
                 torrents.forEach(it => it.refresh(ts[it.hash]))
             }
-
-            console.log('torrentInfos ', new Date(), torrents)
         }
 
 
@@ -80,7 +85,7 @@ const StoreDefinition =
             globalPreference,
             globalInfo,
             torrentInfos,
-            syncMainData,
+            syncMainData: scheduleSyncMainData,
             refreshInfo,
         }
     }

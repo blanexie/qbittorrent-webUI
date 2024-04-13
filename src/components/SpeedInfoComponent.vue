@@ -44,7 +44,7 @@
             <el-switch v-model="store.globalInfo.use_alt_speed_limits" :loading="data.toggleSpeedLimitsModeLoad"
               @change="toggleSpeedLimitsMode" />&nbsp;&nbsp;
             <el-tooltip content="全局限速设置" effect="light">
-              <el-icon @click="data.dialogVisible = !data.dialogVisible">
+              <el-icon @click="openLimitDialog">
                 <Operation />
               </el-icon>
             </el-tooltip>
@@ -54,14 +54,15 @@
     </el-row>
 
     <el-dialog v-model="data.dialogVisible" title="全局限速设置" width="400">
-
       <el-form label-position="right" label-width="auto">
         <el-form-item label="下载限速">
           <el-input v-model="data.dlLimit" placeholder="Please input" class="input-with-select">
             <template #append>
-              <el-select v-model="select" style="width: 80px">
-                <el-option label="KB" value="1024" />
-                <el-option label="MB" value="1,048,576" />
+              <el-select v-model="data.dlLimitUnit" style="width: 80px">
+                <el-option label="B/s" :value="1" />
+                <el-option label="KB/s" :value="1024" />
+                <el-option label="MB/s" :value="1048576" />
+                <el-option label="GB/s" :value="1073741824" />
               </el-select>
             </template>
           </el-input>
@@ -70,9 +71,11 @@
         <el-form-item label="上传限速">
           <el-input v-model="data.upLimt" placeholder="Please input" class="input-with-select">
             <template #append>
-              <el-select v-model="select" style="width: 80px">
-                <el-option label="KB" value="1024" />
-                <el-option label="MB" value="1,048,576" />
+              <el-select v-model="data.upLimitUnit" style="width: 80px">
+                <el-option label="B/s" :value="1" />
+                <el-option label="KB/s" :value="1024" />
+                <el-option label="MB/s" :value="1048576" />
+                <el-option label="GB/s" :value="1073741824" />
               </el-select>
             </template>
           </el-input>
@@ -82,9 +85,9 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="data.dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="data.dialogVisible = false">
-            Confirm
+          <el-button @click="data.dialogVisible = false">取消</el-button>
+          <el-button type="primary" :loading="data.setLoading" @click="setLimit">
+            提交
           </el-button>
         </div>
       </template>
@@ -99,13 +102,59 @@ import { Operation } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { reactive } from 'vue';
 const store = StoreDefinition()
+const globalInfo = store.globalInfo
 
 const data = reactive({
   dialogVisible: false,
   toggleSpeedLimitsModeLoad: false,
-  upLimt: store.globalInfo.up_rate_limit.bytes,
-  dlLimit: store.globalInfo.dl_rate_limit.bytes
+  setLoading: false,
+  upLimt: globalInfo.up_rate_limit.getSize(),
+  upLimitUnit: globalInfo.up_rate_limit.getUnit(),
+  dlLimit: globalInfo.dl_rate_limit.getSize(),
+  dlLimitUnit: globalInfo.dl_rate_limit.getUnit()
 })
+
+const openLimitDialog = () => {
+  //初始化限速值
+  data.upLimt = globalInfo.up_rate_limit.getSize()
+  data.upLimitUnit = globalInfo.up_rate_limit.getUnit()
+  data.dlLimit = globalInfo.dl_rate_limit.getSize()
+  data.dlLimitUnit = globalInfo.dl_rate_limit.getUnit()
+  data.toggleSpeedLimitsModeLoad = false
+  //特殊参数，特殊处理  
+  if (data.upLimt == 0) {
+    data.upLimitUnit = 1024 * 1024
+  }
+  if (data.dlLimit == 0) {
+    data.dlLimitUnit = 1024 * 1024
+  }
+  //开启弹窗
+  data.dialogVisible = true
+}
+
+
+/**
+ * 设置全局限速
+ */
+const setLimit = () => {
+  //设置下载限速
+  data.setLoading = true
+  const url = "/api/v2/transfer/setDownloadLimit"
+  const fromData = new FormData()
+  fromData.set("limit", "" + (data.dlLimit * data.dlLimitUnit))
+  const dl = axios.post(url, fromData)
+  //设置上传速度
+  const url2 = '/api/v2/transfer/setUploadLimit'
+  const fromData2 = new FormData()
+  fromData2.set("limit", "" + (data.upLimitUnit * data.upLimt))
+  const up = axios.post(url2, fromData2)
+  Promise.all([dl, up]).then(resp => {
+    data.setLoading = false
+    data.dialogVisible = false
+  }).catch(err => {
+    data.setLoading = false
+  })
+}
 
 
 

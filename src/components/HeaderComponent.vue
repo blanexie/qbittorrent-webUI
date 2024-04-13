@@ -1,7 +1,7 @@
 <template>
   <div class="toolbar">
     <el-tooltip content="退出登录" effect="light">
-      <el-icon>
+      <el-icon @click="logout">
         <SwitchButton />
       </el-icon>
     </el-tooltip>
@@ -15,32 +15,68 @@
         <Plus />
       </el-icon>
     </el-tooltip>
-    <el-tooltip content="全部开始" effect="light">
-      <el-icon>
+    <el-tooltip content="全部开始" v-if="data.play" effect="light">
+      <el-icon @click="playOrStop()">
         <VideoPlay />
       </el-icon>
     </el-tooltip>
-    <el-tooltip content="全部暂停" effect="light">
-      <el-icon>
+    <el-tooltip content="全部暂停" v-if="!data.play" effect="light">
+      <el-icon @click="playOrStop()">
         <VideoPause />
       </el-icon>
     </el-tooltip>
     <el-tooltip content="刷新" effect="light">
-      <el-icon @click="refreshClick">
+      <el-icon @click="refreshClick($event)">
         <Refresh />
       </el-icon>
     </el-tooltip>
   </div>
 </template>
 <script setup lang="ts">
+import { axios } from "@/requests";
 import StoreDefinition from "@/stores";
 import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from "@element-plus/icons-vue";
+import { reactive } from "vue";
+
+const data = reactive({
+  play: false
+})
+
 const store = StoreDefinition()
 
+const playOrStop = () => {
+  if (data.play) {
+    const hashs = store.torrentInfos.map(it => it.hash).join("|")
+    const from = new FormData()
+    from.set("hashes", hashs)
+    axios.post('/api/v2/torrents/resume', from)
+      .then(resp => {
+        data.play = false
+      })
+  } else {
+    const hashs = store.torrentInfos.map(it => it.hash).join("|")
+    const from = new FormData()
+    from.set("hashes", hashs)
+    axios.post('/api/v2/torrents/pause', from)
+      .then(resp => {
+        data.play = true
+      })
+  }
 
+}
 
-const refreshClick = () => {
-  store.syncMainData(true)
+const logout = () => {
+  axios.post("/api/v2/auth/logout").then(resp => {
+    sessionStorage.removeItem("loginOk")
+    window.location.href = "/"
+  })
+}
+
+const refreshClick = (event: Event) => {
+  store.globalInfo.rid = 0
+  const element = event.target as HTMLElement;
+  // 将元素旋转 360 度
+  element.style.transform = 'rotate(360deg)';
 }
 
 </script>

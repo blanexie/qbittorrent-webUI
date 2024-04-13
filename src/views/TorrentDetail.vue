@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="show" :with-header="false" direction="rtl" size="480">
+  <el-drawer v-model="show" :with-header="false" direction="rtl" size="580">
 
     <el-text size="large" truncated>
       {{ torrentInfo?.name }}

@@ -1,3 +1,5 @@
+
+
 class ByteData {
     /**
      *
@@ -30,6 +32,7 @@ class ByteData {
         return this.getSize() + this.getSizeUnit()
     }
 
+
     public getSpeedUnit(): string {
         if (this.bytes < this.KB) {
             return 'B/s'
@@ -46,6 +49,25 @@ class ByteData {
         return 'TB/s'
     }
 
+
+    public getUnit(): number {
+        if (this.bytes < this.KB) {
+            return 1
+        }
+        if (this.bytes < this.MB) {
+            return this.KB
+        }
+        if (this.bytes < this.GB) {
+            return this.MB
+        }
+        if (this.bytes < this.TB) {
+            return this.GB
+        }
+        return this.TB
+    }
+
+
+
     public getSizeUnit(): string {
         if (this.bytes < this.KB) {
             return 'B'
@@ -60,11 +82,6 @@ class ByteData {
             return 'GB'
         }
         return 'TB'
-    }
-
-
-    public setSize(size: number) {
-        this.bytes = size
     }
 
     public getSize(): number {
@@ -125,23 +142,6 @@ class GlobalInfo {
         mergeObj(this, ts)
     }
 
-    public stopInterval() {
-        if (this.intervalId) {
-            clearInterval(this.intervalId)
-        }
-        this.rid = 0
-        this.intervalId = null
-    }
-
-    public startInterval(fun: Function, milliseconds: number) {
-        //先停止老的定时任务
-        this.stopInterval()
-        //先执行一次
-        fun()
-        //再进行定时
-        this.intervalId = setInterval(fun, milliseconds)
-    }
-
     public incrementRid() {
         this.rid++
     }
@@ -173,6 +173,7 @@ class TorrentInfo {
     public seq_dl = false
     public state = 'downloading'
     public super_seeding = false
+    public magnet_uri = ""
 
     public isActive: boolean = false
 

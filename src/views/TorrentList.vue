@@ -1,26 +1,40 @@
 <template>
   <ul>
-    <li v-for="t in storeDefinition.torrentInfos" v-bind:key="t.hash" @click="handleClick(t as TorrentInfo)"
-        :class="{ 'border-color': t.isActive }">
+    <li v-for="t in store.torrentInfos" v-bind:key="t.hash" @click="handleClick(t as TorrentInfo)"
+      :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
-        <span class="li-left">{{ t.name }}</span>
-        <span class="li-right" @click="showDetail(t as TorrentInfo)">
+        <span class="li-left">
+          {{ t.name }}
+          <span> {{ t.isActive }}</span>
+        </span>
+        <span class="li-right">
           <el-tooltip content="删除" effect="light">
-          <el-icon>
-            <Close />
-          </el-icon>
+            <el-icon @click="showRemoveDialog(t as TorrentInfo)">
+              <Close />
+            </el-icon>
           </el-tooltip>
-          <el-tooltip content="开始" effect="light">
-            <el-icon>
+          <el-tooltip content="开始" v-if="t.state !== 'downloading'" effect="light">
+            <el-icon @click="resume(t as TorrentInfo)">
               <VideoPlay />
             </el-icon>
           </el-tooltip>
-          <el-tooltip content="暂停" effect="light">
-            <el-icon>
+          <el-tooltip content="暂停" v-if="t.state == 'downloading'" effect="light">
+            <el-icon @click="pause(t as TorrentInfo)">
               <VideoPause />
             </el-icon>
           </el-tooltip>
+          <el-tooltip content="复制磁链" effect="light">
+            <el-icon @click="copyLink(t as TorrentInfo)">
+              <Connection />
+            </el-icon>
+          </el-tooltip>
+          <el-tooltip content="详情" effect="light">
+            <el-icon @click="showDetail(t as TorrentInfo)">
+              <Warning />
+            </el-icon>
+          </el-tooltip>
+
         </span>
       </div>
 
@@ -32,6 +46,7 @@
 
       <div class="p3">
         <span class="li-left">{{ t.getDownloadSizeStr() }}
+          &nbsp;&nbsp; 状态：{{ t.state }}
         </span>
         <span class="li-right">
           <span class='icon'>↓</span> {{ t.dlspeed.getSpeedStr() }}&nbsp;&nbsp;
@@ -49,17 +64,81 @@
 
   <TorrentDetail v-model:show="show" v-model:torrent-info="detail" />
 
+  <el-dialog v-model="dialogVisible" title="" width="500">
+    &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteFiles" />
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="remove">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 <script setup lang="ts">
+import { axios } from '@/requests'
 import StoreDefinition from '@/stores'
 import { TorrentInfo } from '@/util'
 import TorrentDetail from '@/views/TorrentDetail.vue'
-import { Close, VideoPause, VideoPlay } from '@element-plus/icons-vue'
+import { Close, Connection, VideoPause, VideoPlay, Warning } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 
-const storeDefinition = StoreDefinition()
+const store = StoreDefinition()
 const detail = ref<TorrentInfo>()
 const show = ref<boolean>(false)
+const deleteFiles = ref<boolean>(false)
+const deleteHash = ref<string>("")
+const dialogVisible = ref<boolean>(false)
+
+const copyLink = (t: TorrentInfo) => {
+  // 判断浏览器是否支持 Clipboard API
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(t.magnet_uri);
+    ElMessage.success("磁力链接已经写入剪切板")
+  } else {
+    console.error('浏览器不支持 Clipboard API。');
+  }
+}
+
+
+const showRemoveDialog = (t: TorrentInfo) => {
+  dialogVisible.value = true
+  deleteHash.value = t.hash
+}
+
+const remove = () => {
+  const from = new FormData()
+  from.set("hashes", deleteHash.value)
+  from.set("deleteFiles", deleteFiles.value + "")
+  axios.post('/api/v2/torrents/delete', from)
+    .then(() => {
+      dialogVisible.value = false
+      deleteHash.value = ''
+      store.globalInfo.rid = 0
+    })
+
+}
+
+const resume = (t: TorrentInfo) => {
+  const from = new FormData()
+  from.set("hashes", t.hash)
+  axios.post('/api/v2/torrents/resume', from)
+    .then(resp => {
+
+    })
+
+}
+
+const pause = (t: TorrentInfo) => {
+  const from = new FormData()
+  from.set("hashes", t.hash)
+  axios.post('/api/v2/torrents/pause', from)
+    .then(resp => {
+
+    })
+}
 
 const showDetail = (item: TorrentInfo) => {
   if (detail.value) {
@@ -88,7 +167,8 @@ const handleClick = (item: TorrentInfo) => {
 ul {
   list-style-type: none;
   padding-inline-start: 0;
-  min-width: 500px;
+  min-width: 600px;
+  max-width: 980px;
 
   li {
     margin-bottom: 20px;
@@ -115,12 +195,12 @@ ul {
         display: flex;
         align-items: center;
         border-radius: 15px;
-        height: 28px;
+        height: 32px;
         padding: 0 10px;
         border: 1px solid #e4e7ea;
 
         .el-icon {
-          margin: 0 5px;
+          margin: 0 10px;
           height: 20px !important;
           width: 20px !important;
         }

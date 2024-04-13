@@ -1,11 +1,14 @@
 <template>
   <div class="body-div">
     <el-form label-width="auto" :model="fromValue" style="max-width: 600px" class="from-card">
-      <el-form-item label="Name">
-        <el-input v-model="fromValue.name" placeholder="admin"/>
+      <h1>
+        <FlyIcon class="fly"></FlyIcon> Qbittorrent
+      </h1> <br>
+      <el-form-item label="用户名">
+        <el-input v-model="fromValue.name" placeholder="admin" />
       </el-form-item>
-      <el-form-item label="Password">
-        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin"/>
+      <el-form-item label="密码">
+        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin" />
       </el-form-item>
       <el-form-item label=" ">
         <el-button @click="loginReq">登录</el-button>
@@ -15,12 +18,10 @@
 </template>
 
 <script setup lang="ts">
-import {reactive} from 'vue'
-import {ElMessage} from 'element-plus'
-import {Authentication} from '@/requests'
-import StoreDefinition from "@/stores";
-
-const store = StoreDefinition()
+import FlyIcon from '@/components/icons/FlyIcon.vue';
+import { Authentication } from '@/requests';
+import { ElMessage } from 'element-plus';
+import { reactive } from 'vue';
 
 const auth = Authentication()
 
@@ -45,33 +46,39 @@ const loginReq = () => {
   }
   //2. 请求服务端
   auth.login(fromValue.name, fromValue.password)
-      .then(resp => {
-        console.log(resp)
-        if (resp.data == 'Fails.') {
-          ElMessage.error('用户名或者密码错误')
-        } else {
-          sessionStorage.setItem("loginOk", "ok")
-          location.reload()
-        }
-      })
-      .catch(error => {
-        ElMessage.error('登录失败，' + error)
-        sessionStorage.removeItem("loginOk")
-      })
+    .then(resp => {
+      console.log(resp)
+      if (resp.data == 'Fails.') {
+        ElMessage.error('用户名或者密码错误')
+      } else {
+        sessionStorage.setItem("loginOk", "ok")
+        location.reload()
+      }
+    })
+    .catch(error => {
+      ElMessage.error('登录失败，' + error)
+      sessionStorage.removeItem("loginOk")
+    })
 }
 </script>
 
 <style scoped>
 .body-div {
-  width: 100vw;
-  height: 100vh;
+  width: 98vw;
+  height: 90vh;
   justify-content: center;
   align-items: center;
   display: flex;
 }
 
 .from-card {
-  width: 300px;
-  height: 370px;
+  border-radius: 10px;
+  padding: 20px 40px 10px 40px;
+  border: 1px solid var(--border-color);
+
+  .fly {
+    width: 40px;
+    height: 40px;
+  }
 }
 </style>
