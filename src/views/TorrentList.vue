@@ -1,12 +1,11 @@
 <template>
   <ul>
-    <li v-for="t in store.torrentInfos" v-bind:key="t.hash" @click="handleClick(t as TorrentInfo)"
+    <li v-for="t in  store.torrentInfos " v-bind:key="t.hash" @click="handleClick(t as TorrentInfo)"
       :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
         <span class="li-left">
           {{ t.name }}
-          <span> {{ t.isActive }}</span>
         </span>
         <span class="li-right">
           <el-tooltip content="删除" effect="light">
@@ -14,12 +13,12 @@
               <Close />
             </el-icon>
           </el-tooltip>
-          <el-tooltip content="开始" v-if="t.state !== 'downloading'" effect="light">
+          <el-tooltip content="开始" v-if="t.getCState() !== 'downloading'" effect="light">
             <el-icon @click="resume(t as TorrentInfo)">
               <VideoPlay />
             </el-icon>
           </el-tooltip>
-          <el-tooltip content="暂停" v-if="t.state == 'downloading'" effect="light">
+          <el-tooltip content="暂停" v-if="t.getCState() == 'downloading'" effect="light">
             <el-icon @click="pause(t as TorrentInfo)">
               <VideoPause />
             </el-icon>
@@ -39,10 +38,12 @@
       </div>
 
       <div class="p2">
-        <el-progress :percentage="t.getProgress()" :text-inside="true" :status="t.progress == 1 ? 'success' : ''">
+        <el-progress :percentage="t.getProgress()" :text-inside="true" :status="getProgressState(t as TorrentInfo)">
           <span> </span>
         </el-progress>
       </div>
+
+
 
       <div class="p3">
         <span class="li-left">{{ t.getDownloadSizeStr() }}
@@ -60,8 +61,6 @@
     </li>
   </ul>
 
-  <div> more</div>
-
   <TorrentDetail v-model:show="show" v-model:torrent-info="detail" />
 
   <el-dialog v-model="dialogVisible" title="" width="500">
@@ -75,11 +74,12 @@
       </div>
     </template>
   </el-dialog>
+
 </template>
 <script setup lang="ts">
 import { axios } from '@/requests'
 import StoreDefinition from '@/stores'
-import { TorrentInfo } from '@/util'
+import { TorrentInfo } from "@/util"
 import TorrentDetail from '@/views/TorrentDetail.vue'
 import { Close, Connection, VideoPause, VideoPlay, Warning } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -91,6 +91,25 @@ const show = ref<boolean>(false)
 const deleteFiles = ref<boolean>(false)
 const deleteHash = ref<string>("")
 const dialogVisible = ref<boolean>(false)
+
+
+const getProgressState = (t: TorrentInfo): string => {
+  if (t.getCState() == "downloading") {
+    return ''
+  }
+  if (t.getCState() == "finish") {
+    return 'success'
+  }
+  if (t.getCState() == "quene") {
+    return 'warning'
+  }
+  if (t.getCState() == "error") {
+    return 'exception'
+  }
+  return ''
+}
+
+
 
 const copyLink = (t: TorrentInfo) => {
   // 判断浏览器是否支持 Clipboard API

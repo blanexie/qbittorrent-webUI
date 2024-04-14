@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { TorrentInfo } from '@/util'
+import { TorrentInfo } from "@/util"
 import { ref } from 'vue'
 import type { TabsPaneContext } from 'element-plus'
 import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue'

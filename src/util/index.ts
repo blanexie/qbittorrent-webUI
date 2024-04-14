@@ -136,6 +136,7 @@ class GlobalInfo {
     public intervalId: number | null = null
     public rid = 0
     public refresh_interval = 1500
+    public currentMenu = "downloading"  //当前目录选择
 
 
     public refresh(ts: any) {
@@ -182,6 +183,56 @@ class TorrentInfo {
     public constructor(hash: string) {
         this.hash = hash
     }
+
+
+    private dl = [
+        "allocating", //开启磁盘空间，马上就下载， 所以算在下载中
+        "downloading",
+        "metaDL",  //开始下载了，正在获取种子的metadata
+        "stalledDL",  //开始下载了，但是无连接
+        "checkingDL", //校验中，校验完成立即下载
+        "forcedDL",//强制下载， 忽略队列限制
+    ]
+
+    private flinsh = [
+        "uploading",
+        "pausedUP",  //已经下载完成了，但是暂停上传中
+        "quenedUP", //在队列中等待上传，应该已经下载完成了 ？？？
+        "stalledUP",  //开始做种了，但是无连接
+        "checkingUP", //校验中， 是下载完成后的校验
+        "forcedUP",//强制上传， 应该已经下载完成了 ？？？
+    ]
+    private quene = [
+        "quenedDL", //在队列中等待下载
+    ]
+
+    private error = [
+        "pausedDL",
+        "error",
+        "missingFiles",
+        "checkingResumeData",
+        "moving",
+        "unknown"
+    ]
+
+    public getCState() {
+        if (this.dl.includes(this.state)) {
+            return "downloading"
+        }
+        if (this.flinsh.includes(this.state)) {
+            return "finish"
+        }
+        if (this.quene.includes(this.state)) {
+            return "quene"
+        }
+        if (this.error.includes(this.state)) {
+            return "error"
+        }
+
+    }
+
+
+
 
     public setProperties(props: TorrentProperties) {
         this.properties = props

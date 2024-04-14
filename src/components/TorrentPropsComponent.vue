@@ -22,7 +22,7 @@
   </ul>
 </template>
 <script lang="ts" setup>
-import { TorrentInfo } from '@/util'
+import { TorrentInfo } from "@/util/TorrentInfo";
 
 const torrentInfo = defineModel<TorrentInfo>()
 
@@ -44,5 +44,4 @@ li {
   }
 
 }
-
 </style>

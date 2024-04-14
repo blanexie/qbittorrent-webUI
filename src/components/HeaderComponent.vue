@@ -15,12 +15,12 @@
         <Plus />
       </el-icon>
     </el-tooltip>
-    <el-tooltip content="全部开始" v-if="data.play" effect="light">
+    <el-tooltip content="全部开始" v-if="store.globalInfo.currentMenu == 'error'" effect="light">
       <el-icon @click="playOrStop()">
         <VideoPlay />
       </el-icon>
     </el-tooltip>
-    <el-tooltip content="全部暂停" v-if="!data.play" effect="light">
+    <el-tooltip content="全部暂停" v-if="store.globalInfo.currentMenu == 'downloading'" effect="light">
       <el-icon @click="playOrStop()">
         <VideoPause />
       </el-icon>
@@ -36,30 +36,30 @@
 import { axios } from "@/requests";
 import StoreDefinition from "@/stores";
 import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from "@element-plus/icons-vue";
-import { reactive } from "vue";
 
-const data = reactive({
-  play: false
-})
 
 const store = StoreDefinition()
 
 const playOrStop = () => {
-  if (data.play) {
+  console.log(store.globalInfo.currentMenu)
+
+  if (store.globalInfo.currentMenu == 'error') {
     const hashs = store.torrentInfos.map(it => it.hash).join("|")
     const from = new FormData()
     from.set("hashes", hashs)
     axios.post('/api/v2/torrents/resume', from)
       .then(resp => {
-        data.play = false
+        store.globalInfo.currentMenu = 'downloading'
       })
-  } else {
+  }
+
+  if (store.globalInfo.currentMenu == 'downloading') {
     const hashs = store.torrentInfos.map(it => it.hash).join("|")
     const from = new FormData()
     from.set("hashes", hashs)
     axios.post('/api/v2/torrents/pause', from)
       .then(resp => {
-        data.play = true
+        store.globalInfo.currentMenu = 'error'
       })
   }
 

@@ -4,8 +4,8 @@
       <FlyIcon class="fly"></FlyIcon>
       <div class="qbt"> Qbittorrent</div>
     </div>
-    <el-menu>
-      <el-menu-item index="2">
+    <el-menu @select="menuSelect" :default-active="store.globalInfo.currentMenu">
+      <el-menu-item index="downloading">
         <template #title>
           <el-icon>
             <Download />
@@ -13,7 +13,7 @@
           下载中
         </template>
       </el-menu-item>
-      <el-menu-item index="3">
+      <el-menu-item index="finish">
         <template #title>
           <el-icon>
             <Finished />
@@ -21,21 +21,21 @@
           已完成
         </template>
       </el-menu-item>
-      <el-menu-item index="4">
+      <el-menu-item index="quene">
         <template #title>
           <el-icon>
             <VideoPause />
           </el-icon>
-          已暂停
+          队列中
         </template>
       </el-menu-item>
 
-      <el-menu-item index="7">
+      <el-menu-item index="error">
         <template #title>
           <el-icon>
             <Warning />
           </el-icon>
-          出错
+          暂停
         </template>
       </el-menu-item>
     </el-menu>
@@ -46,7 +46,15 @@
 <script setup lang="ts">
 import SpeedInfoComponent from '@/components/SpeedInfoComponent.vue';
 import FlyIcon from '@/components/icons/FlyIcon.vue';
+import StoreDefinition from '@/stores';
 import { Download, Finished, VideoPause, Warning } from '@element-plus/icons-vue';
+
+const store = StoreDefinition()
+const menuSelect = (index: string) => {
+  store.globalInfo.currentMenu = index
+}
+
+
 </script>
 <style scoped>
 .side {

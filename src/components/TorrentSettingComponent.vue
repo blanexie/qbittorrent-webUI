@@ -68,7 +68,8 @@
 
 </template>
 <script lang="ts" setup>
-import { ByteData, TorrentInfo, TorrentProperties } from '@/util'
+import { ByteData, TorrentProperties } from '@/util'
+import { TorrentInfo } from "@/util/TorrentInfo";
 import { ElMessage } from 'element-plus'
 import { reactive } from 'vue'
 import { axios } from '@/requests'
@@ -129,5 +130,4 @@ const update = () => {
   margin-top: 10px;
 
 }
-
 </style>

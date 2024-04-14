@@ -24,7 +24,7 @@ import TorrentList from '@/views/TorrentList.vue';
 
 const store = StoreDefinition()
 
-store.syncMainData()
+store.scheduleSyncMainData()
 
 </script>
 
