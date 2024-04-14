@@ -117,7 +117,6 @@ class GlobalInfo {
     public alltime_ul = 1481274895225
     public average_time_queue = 3273
 
-
     public free_space_on_disk = 15657558016
     public global_ratio = "6.60"
     public queued_io_jobs = 0
@@ -137,6 +136,7 @@ class GlobalInfo {
     public rid = 0
     public refresh_interval = 1500
     public currentMenu = "downloading"  //当前目录选择
+    public currentTorrent: TorrentInfo | null = null
 
 
     public refresh(ts: any) {
@@ -157,8 +157,11 @@ class TorrentInfo {
     public total_size: ByteData = new ByteData(657457152)
     public progress = 0.16108787059783936
     public dlspeed = new ByteData(9681262)
+    public dl_limit = new ByteData(9681262)
+    public completed = new ByteData(0)
     public downloaded = new ByteData(9681262)
     public upspeed = new ByteData(4507841)
+    public up_limit = new ByteData(4507841)
     public seeding_time: number = 3 * 60 * 60 + 69
     public eta = 87
     public f_l_piece_prio = false
@@ -175,6 +178,12 @@ class TorrentInfo {
     public state = 'downloading'
     public super_seeding = false
     public magnet_uri = ""
+    public content_path = ''
+    public added_on = 0
+    public last_activity = 0
+    public time_active = 0
+    public tracker = ''
+
 
     public isActive: boolean = false
 
@@ -231,9 +240,6 @@ class TorrentInfo {
 
     }
 
-
-
-
     public setProperties(props: TorrentProperties) {
         this.properties = props
     }
@@ -243,7 +249,7 @@ class TorrentInfo {
     }
 
     public getDownloadSizeStr(): string {
-        return this.getProgress() + '% (' + this.downloaded.getSizeStr() + '/' + this.total_size.getSizeStr() + ')'
+        return this.getProgress() + '% (' + this.completed.getSizeStr() + '/' + this.total_size.getSizeStr() + ')'
     }
 
     public getEtaStr() {
@@ -270,6 +276,18 @@ class TorrentInfo {
         mergeObj(this, ts)
         return this
     }
+
+
+    public getTimeStr(key: string) {
+        if (key == "added_on") {
+            return timeS(this.added_on)
+        }
+        if (key == "last_activity") {
+            return timeS(this.last_activity + this.time_active)
+        }
+        return ''
+    }
+
 
 }
 
@@ -348,6 +366,64 @@ class TorrentListReq {
     }
 }
 
+
+function time(time = +new Date(), type: string = 'yyyy-MM-dd hh:mm:ss') {
+    // 前端开发过程中，常常需要将时间戳转化为标准时间格式供用户浏览
+    // 不借助方法库的情况下，如何又快又好的实现呢？
+    // 下面介绍两种方法
+
+    const date = new Date(time);
+    const Year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const Month = month >= 10 ? month : '0' + month;
+    const day = date.getDate();
+    const Day = day >= 10 ? day : '0' + day;
+    const Hour1 = date.getHours();
+    const Hour = Hour1 < 10 ? '0' + Hour1 : Hour1;
+    const Minute1 = date.getMinutes();
+    const Minute = Minute1 < 10 ? '0' + Minute1 : Minute1;
+    const Second1 = date.getSeconds();
+    const Second = Second1 < 10 ? '0' + Second1 : Second1;
+
+    if (type === 'yyyy-MM-dd') {
+        return Year + '-' + Month + '-' + Day;;
+    } else if (type === 'yyyy-MM-dd hh:mm:ss') {
+        return Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Second;
+    } else if (type === 'hh:mm:ss') {
+        return Hour + ':' + Minute + ':' + Second;
+    } else {
+        return 'error time type!';
+    }
+}
+
+
+function timeS(time: number, type: string = 'yyyy-MM-dd hh:mm:ss') {
+    // 前端开发过程中，常常需要将时间戳转化为标准时间格式供用户浏览
+    // 不借助方法库的情况下，如何又快又好的实现呢？
+    // 下面介绍两种方法
+    const date = new Date(time * 1000);
+    const Year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const Month = month >= 10 ? month : '0' + month;
+    const day = date.getDate();
+    const Day = day >= 10 ? day : '0' + day;
+    const Hour1 = date.getHours();
+    const Hour = Hour1 < 10 ? '0' + Hour1 : Hour1;
+    const Minute1 = date.getMinutes();
+    const Minute = Minute1 < 10 ? '0' + Minute1 : Minute1;
+    const Second1 = date.getSeconds();
+    const Second = Second1 < 10 ? '0' + Second1 : Second1;
+
+    if (type === 'yyyy-MM-dd') {
+        return Year + '-' + Month + '-' + Day;;
+    } else if (type === 'yyyy-MM-dd hh:mm:ss') {
+        return Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Second;
+    } else if (type === 'hh:mm:ss') {
+        return Hour + ':' + Minute + ':' + Second;
+    } else {
+        return 'error time type!';
+    }
+}
 
 function mergeObj(base: any, src: any) {
     if (src) { /* empty */

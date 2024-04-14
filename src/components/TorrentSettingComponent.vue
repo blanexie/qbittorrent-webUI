@@ -1,65 +1,72 @@
 <template>
 
   <el-row>
-    <el-col :span="6">Name:</el-col>
+    <el-col :span="6">名称:</el-col>
     <el-col :span="17">
       <el-input v-model="setting.torrentName"></el-input>
     </el-col>
   </el-row>
 
   <el-row>
-    <el-col :span="6">Save Path:</el-col>
+    <el-col :span="6">保存路径:</el-col>
     <el-col :span="17">
       <el-input v-model="setting.savePath"></el-input>
     </el-col>
   </el-row>
 
   <el-row>
-    <el-col :span="6">Download Limit:</el-col>
+    <el-col :span="6">下载限速:</el-col>
     <el-col :span="17">
       <el-input v-model="setting.downloadLimit.bytes"></el-input>
     </el-col>
   </el-row>
 
   <el-row>
-    <el-col :span="6">Upload Limit:</el-col>
+    <el-col :span="6">上传限速:</el-col>
     <el-col :span="17">
       <el-input v-model="setting.uploadLimit.bytes"></el-input>
     </el-col>
   </el-row>
 
   <el-row>
-    <el-col :span="6">Category:</el-col>
+    <el-col :span="6">分类:</el-col>
     <el-col :span="17">
       <el-input v-model="setting.category"></el-input>
     </el-col>
   </el-row>
   <el-row>
-    <el-col :span="6">Tag:</el-col>
+    <el-col :span="6">标签:</el-col>
     <el-col :span="17">
       <el-input v-model="setting.tags"></el-input>
     </el-col>
   </el-row>
   <el-row>
-    <el-col :span="6">Sequential:</el-col>
+    <el-col :span="6">顺序下载:</el-col>
     <el-col :span="17">
-      <el-input v-model="setting.sequential"></el-input>
+      <el-switch v-model="setting.sequential" />
     </el-col>
   </el-row>
 
   <el-row>
-    <el-col :span="6">Super Seed:</el-col>
+    <el-col :span="6">超级种子:</el-col>
     <el-col :span="17">
-      <el-input v-model="setting.superSeed"></el-input>
+      <el-switch v-model="setting.superSeed" />
     </el-col>
   </el-row>
 
   <el-row>
-    <el-col :span="6">first/last piece priority:</el-col>
+    <el-col :span="6">优先下载首尾:</el-col>
     <el-col :span="17">
-      <el-input v-model="setting.f_l_piece_prio"></el-input>
+      <el-switch v-model="setting.f_l_piece_prio" />
     </el-col>
   </el-row>
+  <el-row>
+    <el-col :span="6">自动Torrent管理:</el-col>
+    <el-col :span="17">
+      <el-switch v-model="setting.autoManagement" />
+    </el-col>
+  </el-row>
+
   <el-row>
     <el-col>
       <el-button @click="update" type="primary">修改</el-button>
@@ -68,13 +75,11 @@
 
 </template>
 <script lang="ts" setup>
-import { ByteData, TorrentProperties } from '@/util'
-import { TorrentInfo } from "@/util/TorrentInfo";
-import { ElMessage } from 'element-plus'
-import { reactive } from 'vue'
-import { axios } from '@/requests'
-
-const torrentInfo = defineModel<TorrentInfo>()
+import StoreDefinition from '@/stores';
+import { ByteData } from '@/util';
+import { reactive } from 'vue';
+const store = StoreDefinition()
+const torrentInfo = store.globalInfo.currentTorrent
 
 
 class Setting {
@@ -87,37 +92,25 @@ class Setting {
   sequential = false
   superSeed = false
   f_l_piece_prio = false
+  autoManagement = true
 }
-
 
 const setting = reactive(new Setting())
 
-const url = '/api/v2/torrents/properties?hash=' + torrentInfo.value?.hash
-axios.get(url).then(resp => {
-  const tinfo = torrentInfo.value!!
+const torrent = torrentInfo!!
+setting.savePath = torrent.content_path
+setting.superSeed = torrent.super_seeding
+setting.sequential = torrent.seq_dl
+setting.uploadLimit = torrent.up_limit
+setting.downloadLimit = torrent.dl_limit
+setting.category = torrent.category
+setting.tags = torrent.tags.split(',')
+setting.torrentName = torrent.name
 
-  const tp = resp.data as TorrentProperties
-  torrentInfo.value?.setProperties(tp)
-  setting.savePath = tp.save_path
-  setting.superSeed = tinfo.super_seeding
-  setting.sequential = tinfo.seq_dl
-  setting.uploadLimit = new ByteData(tp.up_limit)
-  setting.downloadLimit = new ByteData(tp.dl_limit)
-  setting.category = tinfo.category
-  setting.tags = tinfo.tags.split(',')
 
-}).catch(error => {
-  ElMessage.error('获取基本信息失败' + error)
-})
 
 
 const update = () => {
-  const tp = torrentInfo.value!!.properties
-  if (tp.dl_limit === setting.downloadLimit.bytes) {
-    console.log('下载速度没有限制')
-  } else {
-    // 设置上传速度限制
-  }
 
 
 
@@ -129,5 +122,9 @@ const update = () => {
 .el-row {
   margin-top: 10px;
 
+  .el-col:first-child {
+    text-align: right;
+    padding-right: 10px;
+  }
 }
 </style>

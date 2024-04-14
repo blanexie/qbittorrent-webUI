@@ -61,8 +61,7 @@
     </li>
   </ul>
 
-  <TorrentDetail v-model:show="show" v-model:torrent-info="detail" />
-
+  <TorrentDetail v-model:show="show" />
   <el-dialog v-model="dialogVisible" title="" width="500">
     &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteFiles" />
     <template #footer>
@@ -86,7 +85,7 @@ import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 
 const store = StoreDefinition()
-const detail = ref<TorrentInfo>()
+const detail = ref<TorrentInfo>(new TorrentInfo(""))
 const show = ref<boolean>(false)
 const deleteFiles = ref<boolean>(false)
 const deleteHash = ref<string>("")
@@ -160,13 +159,12 @@ const pause = (t: TorrentInfo) => {
 }
 
 const showDetail = (item: TorrentInfo) => {
-  if (detail.value) {
-    detail.value.isActive = false
-  }
+  detail.value.isActive = false
   detail.value = item
   item.isActive = true
   //显示当前点击torrent的详情
   show.value = true
+  store.globalInfo.currentTorrent = item
 }
 
 const handleClick = (item: TorrentInfo) => {

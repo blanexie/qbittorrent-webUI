@@ -43,7 +43,7 @@ const StoreDefinition =
          * @param reset
          */
         const scheduleSyncMainData = (reset: boolean = false, schedule: boolean = true) => {
-            const scheduleTime = 2000
+            const scheduleTime = 3000
             const info = store.info
             if (reset) {
                 info.rid = 0
