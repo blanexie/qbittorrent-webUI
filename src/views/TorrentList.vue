@@ -1,7 +1,7 @@
 <template>
   <ul>
-    <li v-for="t in  store.torrentInfos " v-bind:key="t.hash" @click="handleClick(t as TorrentInfo)"
-      :class="{ 'border-color': t.isActive }">
+    <li v-for=" t in store.torrentInfos " v-bind:key="t.hash" @click="active(t as TorrentInfo)"
+        :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
         <span class="li-left">
@@ -33,7 +33,6 @@
               <Warning />
             </el-icon>
           </el-tooltip>
-
         </span>
       </div>
 
@@ -42,8 +41,6 @@
           <span> </span>
         </el-progress>
       </div>
-
-
 
       <div class="p3">
         <span class="li-left">{{ t.getDownloadSizeStr() }}
@@ -57,16 +54,16 @@
           吸血：{{ t.num_leechs }}
         </span>
       </div>
-
+      <TorrentDetail v-model="t.hash" />
     </li>
   </ul>
 
-  <TorrentDetail v-model:show="show" />
-  <el-dialog v-model="dialogVisible" title="" width="500">
-    &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteFiles" />
+
+  <el-dialog v-model="deleteDialog.visible" title="" width="500">
+    &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteDialog.deleteFiles" />
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button @click="deleteDialog.visible = false">取消</el-button>
         <el-button type="primary" @click="remove">
           确认
         </el-button>
@@ -78,70 +75,77 @@
 <script setup lang="ts">
 import { axios } from '@/requests'
 import StoreDefinition from '@/stores'
-import { TorrentInfo } from "@/util"
+import { TorrentInfo } from '@/util'
 import TorrentDetail from '@/views/TorrentDetail.vue'
 import { Close, Connection, VideoPause, VideoPlay, Warning } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { ref } from 'vue'
+import { reactive } from 'vue'
 
 const store = StoreDefinition()
-const detail = ref<TorrentInfo>(new TorrentInfo(""))
-const show = ref<boolean>(false)
-const deleteFiles = ref<boolean>(false)
-const deleteHash = ref<string>("")
-const dialogVisible = ref<boolean>(false)
 
+const deleteDialog = reactive({
+  deleteFiles: true,
+  hash: '',
+  visible: false
+})
+
+const active = (t: TorrentInfo) => {
+  store.torrentInfos.forEach(it => it.isActive = false)
+  t.isActive = true
+}
+
+const showDetail = (t: TorrentInfo) => {
+  t.show = true
+}
 
 const getProgressState = (t: TorrentInfo): string => {
-  if (t.getCState() == "downloading") {
+  if (t.getCState() == 'downloading') {
     return ''
   }
-  if (t.getCState() == "finish") {
+  if (t.getCState() == 'finish') {
     return 'success'
   }
-  if (t.getCState() == "quene") {
+  if (t.getCState() == 'quene') {
     return 'warning'
   }
-  if (t.getCState() == "error") {
+  if (t.getCState() == 'error') {
     return 'exception'
   }
   return ''
 }
 
-
-
 const copyLink = (t: TorrentInfo) => {
   // 判断浏览器是否支持 Clipboard API
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(t.magnet_uri);
-    ElMessage.success("磁力链接已经写入剪切板")
+    navigator.clipboard.writeText(t.magnet_uri)
+    ElMessage.success('磁力链接已经写入剪切板')
   } else {
-    console.error('浏览器不支持 Clipboard API。');
+    console.error('浏览器不支持 Clipboard API。')
   }
 }
 
 
 const showRemoveDialog = (t: TorrentInfo) => {
-  dialogVisible.value = true
-  deleteHash.value = t.hash
+  deleteDialog.visible = true
+  deleteDialog.hash = t.hash
 }
 
 const remove = () => {
   const from = new FormData()
-  from.set("hashes", deleteHash.value)
-  from.set("deleteFiles", deleteFiles.value + "")
+  from.set('hashes', deleteDialog.hash)
+  from.set('deleteFiles', String(deleteDialog.deleteFiles))
   axios.post('/api/v2/torrents/delete', from)
     .then(() => {
-      dialogVisible.value = false
-      deleteHash.value = ''
+      deleteDialog.visible = false
+      deleteDialog.hash = ''
       store.globalInfo.rid = 0
     })
-
 }
+
 
 const resume = (t: TorrentInfo) => {
   const from = new FormData()
-  from.set("hashes", t.hash)
+  from.set('hashes', t.hash)
   axios.post('/api/v2/torrents/resume', from)
     .then(resp => {
 
@@ -151,28 +155,11 @@ const resume = (t: TorrentInfo) => {
 
 const pause = (t: TorrentInfo) => {
   const from = new FormData()
-  from.set("hashes", t.hash)
+  from.set('hashes', t.hash)
   axios.post('/api/v2/torrents/pause', from)
     .then(resp => {
 
     })
-}
-
-const showDetail = (item: TorrentInfo) => {
-  detail.value.isActive = false
-  detail.value = item
-  item.isActive = true
-  //显示当前点击torrent的详情
-  show.value = true
-  store.globalInfo.currentTorrent = item
-}
-
-const handleClick = (item: TorrentInfo) => {
-  if (detail.value) {
-    detail.value.isActive = false
-  }
-  detail.value = item
-  item.isActive = true
 }
 
 </script>

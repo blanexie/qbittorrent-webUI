@@ -53,8 +53,6 @@ const store = StoreDefinition()
 const menuSelect = (index: string) => {
   store.globalInfo.currentMenu = index
 }
-
-
 </script>
 <style scoped>
 .side {
