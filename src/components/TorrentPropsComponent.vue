@@ -10,8 +10,12 @@
     <li><span>进度:</span><span>{{ torrent?.getDownloadSizeStr() }}</span></li>
     <li><span>速度:</span>
       <span>
-        <el-icon><Bottom /></el-icon> {{ torrent?.dlspeed.getSpeedStr() }}&nbsp;&nbsp;
-        <el-icon><Top /></el-icon> {{ torrent?.upspeed.getSpeedStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-icon>
+          <Bottom />
+        </el-icon> {{ torrent?.dlspeed.getSpeedStr() }}&nbsp;&nbsp;
+        <el-icon>
+          <Top />
+        </el-icon> {{ torrent?.upspeed.getSpeedStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
       </span>
     </li>
     <li><span>限速:</span>
@@ -37,11 +41,11 @@
   </ul>
 </template>
 <script lang="ts" setup>
-import { inject } from 'vue'
-import { TorrentInfo } from '@/util'
-import { Bottom, Download, Top, Upload } from '@element-plus/icons-vue'
+import { TorrentInfo } from '@/util';
+import { Bottom, Download, Top, Upload } from '@element-plus/icons-vue';
+import { inject } from 'vue';
 
-const torrent = inject<TorrentInfo>('torrent')
+const torrent = inject<TorrentInfo>("torrent")
 
 </script>
 <style scoped>

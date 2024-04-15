@@ -1,7 +1,7 @@
 <template>
   <ul>
     <li v-for=" t in store.torrentInfos " v-bind:key="t.hash" @click="active(t as TorrentInfo)"
-        :class="{ 'border-color': t.isActive }">
+      :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
         <span class="li-left">
@@ -54,7 +54,9 @@
           吸血：{{ t.num_leechs }}
         </span>
       </div>
-      <TorrentDetail v-model="t.hash" />
+
+      <TorrentDetail v-model:show="t.show" v-model:torrent="t as TorrentInfo" />
+
     </li>
   </ul>
 
@@ -83,6 +85,10 @@ import { reactive } from 'vue'
 
 const store = StoreDefinition()
 
+const showDetail = (t: TorrentInfo) => {
+  t.show = true
+}
+
 const deleteDialog = reactive({
   deleteFiles: true,
   hash: '',
@@ -94,9 +100,6 @@ const active = (t: TorrentInfo) => {
   t.isActive = true
 }
 
-const showDetail = (t: TorrentInfo) => {
-  t.show = true
-}
 
 const getProgressState = (t: TorrentInfo): string => {
   if (t.getCState() == 'downloading') {

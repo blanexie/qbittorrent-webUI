@@ -1,8 +1,8 @@
 <template>
-  <el-drawer v-model="(torrent as TorrentInfo).show" :with-header="false" direction="rtl" size="600" >
+  <el-drawer v-model="show" :with-header="false" direction="rtl" size="600">
 
     <el-text size="large" truncated>
-      {{ (torrent as TorrentInfo).name }}
+      {{ torrent?.name }}
     </el-text>
 
     <el-tabs v-model="activeName">
@@ -25,14 +25,13 @@
 <script setup lang="ts">
 import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue';
 import TorrentSettingComponent from '@/components/TorrentSettingComponent.vue';
-import type { TorrentInfo } from '@/util';
-import { ref, provide } from 'vue';
-import StoreDefinition from '@/stores'
-
-const hash = defineModel<string>()
-const store = StoreDefinition()
-const torrent = store.torrentInfos.filter(it => it.hash == hash.value).pop()
+import { TorrentInfo } from '@/util';
+import { provide, ref } from 'vue';
+const show = defineModel<boolean>("show")
+const torrent = defineModel<TorrentInfo>("torrent")
 provide("torrent", torrent)
+console.log("tttt", torrent)
+
 
 const activeName = ref('first')
 </script>

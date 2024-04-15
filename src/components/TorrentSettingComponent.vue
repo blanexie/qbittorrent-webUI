@@ -98,11 +98,11 @@
 
 </template>
 <script lang="ts" setup>
-import { TorrentInfo } from '@/util'
-import { inject, reactive } from 'vue'
-import { axios } from '@/requests'
+import { axios } from '@/requests';
+import { TorrentInfo } from '@/util';
+import { inject, reactive } from 'vue';
 
-const torrentInfo = inject<TorrentInfo>('torrent')
+const torrentInfo = inject<TorrentInfo>("torrent")
 
 const setting = reactive({
   savePath: '',
