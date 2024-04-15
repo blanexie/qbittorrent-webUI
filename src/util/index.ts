@@ -113,6 +113,9 @@ class GlobalInfo {
   public up_info_speed = new ByteData(1631)
   public up_rate_limit = new ByteData(13)
 
+  public categories: string[] = []
+  public tags: string[] = []
+
   public alltime_d = 224357181908
   public alltime_ul = 1481274895225
   public average_time_queue = 3273
