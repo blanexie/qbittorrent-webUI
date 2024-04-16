@@ -180,6 +180,7 @@ ul {
   li {
     margin-bottom: 20px;
     border: 1px solid #91949a;
+    background-color: #ffffff;
     border-radius: 10px;
     padding: 10px;
     cursor: pointer;
@@ -227,6 +228,7 @@ ul {
       margin-top: 5px;
       padding-right: 5px;
       font-size: 12px;
+      color: #979795;
 
       .icon {
         font-size: 14px;

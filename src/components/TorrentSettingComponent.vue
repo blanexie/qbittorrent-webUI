@@ -94,9 +94,7 @@
 import { TorrentSetting } from '@/util';
 
 const setting = defineModel<TorrentSetting>()
-
 console.log("setting", setting)
-
 
 const update = () => {
 

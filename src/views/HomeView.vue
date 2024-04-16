@@ -34,4 +34,7 @@ console.log("torrentInfos", store.torrentInfos)
   background-color: #efefef;
   color: var(--el-text-color-primary);
 }
+.el-main{
+  background-color: #f9f9f9;
+}
 </style>
