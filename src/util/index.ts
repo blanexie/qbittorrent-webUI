@@ -1,17 +1,18 @@
+class TorrentSetting {
+    public savePath = ''
+    public downloadLimit = 0
+    public downloadLimitUnit = 1
+    public uploadLimit = 0
+    public uploadLimitUnit = 1
+    public torrentName = ''
+    public category = ''
+    public tags = new Array<string>()
+    public sequential = false
+    public superSeed = false
+    public f_l_piece_prio = false
+    public autoManagement = true
 
-class Context {
-
-    public core: Map<string, any> = new Map()
-
-    public provide(name: string, obj: any) {
-        this.core.set(name, obj)
-    }
-
-    public get<T>(name: string): T {
-        return this.core.get(name) as T
-    }
 }
-
 
 class ByteData {
     /**
@@ -630,7 +631,7 @@ class Preference {
 
 
 export {
-    ByteData, Context, GlobalInfo, Preference, TorrentInfo,
+    ByteData, TorrentSetting, GlobalInfo, Preference, TorrentInfo,
     TorrentListReq, TorrentProperties, mergeObj
 }
 
