@@ -14,17 +14,21 @@
         <TorrentSettingComponent v-model="setting.data"></TorrentSettingComponent>
       </el-tab-pane>
 
-      <el-tab-pane label="Files">Role</el-tab-pane>
+      <el-tab-pane label="Files">
+        <TorrentContentComponent v-model:hash="torrentInfo!.hash"></TorrentContentComponent>
+      </el-tab-pane>
 
-      <el-tab-pane label="Other">Task</el-tab-pane>
+      <el-tab-pane label="Tackers">Task</el-tab-pane>
 
     </el-tabs>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
+import TorrentContentComponent from '@/components/TorrentContentComponent.vue';
 import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue';
 import TorrentSettingComponent from '@/components/TorrentSettingComponent.vue';
+
 import { TorrentInfo, TorrentSetting } from '@/util';
 import { provide, reactive } from 'vue';
 const show = defineModel<boolean>("show")

@@ -14,6 +14,18 @@ class TorrentSetting {
     public firstOpen = true
 }
 
+
+class TorrentFile {
+    public index = 0
+    public is_seed = false
+    public name = "debian-8.1.0-amd64-CD-1.iso"
+    public piece_range = [0, 1253]
+    public priority = 1
+    public progress = 0
+    public size = 657457152
+    public availability = 0.5
+}
+
 class ByteData {
     /**
      *
@@ -632,7 +644,7 @@ class Preference {
 
 
 export {
-    ByteData, TorrentSetting, GlobalInfo, Preference, TorrentInfo,
-    TorrentListReq, TorrentProperties, mergeObj
+    TorrentFile, ByteData, GlobalInfo, Preference, TorrentInfo,
+    TorrentListReq, TorrentProperties, TorrentSetting, mergeObj
 }
 
