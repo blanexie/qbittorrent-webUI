@@ -91,8 +91,7 @@
 
 </template>
 <script lang="ts" setup>
-import { TorrentInfo, TorrentSetting } from '@/util';
-import { inject, reactive } from 'vue';
+import { TorrentSetting } from '@/util';
 
 const setting = defineModel<TorrentSetting>()
 
