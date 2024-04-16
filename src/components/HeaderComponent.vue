@@ -36,6 +36,7 @@
 import { axios } from "@/requests";
 import StoreDefinition from "@/stores";
 import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
 
 
 const store = StoreDefinition()
@@ -77,6 +78,7 @@ const refreshClick = (event: Event) => {
   const element = event.target as HTMLElement;
   // 将元素旋转 360 度
   element.style.transform = 'rotate(360deg)';
+  ElMessage.success("刷新成功")
 }
 
 </script>

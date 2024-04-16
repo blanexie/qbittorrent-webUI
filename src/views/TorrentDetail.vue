@@ -33,13 +33,12 @@ provide("torrent", torrentInfo)
 
 const setting = reactive({
   data: new TorrentSetting(),
-  firstOpen: true
 })
 
 const openDrawer = () => {
-  if (setting.firstOpen) {
+  if (setting.data.firstOpen) {
     const torrent = torrentInfo.value!!
-    setting.data.savePath = torrent.content_path
+    setting.data.savePath = torrent.save_path
     setting.data.downloadLimit = torrent?.dl_limit.getSize()
     setting.data.downloadLimitUnit = torrent?.dl_limit.getUnit()
     setting.data.uploadLimit = torrent?.up_limit.getSize()
@@ -51,7 +50,7 @@ const openDrawer = () => {
     setting.data.superSeed = torrent?.super_seeding
     setting.data.f_l_piece_prio = torrent?.f_l_piece_prio
     //记录首次打开
-    setting.firstOpen = false
+    setting.data.firstOpen = false
   }
 }
 

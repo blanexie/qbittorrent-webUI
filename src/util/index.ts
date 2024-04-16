@@ -11,7 +11,7 @@ class TorrentSetting {
     public superSeed = false
     public f_l_piece_prio = false
     public autoManagement = true
-
+    public firstOpen = true
 }
 
 class ByteData {
@@ -199,8 +199,9 @@ class TorrentInfo {
     public last_activity = 0
     public time_active = 0
     public tracker = ''
-    public show: boolean = false
+    public save_path = '/Downloads/debian-8.1.0-amd64-CD-1.iso'
 
+    public show: boolean = false
     public isActive: boolean = false
 
     public properties = new TorrentProperties()

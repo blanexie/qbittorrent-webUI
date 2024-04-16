@@ -85,67 +85,142 @@
     <el-col> &nbsp;
     </el-col>
     <el-col>
-      <el-button @click="update" type="primary">修改</el-button>
+      <el-button @click="update" :loading="loading" type="primary">修改</el-button>
     </el-col>
   </el-row>
 
 </template>
 <script lang="ts" setup>
-import { TorrentSetting } from '@/util';
-
+import { axios } from "@/requests";
+import { TorrentInfo, TorrentSetting } from '@/util';
+import { ElMessage, ElNotification } from 'element-plus';
+import { inject, ref } from "vue";
+const torrentInfo = inject<TorrentInfo>("torrent")
 const setting = defineModel<TorrentSetting>()
-console.log("setting", setting)
+
+const loading = ref(false)
+
+
+if (setting.value?.downloadLimit === 0) {
+  setting.value.downloadLimitUnit = 1024
+}
+if (setting.value?.uploadLimit === 0) {
+  setting.value.uploadLimitUnit = 1024
+}
+
 
 const update = () => {
+  loading.value = true
+  const torrent = torrentInfo?.value
+  const set = setting.value
+  if (set && torrent) {
+    /* empty */
+  } else {
+    ElMessage.error("页面加载数据失败，无法修改")
+    loading.value = false
+    return
+  }
+  const promises = []
+  //超级种子
+  if (set.superSeed != torrent.super_seeding) {
+    const from = new FormData()
+    from.set("hashes", torrent.hash)
+    from.set("value", set.superSeed + "")
+    const url = `/api/v2/torrents/setSuperSeeding`
+    const promise = axios.post(url, from).then(resp => {
+      console.log(resp)
+      ElMessage.success("设置超级种子成功")
+    }).catch(error => {
+      ElMessage.error("设置超级种子失败，" + error)
+    })
+    promises.push(promise)
+  }
 
-  // //超级种子
-  // if (setting.superSeed != torrent.super_seeding) {
-  //   const url = `/api/v2/torrents/setSuperSeeding?hashes=${torrent.hash}?value=${setting.superSeed}`
-  //   axios.get(url).then(resp => {
+  //顺序下载
+  if (set.sequential != torrent.seq_dl) {
+    const from = new FormData()
+    from.set("hashes", torrent.hash)
+    const url = `/api/v2/torrents/toggleSequentialDownload`
+    const promise = axios.post(url, from).then(resp => {
+      console.log(resp)
+      ElMessage.success("设置顺序下载成功")
+    }).catch(error => {
+      ElMessage.error("设置顺序下载失败，" + error)
+    })
+    promises.push(promise)
+  }
 
-  //   })
-  // }
+  //名称
+  if (set.torrentName != torrent.name) {
+    const from = new FormData()
+    from.set("hash", torrent.hash)
+    from.set("name", set.torrentName)
+    const url = '/api/v2/torrents/rename'
+    const promise = axios.post(url, from).then(resp => {
+      console.log(resp)
+      ElMessage.success("修改名称成功")
+    }).catch(error => {
+      ElMessage.error("修改名称成功失败，" + error)
+    })
+    promises.push(promise)
+  }
 
-  // //顺序下载
-  // if (setting.sequential != torrent.seq_dl) {
-  //   const url = `/api/v2/torrents/toggleSequentialDownload?hashes=${torrent.hash}`
-  //   axios.get(url).then(resp => {
+  //保存路径
+  if (set.savePath !== torrent.save_path) {
+    const from = new FormData()
+    from.set("hashes", torrent.hash)
+    from.set("location", set.savePath)
+    const url = '/api/v2/torrents/setLocation'
+    const promise = axios.post(url, from).then(resp => {
+      console.log(resp)
+      ElMessage.success("修改保存路径成功")
+    }).catch(error => {
+      ElMessage.error("修改保存路径成功" + error)
+    })
+    promises.push(promise)
+  }
+  //下载限速
+  const dlLimit = set.downloadLimit * set.downloadLimitUnit
+  if (dlLimit != torrent.dl_limit.bytes) {
+    const from = new FormData()
+    from.set("hashes", torrent.hash)
+    from.set("limit", dlLimit + "")
+    const url = '/api/v2/torrents/setDownloadLimit'
+    const promise = axios.post(url, from).then(resp => {
+      console.log(resp)
+      ElMessage.success("修改下载限速成功")
+    }).catch(error => {
+      ElMessage.error("修改下载限速失败" + error)
+    })
+    promises.push(promise)
+  }
+  //上传限速
+  const upLimit = set.uploadLimit * set.uploadLimitUnit
+  if (upLimit != torrent.up_limit.bytes) {
+    const from = new FormData()
+    from.set("hashes", torrent.hash)
+    from.set("limit", upLimit + "")
+    const url = '/api/v2/torrents/setUploadLimit'
+    const promise = axios.post(url, from).then(resp => {
+      console.log(resp)
+      ElMessage.success("修改上传限速成功")
+    }).catch(error => {
+      ElMessage.error("修改上传限速失败" + error)
+    })
+    promises.push(promise)
+  }
 
-  //   })
-  // }
+  Promise.all(promises).then(resp => {
 
-  // //名称
-  // if (setting.torrentName != torrent.name) {
-  //   const url = '/api/v2/torrents/rename?hash=' + torrent?.hash + '&name=' + setting.torrentName
-  //   axios.get(url).then(resp => {
-
-  //   })
-  // }
-
-  // //保存路径
-  // if (setting.savePath !== torrent.content_path) {
-  //   const url = '/api/v2/torrents/setLocation?hashes=' + torrent?.hash + '&location=' + setting.savePath
-  //   axios.get(url).then(resp => {
-
-  //   })
-  // }
-  // //下载限速
-  // const dlLimit = setting.downloadLimit * setting.downloadLimitUnit
-  // if (dlLimit != torrent.dl_limit.bytes) {
-  //   const url = '/api/v2/torrents/setDownloadLimit?hashes=' + torrent?.hash + '&limit=' + dlLimit
-  //   axios.get(url).then(resp => {
-
-  //   })
-  // }
-  // //上传限速
-  // const upLimit = setting.uploadLimit * setting.uploadLimitUnit
-  // if (upLimit != torrent.up_limit.bytes) {
-  //   const url = '/api/v2/torrents/setUploadLimit?hashes=' + torrent?.hash + '&limit=' + upLimit
-  //   axios.get(url).then(resp => {
-
-  //   })
-  // }
-
+  }).catch(error => {
+    ElNotification({
+      title: 'Error',
+      message: "修改有失败" + error,
+      type: 'error',
+    })
+  })
+  loading.value = false
+  set.firstOpen = true
 }
 
 
