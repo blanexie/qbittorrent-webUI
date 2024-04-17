@@ -23,7 +23,7 @@ import StoreDefinition from '@/stores';
 import TorrentList from '@/views/TorrentList.vue';
 
 const store = StoreDefinition()
-store.scheduleSyncMainData()
+store.scheduleSyncMainData(true)
 
 console.log("torrentInfos", store.torrentInfos)
 
@@ -34,7 +34,8 @@ console.log("torrentInfos", store.torrentInfos)
   background-color: #efefef;
   color: var(--el-text-color-primary);
 }
-.el-main{
+
+.el-main {
   background-color: #f9f9f9;
 }
 </style>

@@ -18,20 +18,28 @@ class TorrentSetting {
 class TorrentFile {
     public index = 0
     public is_seed = false
+    public fullPath = ""
+    public prefix: string = ""
     public name = ""
     public piece_range = [0, 1253]
     public priority = 1
     public progress = 0
     public size = 657457152
     public availability = 0.5
+    public isLeaf = false
 
     public children: TorrentFile[] = []
 
-
-    public constructor(name: string) {
-        this.name = name
+    public showText(): string {
+        return "下载：" + Math.floor(this.progress * 100) + " 大小：" + new ByteData(this.size).getSizeStr()
     }
-    
+
+    public constructor(prefix: string, name: string) {
+        this.name = name
+        this.prefix = prefix
+        this.fullPath = prefix + "/" + name
+    }
+
 }
 
 class ByteData {
@@ -366,42 +374,6 @@ class TorrentProperties {
 }
 
 
-class TorrentListReq {
-    filter: string = 'all'
-    category: string | undefined = undefined
-    tag: string | undefined = undefined
-    sort: string | undefined = undefined
-    reverse: boolean = false
-    limit: number = 10
-    offset: number = 0
-    hashes: string | undefined = undefined
-
-    public getReqStr(): string {
-        let path = this.filter
-        if (this.category) {
-            path = `${path}&category=${this.category}`
-        }
-        if (this.tag) {
-            path = `${path}&tag=${this.tag}`
-        }
-        if (this.sort) {
-            path = `${path}&sort=${this.sort}`
-        }
-        if (this.reverse) {
-            path = `${path}&reverse=${this.reverse}`
-        }
-        if (this.limit) {
-            path = `${path}&limit =${this.limit}`
-        }
-        if (this.offset) {
-            path = `${path}&limit =${this.offset}`
-        }
-        if (this.hashes) {
-            path = `${path}&limit =${this.hashes}`
-        }
-        return path
-    }
-}
 
 
 function time(time = +new Date(), type: string = 'yyyy-MM-dd hh:mm:ss') {
@@ -652,7 +624,7 @@ class Preference {
 
 export {
     ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo,
-    TorrentListReq, TorrentProperties, TorrentSetting, mergeObj
+    TorrentProperties, TorrentSetting, mergeObj
 }
-}
+
 

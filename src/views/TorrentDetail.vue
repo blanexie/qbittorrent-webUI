@@ -5,20 +5,20 @@
       {{ torrent?.name }}
     </el-text>
 
-    <el-tabs>
-      <el-tab-pane label="Props">
+    <el-tabs :before-leave="beforeLeave" v-model="active">
+      <el-tab-pane label="Props" name="Props">
         <TorrentPropsComponent></TorrentPropsComponent>
       </el-tab-pane>
 
-      <el-tab-pane label="Setting">
+      <el-tab-pane label="Setting" name="Setting">
         <TorrentSettingComponent v-model="setting.data"></TorrentSettingComponent>
       </el-tab-pane>
 
-      <el-tab-pane label="Files">
+      <el-tab-pane label="Files" name="Files">
         <TorrentContentComponent v-model="root.data"></TorrentContentComponent>
       </el-tab-pane>
 
-      <el-tab-pane label="Tackers">Task</el-tab-pane>
+      <el-tab-pane label="Tackers" name="Tackers">Task</el-tab-pane>
 
     </el-tabs>
   </el-drawer>
@@ -28,13 +28,14 @@
 import TorrentContentComponent from '@/components/TorrentContentComponent.vue';
 import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue';
 import TorrentSettingComponent from '@/components/TorrentSettingComponent.vue';
+import { axios } from '@/requests';
 import { TorrentFile, TorrentInfo, TorrentSetting } from '@/util';
-import { files2 } from "@/util/test";
-import { provide, reactive } from 'vue';
+import { ElMessage } from 'element-plus';
+import { provide, reactive, ref } from 'vue';
 const show = defineModel<boolean>("show")
 const torrentInfo = defineModel<TorrentInfo>("torrent")
 provide("torrent", torrentInfo)
-
+const active = ref("Props")
 const setting = reactive({
   data: new TorrentSetting(),
 })
@@ -45,7 +46,13 @@ const root = reactive({
 
 const openDrawer = () => {
   initSetting()
-  getFiles()
+
+}
+
+const beforeLeave = (activeName: string) => {
+  if (activeName == "Files") {
+    getFiles()
+  }
 }
 
 const initSetting = () => {
@@ -66,46 +73,53 @@ const initSetting = () => {
     setting.data.firstOpen = false
   }
 }
-
+const map = new Map<String, TorrentFile>()
 
 const getFiles = () => {
   const hash = torrentInfo.value?.hash
   const url = '/api/v2/torrents/files?hash=' + hash + '&' + new Date().getTime()
-
-  const fs = files2.map(it => it as TorrentFile)
-  root.data = buildTree(fs)
-
-  console.log("11111111111111111111", JSON.stringify(root))
-
-  // axios.get(url).then(resp => {
-  //   torrentFiles.data = resp.data as Array<TorrentFile>
-  // }).catch(error => {
-  //   ElMessage.error("获取内容信息失败" + error)
-  // })
-
+  axios.get(url).then(resp => {
+    root.data.length = 0
+    const data = resp.data as Array<TorrentFile>
+    buildTree(data)
+    console.log("ssssssssssss", root.data)
+  }).catch(error => {
+    ElMessage.error("获取内容信息失败" + error)
+  })
 }
 
-
 const buildTree = (files: TorrentFile[]) => {
-  const map = new Map<string, TorrentFile>()
-  const root: TorrentFile[] = []
   files.forEach(it => {
+    console.log(it)
+    it.isLeaf = true
     const name = it.name
     const [prefix, last] = splitPrefix(name)
-    const p = findPrefix(prefix, root, map)
-    it.name = last
-    p.children.push(it)
-  })
-  const set = new Set<string>()
-  return root.filter(it => {
-    if (set.has(it.name)) {
-      return false
+    if (prefix == '') {
+      root.data.push(it)
     } else {
-      set.add(it.name)
-      return true
+      const p = findPrefix(prefix)
+      it.name = last
+      it.prefix = prefix
+      p.children.push(it)
     }
   })
+}
 
+const findPrefix = (prefix: string): TorrentFile => {
+  const v = map.get(prefix)
+  if (v) {
+    return v
+  }
+  const [p, l] = splitPrefix(prefix)
+  const t = new TorrentFile(p, l)
+  map.set(prefix, t)
+  if (p == '') {
+    root.data.push(t)
+  } else {
+    const t1 = findPrefix(p)
+    t1.children.push(t)
+  }
+  return t
 }
 
 const splitPrefix = (name: string) => {
@@ -121,35 +135,6 @@ const splitPrefix = (name: string) => {
   paths.length = paths.length - 1
   const prefix = paths.join("/")
   return [prefix, last]
-}
-
-
-
-const findPrefix = (prefix: string, root: TorrentFile[], map: Map<string, TorrentFile>): TorrentFile => {
-  let prefixV = map.get(prefix)
-  if (prefixV) {
-    return prefixV
-  } else {
-    const [prefixF, last] = splitPrefix(prefix)
-    if (prefixF == '') {
-      //先检查map中是否存在
-      let file = map.get(last)
-      if (file) {
-        root.push(file)
-      } else {
-        file = new TorrentFile(last)
-        map.set(last, file)
-      }
-      return file
-    } else {
-      const pFile = findPrefix(prefixF, root, map)
-      const file = new TorrentFile(last)
-      pFile.children.push(file)
-      map.set(file.name, file)
-      return file
-    }
-  }
-
 }
 
 </script>
