@@ -2,7 +2,6 @@
   <ul>
 
     <li><span>InfoHash:</span><span>{{ torrent?.hash }}</span></li>
-    <li><span>tracker:</span><span>{{ torrent?.tracker }}</span></li>
     <li><span>添加时间:</span><span>{{ torrent?.getTimeStr('added_on') }}</span></li>
     <li><span>剩余时间:</span><span>{{ torrent?.getEtaStr() }}</span></li>
     <li><span>存储路径:</span><span>{{ torrent?.content_path }}</span></li>

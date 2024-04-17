@@ -1,20 +1,13 @@
 <template>
-    <div></div>
+    <el-tree style="max-width: 600px" :data="root" show-checkbox node-key="name" :props="defaultProps"></el-tree>
 </template>
 <script lang="ts" setup>
-import { axios } from '@/requests';
-import { TorrentFile } from '@/util';
-import { reactive } from 'vue';
-const hash = defineModel<string>("hash")
-
-const data = reactive({
-    files: Array<TorrentFile>()
-})
-
-const url = '/api/v2/torrents/files?hash=' + hash.value + '&' + new Date().getTime()
-axios.get(url).then(resp => {
-
-})
+import type { TorrentFile } from '@/util';
+const root = defineModel<TorrentFile[]>()
+const defaultProps = {
+    children: 'children',
+    label: 'name',
+}
 
 </script>
 <style scoped></style>

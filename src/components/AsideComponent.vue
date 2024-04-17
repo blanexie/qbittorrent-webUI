@@ -2,7 +2,7 @@
   <div class="side">
     <div class="header">
       <FlyIcon class="fly"></FlyIcon>
-      <div class="qbt"> Qbittorrent</div>
+      <!-- <div class="qbt"> Qbittorrent</div> -->
     </div>
     <el-menu @select="menuSelect" :default-active="store.globalInfo.currentMenu">
       <el-menu-item index="downloading">

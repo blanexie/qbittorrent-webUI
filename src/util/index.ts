@@ -18,12 +18,14 @@ class TorrentSetting {
 class TorrentFile {
     public index = 0
     public is_seed = false
-    public name = "debian-8.1.0-amd64-CD-1.iso"
+    public name = ""
     public piece_range = [0, 1253]
     public priority = 1
     public progress = 0
     public size = 657457152
     public availability = 0.5
+
+    public children: TorrentFile[] = []
 }
 
 class ByteData {
