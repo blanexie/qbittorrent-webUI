@@ -26,6 +26,12 @@ class TorrentFile {
     public availability = 0.5
 
     public children: TorrentFile[] = []
+
+
+    public constructor(name: string) {
+        this.name = name
+    }
+    
 }
 
 class ByteData {
@@ -644,9 +650,9 @@ class Preference {
 
 }
 
-
 export {
-    TorrentFile, ByteData, GlobalInfo, Preference, TorrentInfo,
+    ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo,
     TorrentListReq, TorrentProperties, TorrentSetting, mergeObj
+}
 }
 

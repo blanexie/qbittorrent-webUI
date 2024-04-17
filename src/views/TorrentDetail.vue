@@ -137,16 +137,14 @@ const findPrefix = (prefix: string, root: TorrentFile[], map: Map<string, Torren
       if (file) {
         root.push(file)
       } else {
-        file = new TorrentFile()
-        file.name = last
-        map.set(file.name, file)
+        file = new TorrentFile(last)
+        map.set(last, file)
       }
       return file
     } else {
       const pFile = findPrefix(prefixF, root, map)
-      const file = new TorrentFile()
+      const file = new TorrentFile(last)
       pFile.children.push(file)
-      file.name = last
       map.set(file.name, file)
       return file
     }
