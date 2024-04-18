@@ -6,12 +6,11 @@ class TorrentSetting {
     public uploadLimitUnit = 1
     public torrentName = ''
     public category = ''
-    public tags = new Array<string>()
+    public tags: string[] = []
     public sequential = false
     public superSeed = false
     public f_l_piece_prio = false
     public autoManagement = true
-    public firstOpen = true
 }
 
 
@@ -190,7 +189,7 @@ class GlobalInfo {
 
     public showDetail = false
     public currentTorrent: TorrentInfo | null = null
-    public setting: TorrentSetting | null = null
+    public setting: TorrentSetting = new TorrentSetting()
     public files: TorrentFile[] = []
 
     /**
@@ -199,7 +198,6 @@ class GlobalInfo {
     public setCurrentTorrent(torrent: TorrentInfo) {
         this.showDetail = true
         this.currentTorrent = torrent
-        this.setting = new TorrentSetting()
 
         this.setting.savePath = torrent.save_path
         this.setting.downloadLimit = torrent.dl_limit.getSize()

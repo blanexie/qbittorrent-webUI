@@ -1,13 +1,8 @@
-import { axios } from '@/requests';
 import { GlobalInfo, Preference, TorrentInfo } from '@/util';
 import { initData } from '@/util/test';
-import { ElMessage } from 'element-plus';
 import { defineStore } from 'pinia';
 import { computed, reactive } from 'vue';
 
-/**
- * 全局速度相关
- */
 const StoreDefinition =
   defineStore('info', () => {
     //state
@@ -52,11 +47,8 @@ const StoreDefinition =
 
       const data = initData
       const fullUpdate = data.full_update ? data.full_update : false
-      refreshInfo(data.server_state)
+      store.info.refresh(data.server_state)
       if (data.torrents) {
-        if (Object.keys(data.torrents).length != store.torrents.length) {
-          info.rid = 0
-        }
         refreshTorrents(data.torrents, fullUpdate)
       }
 
@@ -77,14 +69,6 @@ const StoreDefinition =
       //     setTimeout(scheduleSyncMainData, scheduleTime)
       //   }
       // })
-    }
-
-    /**
-     *
-     * @param infoV 更新全局的信息
-     */
-    const refreshInfo = (infoV: any) => {
-      store.info.refresh(infoV)
     }
 
     /**
@@ -112,11 +96,8 @@ const StoreDefinition =
       globalInfo,
       torrentInfos,
       scheduleSyncMainData,
-      refreshInfo,
-
     }
-  }
-  )
+  })
 
 
 export default StoreDefinition

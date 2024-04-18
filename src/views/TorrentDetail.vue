@@ -30,8 +30,8 @@ import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue';
 import TorrentSettingComponent from '@/components/TorrentSettingComponent.vue';
 import { axios } from '@/requests';
 import StoreDefinition from '@/stores';
-import { TorrentFile, mergeObj } from '@/util';
-import { files } from '@/util/test';
+import { TorrentFile } from '@/util';
+import { files2 } from '@/util/test';
 import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
 
@@ -42,7 +42,7 @@ const active = ref("Props")
 const beforeLeave = (activeName: string) => {
   console.log(activeName)
   if (activeName == "Files") {
-    const tfiles = files.map(it => it as TorrentFile)
+    const tfiles = files2.map(it => it as TorrentFile)
     globalInfo.refreshFiles(tfiles)
     //refreshFiles()
   }
