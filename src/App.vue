@@ -1,6 +1,6 @@
 <template>
-  <LoginView v-if="store.globalPreference.loginShow"></LoginView>
-  <HomeView v-if="!store.globalPreference.loginShow"></HomeView>
+  <LoginView v-if="store.globalInfo.loginShow"></LoginView>
+  <HomeView v-if="!store.globalInfo.loginShow"></HomeView>
 </template>
 <script lang="ts" setup>
 import HomeView from '@/views/HomeView.vue';
@@ -10,7 +10,7 @@ import StoreDefinition from "@/stores"
 const store = StoreDefinition()
 
 if (sessionStorage.getItem("loginOk")) {
-  store.globalPreference.loginShow = false
+  store.globalInfo.loginShow = false
 }
 
 </script>

@@ -40,11 +40,12 @@
   </ul>
 </template>
 <script lang="ts" setup>
-import { TorrentInfo } from '@/util';
+import StoreDefinition from '@/stores';
 import { Bottom, Download, Top, Upload } from '@element-plus/icons-vue';
-import { inject } from 'vue';
 
-const torrent = inject<TorrentInfo>("torrent")
+const store = StoreDefinition()
+const globalInfo = store.globalInfo
+const torrent = globalInfo.currentTorrent
 
 </script>
 <style scoped>

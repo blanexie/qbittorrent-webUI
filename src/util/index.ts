@@ -18,8 +18,10 @@ class TorrentSetting {
 class TorrentFile {
     public index = 0
     public is_seed = false
-    public fullPath = ""
+
     public prefix: string = ""
+    public label: string = ''
+
     public name = ""
     public piece_range = [0, 1253]
     public priority = 1
@@ -30,14 +32,18 @@ class TorrentFile {
 
     public children: TorrentFile[] = []
 
-    public showText(): string {
-        return "下载：" + Math.floor(this.progress * 100) + " 大小：" + new ByteData(this.size).getSizeStr()
+    public getProgress() {
+        return Math.floor(this.progress * 100)
     }
 
-    public constructor(prefix: string, name: string) {
-        this.name = name
+    public constructor(prefix: string, label: string) {
+        this.label = label
         this.prefix = prefix
-        this.fullPath = prefix + "/" + name
+        if (prefix == '') {
+            this.name = label
+        } else {
+            this.name = prefix + "/" + label
+        }
     }
 
 }
@@ -173,15 +179,102 @@ class GlobalInfo {
     public total_peer_connections = 67
     public total_queued_size = 0
     public total_wasted_session = 271592381
-
     public use_alt_speed_limits = false
     public write_cache_overload = "0"
 
+    public loginShow: boolean = true
     public intervalId: number | null = null
     public rid = 0
     public refresh_interval = 1500
     public currentMenu = "downloading"  //当前目录选择
+
+    public showDetail = false
     public currentTorrent: TorrentInfo | null = null
+    public setting: TorrentSetting | null = null
+    public files: TorrentFile[] = []
+
+    /**
+     * setCurrentTorrent
+     */
+    public setCurrentTorrent(torrent: TorrentInfo) {
+        this.showDetail = true
+        this.currentTorrent = torrent
+        this.setting = new TorrentSetting()
+
+        this.setting.savePath = torrent.save_path
+        this.setting.downloadLimit = torrent.dl_limit.getSize()
+        this.setting.downloadLimitUnit = torrent.dl_limit.getUnit()
+        this.setting.uploadLimit = torrent.up_limit.getSize()
+        this.setting.uploadLimitUnit = torrent.up_limit.getUnit()
+        this.setting.torrentName = torrent.name
+        this.setting.category = torrent.category
+        this.setting.tags = torrent.tags.split(',')
+        this.setting.sequential = torrent.seq_dl
+        this.setting.superSeed = torrent.super_seeding
+        this.setting.f_l_piece_prio = torrent.f_l_piece_prio
+
+        if (this.setting.downloadLimit === 0) {
+            this.setting.downloadLimitUnit = 1024
+        }
+        if (this.setting.uploadLimit === 0) {
+            this.setting.uploadLimitUnit = 1024
+        }
+    }
+
+    /**
+     * refreshFiles
+     */
+    public refreshFiles(tFiles: TorrentFile[]) {
+        this.files.length = 0
+        const fileMap = new Map<string, TorrentFile>()
+        tFiles.forEach(it => {
+            it.isLeaf = true
+            const [p, l] = this.splitPrefix(it.name)
+            it.prefix = p
+            it.label = l
+            fileMap.set(it.name, it)
+            const parent = this.findMapFile(p, fileMap)
+            parent?.children.push(it)
+        });
+        //获取一级目录
+        fileMap.forEach((it) => {
+            if (it.prefix == '') {
+                this.files.push(it)
+            }
+        })
+    }
+
+
+    private findMapFile(name: string, fileMap: Map<string, TorrentFile>) {
+        if (name == '') {
+            return null
+        }
+        let file = fileMap.get(name)
+        if (file) {
+            return file
+        } else {
+            const [p, l] = this.splitPrefix(name)
+            file = new TorrentFile(p, l)
+            fileMap.set(file.name, file)
+            const parent = this.findMapFile(p, fileMap)
+            parent?.children.push(file)
+            return file
+        }
+    }
+
+    private splitPrefix = (name: string) => {
+        const paths = name.split("/")
+        if (paths.length == 1) {
+            return ['', name]
+        }
+        if (paths.length == 2) {
+            return [paths[0], paths[1]]
+        }
+        const last = paths[paths.length - 1]
+        paths.length = paths.length - 1
+        const prefix = paths.join("/")
+        return [prefix, last]
+    }
 
     public refresh(ts: any) {
         mergeObj(this, ts)
@@ -333,7 +426,6 @@ class TorrentInfo {
         return ''
     }
 
-
 }
 
 
@@ -380,7 +472,6 @@ function time(time = +new Date(), type: string = 'yyyy-MM-dd hh:mm:ss') {
     // 前端开发过程中，常常需要将时间戳转化为标准时间格式供用户浏览
     // 不借助方法库的情况下，如何又快又好的实现呢？
     // 下面介绍两种方法
-
     const date = new Date(time);
     const Year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -456,8 +547,6 @@ function mergeObj(base: any, src: any) {
 
 
 class Preference {
-
-    public loginShow: boolean = true
 
     public random_port = false
     public listen_port = 58925

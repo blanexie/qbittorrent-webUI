@@ -1,5 +1,6 @@
 import { axios } from '@/requests';
 import { GlobalInfo, Preference, TorrentInfo } from '@/util';
+import { initData } from '@/util/test';
 import { ElMessage } from 'element-plus';
 import { defineStore } from 'pinia';
 import { computed, reactive } from 'vue';
@@ -49,33 +50,33 @@ const StoreDefinition =
         info.rid = 0
       }
 
-      // const data = initData
-      // const fullUpdate = data.full_update ? data.full_update : false
-      // refreshInfo(data.server_state)
-      // if (data.torrents) {
-      //   if (Object.keys(data.torrents).length != store.torrents.length) {
-      //     info.rid = 0
-      //   }
-      //   refreshTorrents(data.torrents, fullUpdate)
-      // }
+      const data = initData
+      const fullUpdate = data.full_update ? data.full_update : false
+      refreshInfo(data.server_state)
+      if (data.torrents) {
+        if (Object.keys(data.torrents).length != store.torrents.length) {
+          info.rid = 0
+        }
+        refreshTorrents(data.torrents, fullUpdate)
+      }
 
-      axios.get('/api/v2/sync/maindata?rid=' + info.rid + "&" + new Date().getTime()).then(resp => {
-        info.incrementRid()
-        const data = resp.data
-        const fullUpdate = data.full_update ? data.full_update : false
-        refreshInfo(data.server_state)
-        if (data.torrents) {
-          refreshTorrents(data.torrents, fullUpdate)
-        }
-        if (schedule) {
-          setTimeout(scheduleSyncMainData, scheduleTime)
-        }
-      }).catch(err => {
-        ElMessage.error('/api/v2/sync/maindata error' + err)
-        if (schedule) {
-          setTimeout(scheduleSyncMainData, scheduleTime)
-        }
-      })
+      // axios.get('/api/v2/sync/maindata?rid=' + info.rid + "&" + new Date().getTime()).then(resp => {
+      //   info.incrementRid()
+      //   const data = resp.data
+      //   const fullUpdate = data.full_update ? data.full_update : false
+      //   refreshInfo(data.server_state)
+      //   if (data.torrents) {
+      //     refreshTorrents(data.torrents, fullUpdate)
+      //   }
+      //   if (schedule) {
+      //     setTimeout(scheduleSyncMainData, scheduleTime)
+      //   }
+      // }).catch(err => {
+      //   ElMessage.error('/api/v2/sync/maindata error' + err)
+      //   if (schedule) {
+      //     setTimeout(scheduleSyncMainData, scheduleTime)
+      //   }
+      // })
     }
 
     /**

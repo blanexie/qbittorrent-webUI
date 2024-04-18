@@ -54,12 +54,10 @@
           吸血：{{ t.num_leechs }}
         </span>
       </div>
-
-      <TorrentDetail v-model:show="t.show" v-model:torrent="t as TorrentInfo" />
-
     </li>
   </ul>
 
+  <TorrentDetail  />
 
   <el-dialog v-model="deleteDialog.visible" title="" width="500">
     &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteDialog.deleteFiles" />
@@ -84,9 +82,11 @@ import { ElMessage } from 'element-plus'
 import { reactive } from 'vue'
 
 const store = StoreDefinition()
+const globalInfo = store.globalInfo
 
 const showDetail = (t: TorrentInfo) => {
-  t.show = true
+  globalInfo.setCurrentTorrent(t)
+  globalInfo.showDetail = true
 }
 
 const deleteDialog = reactive({
