@@ -3,23 +3,23 @@
   <el-row>
     <el-col :span="6">名称:</el-col>
     <el-col :span="17">
-      <el-input v-model="setting.torrentName"></el-input>
+      <el-input v-model="globalInfo.setting.torrentName"></el-input>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">保存路径:</el-col>
     <el-col :span="17">
-      <el-input v-model="setting.savePath"></el-input>
+      <el-input v-model="globalInfo.setting.savePath"></el-input>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">下载限速:</el-col>
     <el-col :span="17">
-      <el-input v-model="setting.downloadLimit" placeholder="Please input" class="input-with-select">
+      <el-input v-model="globalInfo.setting.downloadLimit" placeholder="Please input" class="input-with-select">
         <template #append>
-          <el-select v-model="setting.downloadLimitUnit" style="width: 80px">
+          <el-select v-model="globalInfo.setting.downloadLimitUnit" style="width: 80px">
             <el-option label="B/s" :value="1"/>
             <el-option label="KB/s" :value="1024"/>
             <el-option label="MB/s" :value="1048576"/>
@@ -33,9 +33,9 @@
   <el-row>
     <el-col :span="6">上传限速:</el-col>
     <el-col :span="17">
-      <el-input v-model="setting.uploadLimit" placeholder="Please input" class="input-with-select">
+      <el-input v-model="globalInfo.setting.uploadLimit" placeholder="Please input" class="input-with-select">
         <template #append>
-          <el-select v-model="setting.uploadLimitUnit" style="width: 80px">
+          <el-select v-model="globalInfo.setting.uploadLimitUnit" style="width: 80px">
             <el-option label="B/s" :value="1"/>
             <el-option label="KB/s" :value="1024"/>
             <el-option label="MB/s" :value="1048576"/>
@@ -49,7 +49,7 @@
   <el-row>
     <el-col :span="6">分类:</el-col>
     <el-col :span="17">
-      <el-select v-model="setting.category" :reserve-keyword="false" filterable allow-create placeholder="分类">
+      <el-select v-model="globalInfo.setting.category" :reserve-keyword="false" filterable allow-create placeholder="分类">
         <el-option v-for="item in globalInfo.categories" :key="item" :label="item" :value="item"/>
       </el-select>
     </el-col>
@@ -58,7 +58,7 @@
   <el-row>
     <el-col :span="6">标签:</el-col>
     <el-col :span="17">
-      <el-select v-model="setting.tags" :reserve-keyword="false" multiple allow-create filterable placeholder="标签 ">
+      <el-select v-model="globalInfo.setting.tags" :reserve-keyword="false" multiple allow-create filterable placeholder="标签 ">
         <el-option v-for="(item ,index) in globalInfo.tags" :key="index" :label="item" :value="item"/>
       </el-select>
     </el-col>
@@ -67,21 +67,21 @@
   <el-row>
     <el-col :span="6">顺序下载:</el-col>
     <el-col :span="17">
-      <el-switch v-model="setting.sequential"/>
+      <el-switch v-model="globalInfo.setting.sequential"/>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">超级种子:</el-col>
     <el-col :span="17">
-      <el-switch v-model="setting.superSeed"/>
+      <el-switch v-model="globalInfo.setting.superSeed"/>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">优先下载首尾:</el-col>
     <el-col :span="17">
-      <el-switch v-model="setting.f_l_piece_prio"/>
+      <el-switch v-model="globalInfo.setting.f_l_piece_prio"/>
     </el-col>
   </el-row>
 
@@ -102,11 +102,11 @@ import {ref} from "vue";
 
 const store = StoreDefinition()
 const globalInfo = store.globalInfo
-const torrent = store.globalInfo.currentTorrent
-const setting = store.globalInfo.setting
 
 const loading = ref(false)
 const update = async () => {
+  const torrent = store.globalInfo.currentTorrent
+  const setting = store.globalInfo.setting
   if (!setting || !torrent) {
     ElMessage.error("页面加载数据失败，无法修改");
     loading.value = false;

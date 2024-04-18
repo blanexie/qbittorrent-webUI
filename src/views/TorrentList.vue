@@ -1,6 +1,6 @@
 <template>
   <ul>
-    <li v-for=" t in store.torrentInfos " v-bind:key="t.hash" @click="active(t as TorrentInfo)"
+    <li v-for="t in store.torrentInfos " v-bind:key="t.hash" @click="active(t as TorrentInfo)"
       :class="{ 'border-color': t.isActive }">
 
       <div class="p1">

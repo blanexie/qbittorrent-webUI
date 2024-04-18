@@ -182,9 +182,8 @@ class GlobalInfo {
      * setCurrentTorrent
      */
     public setCurrentTorrent(torrent: TorrentInfo) {
-        this.showDetail = true
-        this.setting = new TorrentSetting()
         this.currentTorrent = torrent
+        this.setting = new TorrentSetting()
 
         this.setting.torrentName = torrent.name
         this.setting.savePath = torrent.save_path
@@ -204,6 +203,8 @@ class GlobalInfo {
         if (this.setting.uploadLimit === 0) {
             this.setting.uploadLimitUnit = 1024
         }
+
+        this.showDetail = true
     }
 
     /**
