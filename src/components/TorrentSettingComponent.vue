@@ -20,10 +20,10 @@
       <el-input v-model="setting.downloadLimit" placeholder="Please input" class="input-with-select">
         <template #append>
           <el-select v-model="setting.downloadLimitUnit" style="width: 80px">
-            <el-option label="B/s" :value="1" />
-            <el-option label="KB/s" :value="1024" />
-            <el-option label="MB/s" :value="1048576" />
-            <el-option label="GB/s" :value="1073741824" />
+            <el-option label="B/s" :value="1"/>
+            <el-option label="KB/s" :value="1024"/>
+            <el-option label="MB/s" :value="1048576"/>
+            <el-option label="GB/s" :value="1073741824"/>
           </el-select>
         </template>
       </el-input>
@@ -36,10 +36,10 @@
       <el-input v-model="setting.uploadLimit" placeholder="Please input" class="input-with-select">
         <template #append>
           <el-select v-model="setting.uploadLimitUnit" style="width: 80px">
-            <el-option label="B/s" :value="1" />
-            <el-option label="KB/s" :value="1024" />
-            <el-option label="MB/s" :value="1048576" />
-            <el-option label="GB/s" :value="1073741824" />
+            <el-option label="B/s" :value="1"/>
+            <el-option label="KB/s" :value="1024"/>
+            <el-option label="MB/s" :value="1048576"/>
+            <el-option label="GB/s" :value="1073741824"/>
           </el-select>
         </template>
       </el-input>
@@ -49,9 +49,8 @@
   <el-row>
     <el-col :span="6">分类:</el-col>
     <el-col :span="17">
-      <el-select v-model="setting.category" default-first-option filterable allow-create placeholder="分类"
-        style="width: 240px">
-        <el-option v-for="item in globalInfo.categories" :key="item.name" :label="item.name" :value="item.savePath" />
+      <el-select v-model="setting.category" :reserve-keyword="false" filterable allow-create placeholder="分类">
+        <el-option v-for="item in globalInfo.categories" :key="item" :label="item" :value="item"/>
       </el-select>
     </el-col>
   </el-row>
@@ -59,10 +58,8 @@
   <el-row>
     <el-col :span="6">标签:</el-col>
     <el-col :span="17">
-      <!-- <el-input v-model="setting!.tags"></el-input> -->
-      <el-select v-model="setting.tags" multiple filterable allow-create default-first-option :reserve-keyword="false"
-        placeholder="标签 " style="width: 240px">
-        <el-option v-for="item in globalInfo.tags" :key="item" :label="item" :value="item" />
+      <el-select v-model="setting.tags" :reserve-keyword="false" multiple allow-create filterable placeholder="标签 ">
+        <el-option v-for="(item ,index) in globalInfo.tags" :key="index" :label="item" :value="item"/>
       </el-select>
     </el-col>
   </el-row>
@@ -70,21 +67,21 @@
   <el-row>
     <el-col :span="6">顺序下载:</el-col>
     <el-col :span="17">
-      <el-switch v-model="setting.sequential" />
+      <el-switch v-model="setting.sequential"/>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">超级种子:</el-col>
     <el-col :span="17">
-      <el-switch v-model="setting.superSeed" />
+      <el-switch v-model="setting.superSeed"/>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">优先下载首尾:</el-col>
     <el-col :span="17">
-      <el-switch v-model="setting.f_l_piece_prio" />
+      <el-switch v-model="setting.f_l_piece_prio"/>
     </el-col>
   </el-row>
 
@@ -98,10 +95,10 @@
 
 </template>
 <script lang="ts" setup>
-import { axios } from "@/requests";
+import {axios} from "@/requests";
 import StoreDefinition from "@/stores";
-import { ElButton, ElCol, ElInput, ElMessage, ElNotification, ElOption, ElRow, ElSelect, ElSwitch } from 'element-plus';
-import { ref } from "vue";
+import {ElButton, ElCol, ElInput, ElMessage, ElNotification, ElOption, ElRow, ElSelect, ElSwitch} from 'element-plus';
+import {ref} from "vue";
 
 const store = StoreDefinition()
 const globalInfo = store.globalInfo
@@ -121,15 +118,62 @@ const update = async () => {
     // 提取重复代码至单独函数
     const sendRequest = (url: string, data: FormData) => {
       return axios.post(url, data)
-        .then(resp => {
-          console.log(resp);
-          ElMessage.success("设置成功");
-        })
-        .catch(error => {
-          console.error(`设置失败: ${error}`);
-          ElMessage.error(`设置失败，${error}`);
-        });
+          .then(resp => {
+            console.log(resp);
+            ElMessage.success("设置成功");
+          })
+          .catch(error => {
+            console.error(`设置失败: ${error}`);
+            ElMessage.error(`设置失败，${error}`);
+          });
     };
+
+    //标签
+    //1. 获取新增的标签
+    const tTags = torrent.getTags()
+    const addTags = setting.tags.filter(tag => !tTags.includes(tag))
+    //2. 判断需要新增的标签中那些是不存在的
+    const newTags = addTags.filter(tag => !globalInfo.tags.includes(tag))
+    //3. 创建不存在的标签
+    if (newTags.length > 0) {
+      const from = new FormData();
+      from.set("tags", newTags.join(","));
+      await sendRequest('/api/v2/torrents/createTags', from)
+    }
+    //4. 给当前torrent增加标签
+    if (addTags.length > 0) {
+      const from = new FormData();
+      from.set("hashes", torrent.hash);
+      from.set("tags", addTags.join(","));
+      const url = `/api/v2/torrents/addTags`;
+      updatePromises.push(sendRequest(url, from));
+    }
+    //2. 获取要删的标签
+    const delTags = tTags.filter(tag => !setting.tags.includes(tag))
+    if (delTags.length > 0) {
+      const from = new FormData();
+      from.set("hashes", torrent.hash);
+      from.set("tags", delTags.join(","));
+      const url = `/api/v2/torrents/removeTags`;
+      updatePromises.push(sendRequest(url, from));
+    }
+
+    //判断当前分类 如果不存在， 则新增
+    if (!globalInfo.categories.includes(setting.category)) {
+      const from = new FormData();
+      from.set("savePath", '');
+      from.set("category", setting.category);
+      const url = `/api/v2/torrents/createCategory`;
+      await sendRequest(url, from)
+    }
+    //分类
+    if (setting.category !== torrent.category) {
+      const from = new FormData();
+      from.set("hashes", torrent.hash);
+      from.set("category", setting.category + "");
+      const url = `/api/v2/torrents/setCategory`;
+      updatePromises.push(sendRequest(url, from));
+    }
 
     // 超级种子
     if (setting.superSeed !== torrent.super_seeding) {

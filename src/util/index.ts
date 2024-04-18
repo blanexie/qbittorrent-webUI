@@ -31,10 +31,6 @@ class TorrentFile {
 
     public children: TorrentFile[] = []
 
-    public getProgress() {
-        return Math.floor(this.progress * 100)
-    }
-
     public constructor(prefix: string, label: string) {
         this.label = label
         this.prefix = prefix
@@ -67,10 +63,6 @@ class ByteData {
         this.bytes = bytes
     }
 
-    public getBytes(): number {
-        return this.bytes
-    }
-
     public getSpeedStr(): string {
         return this.getSize() + this.getSpeedUnit()
     }
@@ -78,7 +70,6 @@ class ByteData {
     public getSizeStr(): string {
         return this.getSize() + this.getSizeUnit()
     }
-
 
     public getSpeedUnit(): string {
         if (this.bytes < this.KB) {
@@ -96,7 +87,6 @@ class ByteData {
         return 'TB/s'
     }
 
-
     public getUnit(): number {
         if (this.bytes < this.KB) {
             return 1
@@ -112,8 +102,6 @@ class ByteData {
         }
         return this.TB
     }
-
-
 
     public getSizeUnit(): string {
         if (this.bytes < this.KB) {
@@ -146,18 +134,6 @@ class ByteData {
         }
         return Math.round((this.bytes / this.TB) * 100) / 100
     }
-
-}
-
-class Category {
-
-    name: string
-    savePath: string
-
-    constructor(name: string, savePath: string) {
-        this.name = name
-        this.savePath = savePath
-    }
 }
 
 class GlobalInfo {
@@ -170,7 +146,7 @@ class GlobalInfo {
     public up_info_speed = new ByteData(1631)
     public up_rate_limit = new ByteData(13)
 
-    public categories: Category[] = []
+    public categories: string[] = []
     public tags: string[] = []
 
     public alltime_d = 224357181908
@@ -207,16 +183,17 @@ class GlobalInfo {
      */
     public setCurrentTorrent(torrent: TorrentInfo) {
         this.showDetail = true
+        this.setting = new TorrentSetting()
         this.currentTorrent = torrent
 
+        this.setting.torrentName = torrent.name
         this.setting.savePath = torrent.save_path
         this.setting.downloadLimit = torrent.dl_limit.getSize()
         this.setting.downloadLimitUnit = torrent.dl_limit.getUnit()
         this.setting.uploadLimit = torrent.up_limit.getSize()
         this.setting.uploadLimitUnit = torrent.up_limit.getUnit()
-        this.setting.torrentName = torrent.name
         this.setting.category = torrent.category
-        this.setting.tags = torrent.tags.split(',')
+        this.setting.tags = torrent.getTags()
         this.setting.sequential = torrent.seq_dl
         this.setting.superSeed = torrent.super_seeding
         this.setting.f_l_piece_prio = torrent.f_l_piece_prio
@@ -284,6 +261,15 @@ class GlobalInfo {
         return [prefix, last]
     }
 
+    public setCategoryAndTags(category: any | null, tags: string[] | null) {
+        if (category) {
+            this.categories = Object.keys(category)
+        }
+        if (tags) {
+            this.tags = tags
+        }
+    }
+
     public refresh(ts: any) {
         mergeObj(this, ts)
     }
@@ -339,7 +325,6 @@ class TorrentInfo {
         this.hash = hash
     }
 
-
     private dl = [
         "allocating", //开启磁盘空间，马上就下载， 所以算在下载中
         "downloading",
@@ -383,11 +368,6 @@ class TorrentInfo {
         if (this.error.includes(this.state)) {
             return "error"
         }
-
-    }
-
-    public setProperties(props: TorrentProperties) {
-        this.properties = props
     }
 
     public getProgress(): number {
@@ -396,6 +376,10 @@ class TorrentInfo {
 
     public getDownloadSizeStr(): string {
         return this.getProgress() + '% (' + this.completed.getSizeStr() + '/' + this.total_size.getSizeStr() + ')'
+    }
+
+    public getTags() {
+        return this.tags == '' ? [] : this.tags.split(',')
     }
 
     public getEtaStr() {
@@ -422,7 +406,6 @@ class TorrentInfo {
         mergeObj(this, ts)
         return this
     }
-
 
     public getTimeStr(key: string) {
         if (key == "added_on") {
@@ -473,9 +456,6 @@ class TorrentProperties {
     public up_speed_avg = 410
 }
 
-
-
-
 function time(time = +new Date(), type: string = 'yyyy-MM-dd hh:mm:ss') {
     // 前端开发过程中，常常需要将时间戳转化为标准时间格式供用户浏览
     // 不借助方法库的情况下，如何又快又好的实现呢？
@@ -494,7 +474,8 @@ function time(time = +new Date(), type: string = 'yyyy-MM-dd hh:mm:ss') {
     const Second = Second1 < 10 ? '0' + Second1 : Second1;
 
     if (type === 'yyyy-MM-dd') {
-        return Year + '-' + Month + '-' + Day;;
+        return Year + '-' + Month + '-' + Day;
+        ;
     } else if (type === 'yyyy-MM-dd hh:mm:ss') {
         return Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Second;
     } else if (type === 'hh:mm:ss') {
@@ -523,7 +504,8 @@ function timeS(time: number, type: string = 'yyyy-MM-dd hh:mm:ss') {
     const Second = Second1 < 10 ? '0' + Second1 : Second1;
 
     if (type === 'yyyy-MM-dd') {
-        return Year + '-' + Month + '-' + Day;;
+        return Year + '-' + Month + '-' + Day;
+        ;
     } else if (type === 'yyyy-MM-dd hh:mm:ss') {
         return Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Second;
     } else if (type === 'hh:mm:ss') {
@@ -720,7 +702,7 @@ class Preference {
 }
 
 export {
-    ByteData, Category, GlobalInfo, Preference, TorrentFile, TorrentInfo,
+    ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo,
     TorrentProperties, TorrentSetting, mergeObj
 }
 

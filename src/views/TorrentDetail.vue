@@ -28,12 +28,10 @@
 import TorrentContentComponent from '@/components/TorrentContentComponent.vue';
 import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue';
 import TorrentSettingComponent from '@/components/TorrentSettingComponent.vue';
-import { axios } from '@/requests';
+import {axios} from '@/requests';
 import StoreDefinition from '@/stores';
-import { Category, TorrentFile } from '@/util';
-import { files2 } from '@/util/test';
-import { ElMessage } from 'element-plus';
-import { ref } from 'vue';
+import {ElMessage} from 'element-plus';
+import {ref} from 'vue';
 
 const store = StoreDefinition()
 const globalInfo = store.globalInfo
@@ -42,9 +40,9 @@ const active = ref("Props")
 const beforeLeave = (activeName: string) => {
   console.log(activeName)
   if (activeName == "Files") {
-    const tfiles = files2.map(it => it as TorrentFile)
-    globalInfo.refreshFiles(tfiles)
-    //scheduleRefreshFiles()
+    // const tfiles = files2.map(it => it as TorrentFile)
+    // globalInfo.refreshFiles(tfiles)
+    scheduleRefreshFiles()
   }
   if (activeName == "Setting") {
     fetchTagsAndCategory()
@@ -57,7 +55,6 @@ const scheduleRefreshFiles = () => {
 
   axios.get(url).then(resp => {
     globalInfo.refreshFiles(resp.data)
-    setTimeout(scheduleRefreshFiles, 3000)
   }).catch(error => {
     ElMessage.error("获取内容信息失败" + error)
   })
@@ -65,16 +62,18 @@ const scheduleRefreshFiles = () => {
 
 const fetchTagsAndCategory = async () => {
   axios.get('/api/v2/torrents/categories').then(resp => {
-    globalInfo.categories = resp.data.value.map((it: { name: string; savePath: string; }) => {
-      return new Category(it.name, it.savePath)
-    })
+    globalInfo.categories = Object.keys(resp.data)
   }).catch(error => {
     ElMessage.error("获取分类失败" + error)
   })
 
+  //获取所有的标签
   axios.get('/api/v2/torrents/tags').then(resp => {
-    globalInfo.tags = resp.data
-  }).catch()
+    console.log(resp.data)
+    globalInfo.tags = resp.data as string[]
+  }).catch(error => {
+    ElMessage.error("获取标签失败" + error)
+  })
 }
 
 </script>
