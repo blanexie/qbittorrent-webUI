@@ -51,7 +51,7 @@
     <el-col :span="17">
       <el-select v-model="setting.category" default-first-option filterable allow-create placeholder="分类"
         style="width: 240px">
-        <el-option v-for="item in globalInfo.categories" :key="item" :label="item" :value="item" />
+        <el-option v-for="item in globalInfo.categories" :key="item.name" :label="item.name" :value="item.savePath" />
       </el-select>
     </el-col>
   </el-row>

@@ -149,6 +149,16 @@ class ByteData {
 
 }
 
+class Category {
+
+    name: string
+    savePath: string
+
+    constructor(name: string, savePath: string) {
+        this.name = name
+        this.savePath = savePath
+    }
+}
 
 class GlobalInfo {
     public connection_status = 'connected'
@@ -160,7 +170,7 @@ class GlobalInfo {
     public up_info_speed = new ByteData(1631)
     public up_rate_limit = new ByteData(13)
 
-    public categories: string[] = []
+    public categories: Category[] = []
     public tags: string[] = []
 
     public alltime_d = 224357181908
@@ -710,7 +720,7 @@ class Preference {
 }
 
 export {
-    ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo,
+    ByteData, Category, GlobalInfo, Preference, TorrentFile, TorrentInfo,
     TorrentProperties, TorrentSetting, mergeObj
 }
 

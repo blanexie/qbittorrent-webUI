@@ -11,7 +11,7 @@
         <el-input v-model="fromValue.password" type="password" placeholder="adminadmin" />
       </el-form-item>
       <el-form-item label=" ">
-        <el-button type="primary" @click="loginReq">登录</el-button>
+        <el-button type="primary" @click="login">登录</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -19,11 +19,9 @@
 
 <script setup lang="ts">
 import FlyIcon from '@/components/icons/FlyIcon.vue';
-import { Authentication } from '@/requests';
+import { axios } from '@/requests';
 import { ElMessage } from 'element-plus';
 import { reactive } from 'vue';
-
-const auth = Authentication()
 
 
 const fromValue = reactive({
@@ -34,7 +32,7 @@ const fromValue = reactive({
 /**
  * 登录请求
  */
-const loginReq = () => {
+const login = () => {
   //1. 检查参数填写是否正常
   if (fromValue.name.length >= 20 || fromValue.name.length <= 0) {
     ElMessage.error('用户名长度限定在20以内')
@@ -45,7 +43,10 @@ const loginReq = () => {
     return
   }
   //2. 请求服务端
-  auth.login(fromValue.name, fromValue.password)
+  const from = new FormData()
+  from.set("username", fromValue.name)
+  from.set("password", fromValue.password)
+  axios.post('/api/v2/auth/login', from)
     .then(resp => {
       console.log(resp)
       if (resp.data == 'Fails.') {
@@ -60,6 +61,7 @@ const loginReq = () => {
       sessionStorage.removeItem("loginOk")
     })
 }
+
 </script>
 
 <style scoped>
