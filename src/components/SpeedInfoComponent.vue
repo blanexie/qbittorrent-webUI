@@ -181,7 +181,7 @@ const toggleSpeedLimitsMode = () => {
   margin: 3px;
   padding: 7px;
 
-  border: 1px #91949a solid;
+  border: 1px #b5b5b4 solid;
   border-radius: 10px;
 }
 

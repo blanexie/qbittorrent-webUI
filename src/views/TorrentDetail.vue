@@ -18,7 +18,9 @@
         <TorrentContentComponent></TorrentContentComponent>
       </el-tab-pane>
 
-      <el-tab-pane label="Tackers" name="Tackers">Task</el-tab-pane>
+      <el-tab-pane label="Tackers" name="Tackers">
+        <TorrentTrackerComponent></TorrentTrackerComponent>
+      </el-tab-pane>
 
     </el-tabs>
   </el-drawer>
@@ -28,10 +30,13 @@
 import TorrentContentComponent from '@/components/TorrentContentComponent.vue';
 import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue';
 import TorrentSettingComponent from '@/components/TorrentSettingComponent.vue';
-import {axios} from '@/requests';
+import TorrentTrackerComponent from '@/components/TorrentTrackerComponent.vue';
+import { axios } from '@/requests';
 import StoreDefinition from '@/stores';
-import {ElMessage} from 'element-plus';
-import {ref} from 'vue';
+import type { TorrentFile, Tracker } from '@/util';
+import { files2 } from '@/util/test';
+import { ElMessage } from 'element-plus';
+import { ref } from 'vue';
 
 const store = StoreDefinition()
 const globalInfo = store.globalInfo
@@ -40,14 +45,33 @@ const active = ref("Props")
 const beforeLeave = (activeName: string) => {
   console.log(activeName)
   if (activeName == "Files") {
-    // const tfiles = files2.map(it => it as TorrentFile)
-    // globalInfo.refreshFiles(tfiles)
-    scheduleRefreshFiles()
+    const tfiles = files2.map(it => it as TorrentFile)
+    globalInfo.refreshFiles(tfiles)
+    // scheduleRefreshFiles()
   }
   if (activeName == "Setting") {
-    fetchTagsAndCategory()
+    // fetchTagsAndCategory()
+  }
+  if (activeName == 'Trackers') {
+    fetchTracker()
   }
 }
+
+
+const fetchTracker = () => {
+  const hash = globalInfo.currentTorrent?.hash
+  const url = '/api/v2/torrents/trackers?hash=' + hash
+  axios.get(url).then(resp => {
+    if (resp.status == 200) {
+      const data = resp.data
+      globalInfo.trackers = data.trackers.map((it: any) => it as Tracker)
+    }
+  }).catch(err => {
+    ElMessage.error("获取内容信息失败" + err)
+  })
+
+}
+
 
 const scheduleRefreshFiles = () => {
   const hash = globalInfo.currentTorrent?.hash

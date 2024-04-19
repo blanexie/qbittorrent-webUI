@@ -179,7 +179,7 @@ ul {
 
   li {
     margin-bottom: 20px;
-    border: 1px solid #91949a;
+    border: 1px solid #b5b5b4;
     background-color: #ffffff;
     border-radius: 10px;
     padding: 10px;

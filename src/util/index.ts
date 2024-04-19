@@ -13,6 +13,37 @@ class TorrentSetting {
     public autoManagement = true
 }
 
+class Tracker {
+    public msg = ""
+    public num_peers = 100
+    public status = 2
+    public url = 'http://bttracker.debian.org:6969/announce'
+
+    public getStatusText() {
+        if (this.status == 0) {
+            //0	Tracker is disabled (used for DHT, PeX, and LSD)
+            return "disabled"
+        }
+        if (this.status == 1) {
+            //1	Tracker has not been contacted yet
+            return 'contacted'
+        }
+        if (this.status == 2) {
+            //2	Tracker has been contacted and is working
+            return 'working'
+        }
+        if (this.status == 3) {
+            //3	Tracker is updating
+            return 'updating'
+        }
+        if (this.status == 3) {
+            //4	Tracker has been contacted, but it is not working (or doesn't send proper replies)
+            return 'not working'
+        }
+
+    }
+
+}
 
 class TorrentFile {
     public index = 0
@@ -177,6 +208,7 @@ class GlobalInfo {
     public currentTorrent: TorrentInfo | null = null
     public setting: TorrentSetting = new TorrentSetting()
     public files: TorrentFile[] = []
+    public trackers: Tracker[] = []
 
     /**
      * setCurrentTorrent
@@ -703,7 +735,7 @@ class Preference {
 }
 
 export {
-    ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo,
+    ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo, Tracker,
     TorrentProperties, TorrentSetting, mergeObj
 }
 
