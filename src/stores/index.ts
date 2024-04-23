@@ -104,5 +104,4 @@ const StoreDefinition =
         }
     })
 
-
 export default StoreDefinition

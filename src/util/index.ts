@@ -571,6 +571,8 @@ function mergeObj(base: any, src: any) {
 
 class Preference {
 
+    public show = true
+
     public random_port = false
     public listen_port = 58925
     public locale = 'en'
@@ -735,8 +737,7 @@ class Preference {
 }
 
 export {
-    ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo, Tracker,
-    TorrentProperties, TorrentSetting, mergeObj
+    ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo, TorrentProperties, TorrentSetting, Tracker, mergeObj
 }
 
 

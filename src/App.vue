@@ -3,9 +3,9 @@
   <HomeView v-if="!store.globalInfo.loginShow"></HomeView>
 </template>
 <script lang="ts" setup>
+import StoreDefinition from "@/stores";
 import HomeView from '@/views/HomeView.vue';
 import LoginView from '@/views/LoginView.vue';
-import StoreDefinition from "@/stores"
 
 const store = StoreDefinition()
 
