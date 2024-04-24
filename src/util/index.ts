@@ -15,33 +15,16 @@ class TorrentSetting {
 
 class Tracker {
     public msg = ""
-    public num_peers = 100
+    public num_peers = 0
+    public num_downloaded = 0
+    public num_leeches = 0
+    public num_seeds = 0
+    public tier = -1
     public status = 2
-    public url = 'http://bttracker.debian.org:6969/announce'
+    public url = ''
 
-    public getStatusText() {
-        if (this.status == 0) {
-            //0	Tracker is disabled (used for DHT, PeX, and LSD)
-            return "disabled"
-        }
-        if (this.status == 1) {
-            //1	Tracker has not been contacted yet
-            return 'contacted'
-        }
-        if (this.status == 2) {
-            //2	Tracker has been contacted and is working
-            return 'working'
-        }
-        if (this.status == 3) {
-            //3	Tracker is updating
-            return 'updating'
-        }
-        if (this.status == 3) {
-            //4	Tracker has been contacted, but it is not working (or doesn't send proper replies)
-            return 'not working'
-        }
-
-    }
+    public statusText =
+        this.status === 0 ? 'disabled' : this.status === 1 ? 'contacted' : this.status === 2 ? 'working' : this.status === 3 ? 'updating' : 'not working'
 
 }
 

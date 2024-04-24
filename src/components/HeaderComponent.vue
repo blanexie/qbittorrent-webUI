@@ -2,41 +2,44 @@
   <div class="toolbar">
     <el-tooltip content="退出登录" effect="light">
       <el-icon @click="logout">
-        <SwitchButton />
+        <SwitchButton/>
       </el-icon>
     </el-tooltip>
     <el-tooltip content="全局设置" effect="light">
       <el-icon>
-        <Setting />
+        <Setting/>
       </el-icon>
     </el-tooltip>
     <el-tooltip content="新增下载" effect="light">
       <el-icon>
-        <Plus />
+        <Plus/>
       </el-icon>
     </el-tooltip>
     <el-tooltip content="全部开始" v-if="store.globalInfo.currentMenu == 'error'" effect="light">
       <el-icon @click="playOrStop()">
-        <VideoPlay />
+        <VideoPlay/>
       </el-icon>
     </el-tooltip>
     <el-tooltip content="全部暂停" v-if="store.globalInfo.currentMenu == 'downloading'" effect="light">
       <el-icon @click="playOrStop()">
-        <VideoPause />
+        <VideoPause/>
       </el-icon>
     </el-tooltip>
     <el-tooltip content="刷新" effect="light">
       <el-icon @click="refreshClick($event)">
-        <Refresh />
+        <Refresh/>
       </el-icon>
     </el-tooltip>
+
+    <PreferenceComponent></PreferenceComponent>
   </div>
 </template>
 <script setup lang="ts">
-import { axios } from "@/requests";
+import {axios} from "@/requests";
 import StoreDefinition from "@/stores";
-import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
+import {Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
+import PreferenceComponent from "@/components/perference/PreferenceComponent.vue";
 
 
 const store = StoreDefinition()
@@ -49,9 +52,9 @@ const playOrStop = () => {
     const from = new FormData()
     from.set("hashes", hashs)
     axios.post('/api/v2/torrents/resume', from)
-      .then(resp => {
-        store.globalInfo.currentMenu = 'downloading'
-      })
+        .then(resp => {
+          store.globalInfo.currentMenu = 'downloading'
+        })
   }
 
   if (store.globalInfo.currentMenu == 'downloading') {
@@ -59,9 +62,9 @@ const playOrStop = () => {
     const from = new FormData()
     from.set("hashes", hashs)
     axios.post('/api/v2/torrents/pause', from)
-      .then(resp => {
-        store.globalInfo.currentMenu = 'error'
-      })
+        .then(resp => {
+          store.globalInfo.currentMenu = 'error'
+        })
   }
 
 }

@@ -1,14 +1,16 @@
 <template>
   <el-table :data="globalInfo.trackers">
-    <el-table-column prop="url" label="Url" />
-    <el-table-column prop="msg" label="Msg" />
-    <el-table-column prop="num_peers" label="num_peers" />
-    <el-table-column prop="status" label="status" />
+    <el-table-column prop="url" label="Url"/>
+    <el-table-column prop="statusText" label="status"/>
+    <el-table-column prop="num_peers" label="peers"/>
+    <el-table-column prop="num_leeches" label="吸血"/>
+    <el-table-column prop="num_seeds" label="做种"/>
   </el-table>
 </template>
 <script lang="ts" setup>
-import { ElTable, ElTableColumn } from 'element-plus';
+import {ElTable, ElTableColumn} from 'element-plus';
 import StoreDefinition from "@/stores";
+
 const store = StoreDefinition();
 const globalInfo = store.globalInfo;
 
