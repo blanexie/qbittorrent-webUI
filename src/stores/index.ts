@@ -47,30 +47,30 @@ const StoreDefinition =
                 info.rid = 0
             }
 
-            // const data = initData
-            // const fullUpdate = data.full_update ? data.full_update : false
-            // store.info.refresh(data.server_state)
-            // refreshTorrents(data.torrents, fullUpdate)
+            const data = initData
+            const fullUpdate = data.full_update ? data.full_update : false
+            store.info.refresh(data.server_state)
+            refreshTorrents(data.torrents, fullUpdate)
 
-            axios.get('/api/v2/sync/maindata?rid=' + info.rid + "&" + new Date().getTime()).then(resp => {
-                info.incrementRid()
-                const data = resp.data
-                //设置分类和标签
-                store.info.setCategoryAndTags(data.category, data.tags)
-                //设置全局属性
-                store.info.refresh(data.server_state)
-                //设置各个torrent属性
-                const fullUpdate = data.full_update ? data.full_update : false
-                refreshTorrents(data.torrents, fullUpdate)
-                if (schedule) {
-                    setTimeout(scheduleSyncMainData, scheduleTime)
-                }
-            }).catch(err => {
-                ElMessage.error('/api/v2/sync/maindata error' + err)
-                if (schedule) {
-                    setTimeout(scheduleSyncMainData, scheduleTime)
-                }
-            })
+            // axios.get('/api/v2/sync/maindata?rid=' + info.rid + "&" + new Date().getTime()).then(resp => {
+            //     info.incrementRid()
+            //     const data = resp.data
+            //     //设置分类和标签
+            //     store.info.setCategoryAndTags(data.category, data.tags)
+            //     //设置全局属性
+            //     store.info.refresh(data.server_state)
+            //     //设置各个torrent属性
+            //     const fullUpdate = data.full_update ? data.full_update : false
+            //     refreshTorrents(data.torrents, fullUpdate)
+            //     if (schedule) {
+            //         setTimeout(scheduleSyncMainData, scheduleTime)
+            //     }
+            // }).catch(err => {
+            //     ElMessage.error('/api/v2/sync/maindata error' + err)
+            //     if (schedule) {
+            //         setTimeout(scheduleSyncMainData, scheduleTime)
+            //     }
+            // })
         }
 
         /**

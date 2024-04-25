@@ -711,6 +711,7 @@ class Preference {
     public web_ui_upnp = false
     public web_ui_use_custom_http_headers_enabled = false
     public web_ui_username = 'admin'
+    public web_ui_password= ''
     public scan_dirs = {
         '/home/user/Downloads/incoming/games': 0,
         '/home/user/Downloads/incoming/movies': 1

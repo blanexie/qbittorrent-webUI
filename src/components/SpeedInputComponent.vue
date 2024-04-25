@@ -1,7 +1,7 @@
 <template>
   <el-input v-model="su.speed" placeholder="Please input" @change="change" size="small">
     <template #append>
-      <el-select v-model="su.unit" @change="change" style="width: 100px" size="small">
+      <el-select v-model="su.unit" @change="change" style="width: 80px" size="small">
         <el-option v-for="u in su.units" v-bind:key="u.value" :label="u.label" :value="u.value"/>
       </el-select>
     </template>

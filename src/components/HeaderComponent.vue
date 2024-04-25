@@ -6,7 +6,7 @@
       </el-icon>
     </el-tooltip>
     <el-tooltip content="全局设置" effect="light">
-      <el-icon>
+      <el-icon @click="settingClick">
         <Setting/>
       </el-icon>
     </el-tooltip>
@@ -35,14 +35,19 @@
   </div>
 </template>
 <script setup lang="ts">
-import {axios} from "@/requests";
-import StoreDefinition from "@/stores";
-import {Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay} from "@element-plus/icons-vue";
-import {ElMessage} from "element-plus";
 import PreferenceComponent from "@/components/perference/PreferenceComponent.vue";
+import { axios } from "@/requests";
+import StoreDefinition from "@/stores";
+import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from "@element-plus/icons-vue";
+import { ElIcon, ElMessage, ElTooltip } from "element-plus";
 
 
 const store = StoreDefinition()
+
+const settingClick= () => {
+  store.globalPreference.show = true
+}
+
 
 const playOrStop = () => {
   console.log(store.globalInfo.currentMenu)
