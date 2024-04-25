@@ -190,13 +190,12 @@
             <el-input v-model="preference.temp.web_ui_session_timeout" type="number" size="small"></el-input>
           </el-col>
         </el-row>
-
       </el-tab-pane>
     </el-tabs>
 
     <div class="sub-but">
-      <el-button type="primary">设置</el-button>
-      <el-button type="primary">取消</el-button>
+      <el-button type="primary" @click="update">设置</el-button>
+      <el-button type="primary" @click="globalPreference.show = false">取消</el-button>
     </div>
   </el-dialog>
 </template>
@@ -222,13 +221,22 @@ const preference = reactive<{
 const openInit = () => {
   console.log("openInit")
   //复制一份globalPreference数据
-  preference.temp = JSON.parse(JSON.stringify(globalPreference))
+  globalPreference.web_ui_port= 98946
+  Object.assign(preference.temp, globalPreference)
+  preference.temp.web_ui_username = "admin111"
+  console.log(preference.temp)
 }
+
 
 const update = () => {
   console.log("update")
   // 比较 preference.temp 与 globalPreference 的差异， 获取那些字段修改了
   const req = findChangedField(preference.temp, globalPreference)
+  console.log("preference update", req)
+  if (Object.keys(req).length == 0) {
+    return
+  }
+
   axios.post('/api/v2/app/setPreferences', req).then(res => {
     ElMessage.success('设置成功')
     globalPreference.show = false
@@ -247,6 +255,7 @@ function findChangedField(base: any, src: any) {
   const ret = new Map<string, any>()
   const keysb = Object.keys(base)
   const keyss = Object.keys(src)
+
   for (const k of keyss) {
     const index = keysb.indexOf(k)
     if (index >= 0 && base[k] != src[k]) {

@@ -554,13 +554,13 @@ function mergeObj(base: any, src: any) {
 
 class Preference {
 
-    public show = true
+    public show = false
 
     public random_port = false
     public listen_port = 58925
     public locale = 'en'
-    public alt_dl_limit = new ByteData(10240)
-    public alt_up_limit = new ByteData(10240)
+    public alt_dl_limit =  10240 
+    public alt_up_limit =  10240 
     public dht = true
     public upnp = true
     public enable_embedded_tracker = false
