@@ -11,7 +11,7 @@
       </el-icon>
     </el-tooltip>
     <el-tooltip content="新增下载" effect="light">
-      <el-icon>
+      <el-icon @click="addDownload">
         <Plus/>
       </el-icon>
     </el-tooltip>
@@ -32,22 +32,25 @@
     </el-tooltip>
 
     <PreferenceComponent></PreferenceComponent>
+    <AddTorrentComponent></AddTorrentComponent>
   </div>
 </template>
 <script setup lang="ts">
-import PreferenceComponent from "@/components/perference/PreferenceComponent.vue";
-import { axios } from "@/requests";
+import PreferenceComponent from "@/components/PreferenceComponent.vue";
+import {axios} from "@/requests";
 import StoreDefinition from "@/stores";
-import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from "@element-plus/icons-vue";
-import { ElIcon, ElMessage, ElTooltip } from "element-plus";
-
+import {Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay} from "@element-plus/icons-vue";
+import {ElIcon, ElMessage, ElTooltip} from "element-plus";
+import AddTorrentComponent from "@/components/AddTorrentComponent.vue";
 
 const store = StoreDefinition()
 
-const settingClick= () => {
+const settingClick = () => {
   store.globalPreference.show = true
 }
-
+const addDownload = () => {
+  store.globalInfo.showTorrentAddView = true
+}
 
 const playOrStop = () => {
   console.log(store.globalInfo.currentMenu)

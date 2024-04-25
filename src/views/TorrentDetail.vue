@@ -81,7 +81,10 @@ const scheduleRefreshFiles = () => {
 
 const fetchTagsAndCategory = async () => {
   axios.get('/api/v2/torrents/categories').then(resp => {
-    globalInfo.categories = Object.keys(resp.data)
+    globalInfo.categories = 0
+    Object.keys(resp.data).forEach(it => {
+      globalInfo.categories.push(it)
+    })
   }).catch(error => {
     ElMessage.error("获取分类失败" + error)
   })

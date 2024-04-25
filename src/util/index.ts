@@ -187,6 +187,7 @@ class GlobalInfo {
     public refresh_interval = 1500
     public currentMenu = "downloading"  //当前目录选择
 
+    public showTorrentAddView = false
     public showDetail = false
     public currentTorrent: TorrentInfo | null = null
     public setting: TorrentSetting = new TorrentSetting()
@@ -279,7 +280,8 @@ class GlobalInfo {
 
     public setCategoryAndTags(category: any | null, tags: string[] | null) {
         if (category) {
-            this.categories = Object.keys(category)
+            this.categories.length = 0
+            Object.keys(category).forEach(it => this.categories.push(it))
         }
         if (tags) {
             this.tags = tags
@@ -559,8 +561,8 @@ class Preference {
     public random_port = false
     public listen_port = 58925
     public locale = 'en'
-    public alt_dl_limit =  10240 
-    public alt_up_limit =  10240 
+    public alt_dl_limit = 10240
+    public alt_up_limit = 10240
     public dht = true
     public upnp = true
     public enable_embedded_tracker = false
@@ -711,7 +713,7 @@ class Preference {
     public web_ui_upnp = false
     public web_ui_use_custom_http_headers_enabled = false
     public web_ui_username = 'admin'
-    public web_ui_password= ''
+    public web_ui_password = ''
     public scan_dirs = {
         '/home/user/Downloads/incoming/games': 0,
         '/home/user/Downloads/incoming/movies': 1

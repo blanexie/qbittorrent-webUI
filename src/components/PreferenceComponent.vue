@@ -21,31 +21,31 @@
         <el-row>
           <el-col :span="6">开启UPnP/NAT-PMP:</el-col>
           <el-col :span="10">
-            <el-switch v-model="preference.temp.upnp" size="small" />
+            <el-switch v-model="preference.temp.upnp" size="small"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">保存路径:</el-col>
           <el-col :span="10">
-            <el-input v-model="preference.temp.save_path" size="small" />
+            <el-input v-model="preference.temp.save_path" size="small"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">启用DHT:</el-col>
           <el-col :span="10">
-            <el-switch v-model="preference.temp.dht" size="small" />
+            <el-switch v-model="preference.temp.dht" size="small"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">启用用户交换(PeX):</el-col>
           <el-col :span="10">
-            <el-switch v-model="preference.temp.pex" size="small" />
+            <el-switch v-model="preference.temp.pex" size="small"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">启用本地用户发现:</el-col>
           <el-col :span="10">
-            <el-switch v-model="preference.temp.lsd" size="small" />
+            <el-switch v-model="preference.temp.lsd" size="small"/>
           </el-col>
         </el-row>
         <el-row>
@@ -69,25 +69,25 @@
         <el-row>
           <el-col :span="6">总连接数:</el-col>
           <el-col :span="10">
-            <el-input v-model="preference.temp.max_connec" type="number" size="small" />
+            <el-input v-model="preference.temp.max_connec" type="number" size="small"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">每Torrent连接数:</el-col>
           <el-col :span="10">
-            <el-input v-model="preference.temp.max_connec_per_torrent" type="number" size="small" />
+            <el-input v-model="preference.temp.max_connec_per_torrent" type="number" size="small"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">总上传连接数:</el-col>
           <el-col :span="10">
-            <el-input v-model="preference.temp.max_uploads" type="number" size="small" />
+            <el-input v-model="preference.temp.max_uploads" type="number" size="small"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">每Torrent上传连接数:</el-col>
           <el-col :span="10">
-            <el-input v-model="preference.temp.max_uploads_per_torrent" type="number" size="small" />
+            <el-input v-model="preference.temp.max_uploads_per_torrent" type="number" size="small"/>
           </el-col>
         </el-row>
         <el-row>
@@ -113,31 +113,31 @@
         <el-row>
           <el-col :span="6">全局上传速度限制:</el-col>
           <el-col :span="10">
-            <SpeedInputComponent v-model:speed="preference.temp.up_limit" />
+            <SpeedInputComponent v-model:speed="preference.temp.up_limit"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">全局下载速度限制:</el-col>
           <el-col :span="10">
-            <SpeedInputComponent v-model:speed="preference.temp.dl_limit" />
+            <SpeedInputComponent v-model:speed="preference.temp.dl_limit"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">慢速torrent是否限速:</el-col>
           <el-col :span="10">
-            <el-switch v-model="preference.temp.dont_count_slow_torrents" size="small" />
+            <el-switch v-model="preference.temp.dont_count_slow_torrents" size="small"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">慢速下载阈值:</el-col>
           <el-col :span="10">
-            <SpeedInputComponent v-model:speed="preference.temp.slow_torrent_dl_rate_threshold" />
+            <SpeedInputComponent v-model:speed="preference.temp.slow_torrent_dl_rate_threshold"/>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">慢速上传阈值:</el-col>
           <el-col :span="10">
-            <SpeedInputComponent v-model:speed="preference.temp.slow_torrent_ul_rate_threshold" />
+            <SpeedInputComponent v-model:speed="preference.temp.slow_torrent_ul_rate_threshold"/>
           </el-col>
         </el-row>
         <el-row>
@@ -201,11 +201,11 @@
 </template>
 <script lang="ts" setup>
 import SpeedInputComponent from "@/components/SpeedInputComponent.vue";
-import { axios } from '@/requests';
+import {axios} from '@/requests';
 import StoreDefinition from "@/stores";
-import { Preference, mergeObj } from "@/util";
-import { ElButton, ElCol, ElDialog, ElInput, ElMessage, ElOption, ElRow, ElSelect, ElSwitch, ElTabs } from 'element-plus';
-import { reactive } from 'vue';
+import {mergeObj, Preference} from "@/util";
+import {ElButton, ElCol, ElDialog, ElInput, ElMessage, ElOption, ElRow, ElSelect, ElSwitch, ElTabs} from 'element-plus';
+import {reactive} from 'vue';
 
 const store = StoreDefinition()
 const globalPreference = store.globalPreference
@@ -220,25 +220,45 @@ const preference = reactive<{
 
 const openInit = () => {
   console.log("openInit")
-  //复制一份globalPreference数据
-  globalPreference.web_ui_port= 98946
-  Object.assign(preference.temp, globalPreference)
-  preference.temp.web_ui_username = "admin111"
-  console.log(preference.temp)
+  axios.get('/api/v2/app/preferences').then(resp => {
+    console.log("resp", resp.data)
+    mergeObj(globalPreference, resp.data)
+    console.log("globalPreference", globalPreference)
+    mergeObj(preference.temp, resp.data)
+    console.log("temp", preference.temp)
+  })
+
+}
+
+const isEmptyObject = (obj: any): boolean => {
+  // 检查obj是否为null或undefined，以及是否是一个对象
+  if (obj == null || typeof obj !== 'object') {
+    return true;
+  }
+  return obj.size === 0;
 }
 
 
 const update = () => {
-  console.log("update")
   // 比较 preference.temp 与 globalPreference 的差异， 获取那些字段修改了
   const req = findChangedField(preference.temp, globalPreference)
-  console.log("preference update", req)
-  if (Object.keys(req).length == 0) {
+  //判断req是否是空对象
+  if (isEmptyObject(req)) {
     return
   }
-
-  axios.post('/api/v2/app/setPreferences', req).then(res => {
-    ElMessage.success('设置成功')
+  const reqStr = JSON.stringify(req)
+  const data = "json=" + encodeURIComponent(reqStr)
+  console.log("update3", data)
+  axios({
+    method: "post",
+    url: '/api/v2/app/setPreferences',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    },
+    data: data
+  }).then(res => {
+    console.log("ressss", res)
+    ElMessage.success('设置成功121221')
     globalPreference.show = false
     mergeObj(globalPreference, preference.temp)
   }).catch(err => {
@@ -252,14 +272,17 @@ function findChangedField(base: any, src: any) {
   } else {
     return base
   }
-  const ret = new Map<string, any>()
+  const ret: any = {}
   const keysb = Object.keys(base)
   const keyss = Object.keys(src)
 
   for (const k of keyss) {
     const index = keysb.indexOf(k)
     if (index >= 0 && base[k] != src[k]) {
-      ret.set(k, base[k])
+      if ("show" === k || k === "scan_dirs") { /* empty */
+      } else {
+        ret[k] = base[k]
+      }
     }
   }
   return ret
