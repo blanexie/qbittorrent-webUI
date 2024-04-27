@@ -70,7 +70,7 @@
       </el-row>
       <div class="but">
         <el-button type="primary" @click="submit">确定</el-button>
-        <el-button type="primary">取消</el-button>
+        <el-button type="primary" @clikc="store.globalInfo.showTorrentAddView=false">取消</el-button>
       </div>
     </el-tabs>
   </el-dialog>
@@ -134,7 +134,7 @@ const data = reactive<TorrentData>({
 
 const beforeUp = async (uploadFile: UploadFile) => {
   console.log("uploadFile", uploadFile)
-  if (uploadFile.size!! > 1 * 1048576) {
+  if (uploadFile.size!! > 10 * 1048576) {
     ElMessage.error("选择的Torrent本身（不是下载的内容）大小不得超出10MB")
     return false
   }

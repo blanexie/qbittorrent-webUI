@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="globalInfo.showDetail" :with-header="false" direction="rtl" size="600">
+  <el-drawer v-model="globalInfo.showDetail" :with-header="false" @open="beforeLeave" direction="rtl" size="600">
 
     <el-text size="large" truncated>
       {{ globalInfo.currentTorrent?.name }}
