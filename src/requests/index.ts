@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ElMessage } from 'element-plus'
+import {ElMessage} from 'element-plus'
 
 
 const service = axios.create({
@@ -29,7 +29,8 @@ service.interceptors.response
             return Promise.reject(response)
         }
     }, error => {
-        if (error.response.status == 403) {
+        console.log("接口报错", error)
+        if (error?.response?.status == 403) {
             sessionStorage.removeItem("loginOk")
             location.reload()
         } else {
@@ -37,5 +38,5 @@ service.interceptors.response
         }
     })
 
-export { service as axios }
+export {service as axios}
 

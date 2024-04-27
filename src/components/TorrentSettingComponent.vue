@@ -49,7 +49,8 @@
   <el-row>
     <el-col :span="6">分类:</el-col>
     <el-col :span="17">
-      <el-select v-model="globalInfo.setting.category" :reserve-keyword="false" filterable allow-create placeholder="分类">
+      <el-select v-model="globalInfo.setting.category" :reserve-keyword="false" filterable allow-create
+                 placeholder="分类">
         <el-option v-for="item in globalInfo.categories" :key="item" :label="item" :value="item"/>
       </el-select>
     </el-col>
@@ -58,7 +59,8 @@
   <el-row>
     <el-col :span="6">标签:</el-col>
     <el-col :span="17">
-      <el-select v-model="globalInfo.setting.tags" :reserve-keyword="false" multiple allow-create filterable placeholder="标签 ">
+      <el-select v-model="globalInfo.setting.tags" :reserve-keyword="false" multiple allow-create filterable
+                 placeholder="标签 ">
         <el-option v-for="(item ,index) in globalInfo.tags" :key="index" :label="item" :value="item"/>
       </el-select>
     </el-col>
@@ -131,9 +133,9 @@ const update = async () => {
     //标签
     //1. 获取新增的标签
     const tTags = torrent.getTags()
-    const addTags = setting.tags.filter(tag => !tTags.includes(tag))
+    const addTags = setting.tags.filter(tag => !tTags.includes(tag)).filter(tag => tag != "")
     //2. 判断需要新增的标签中那些是不存在的
-    const newTags = addTags.filter(tag => !globalInfo.tags.includes(tag))
+    const newTags = addTags.filter(tag => !globalInfo.tags.includes(tag)).filter(tag => tag != "")
     //3. 创建不存在的标签
     if (newTags.length > 0) {
       const from = new FormData();
@@ -159,7 +161,8 @@ const update = async () => {
     }
 
     //判断当前分类 如果不存在， 则新增
-    if (!globalInfo.categories.includes(setting.category)) {
+    console.log(globalInfo.categories)
+    if (setting.category != '' && !globalInfo.categories.includes(setting.category)) {
       const from = new FormData();
       from.set("savePath", '');
       from.set("category", setting.category);

@@ -81,7 +81,7 @@ const scheduleRefreshFiles = () => {
 
 const fetchTagsAndCategory = async () => {
   axios.get('/api/v2/torrents/categories').then(resp => {
-    globalInfo.categories = 0
+    globalInfo.categories.length = 0
     Object.keys(resp.data).forEach(it => {
       globalInfo.categories.push(it)
     })

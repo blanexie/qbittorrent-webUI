@@ -2,13 +2,13 @@
   <div class="side">
     <div class="header">
       <FlyIcon class="fly"></FlyIcon>
-      <!-- <div class="qbt"> Qbittorrent</div> -->
+      <div class="qbt">Qbittorrent</div>
     </div>
     <el-menu @select="menuSelect" :default-active="store.globalInfo.currentMenu">
       <el-menu-item index="downloading">
         <template #title>
           <el-icon>
-            <Download />
+            <Download/>
           </el-icon>
           下载中
         </template>
@@ -16,7 +16,7 @@
       <el-menu-item index="finish">
         <template #title>
           <el-icon>
-            <Finished />
+            <Finished/>
           </el-icon>
           已完成
         </template>
@@ -24,7 +24,7 @@
       <el-menu-item index="quene">
         <template #title>
           <el-icon>
-            <VideoPause />
+            <VideoPause/>
           </el-icon>
           队列中
         </template>
@@ -33,21 +33,21 @@
       <el-menu-item index="error">
         <template #title>
           <el-icon>
-            <Warning />
+            <Warning/>
           </el-icon>
           暂停
         </template>
       </el-menu-item>
     </el-menu>
-    <br />
-    <SpeedInfoComponent />
+    <br/>
+    <SpeedInfoComponent/>
   </div>
 </template>
 <script setup lang="ts">
 import SpeedInfoComponent from '@/components/SpeedInfoComponent.vue';
 import FlyIcon from '@/components/icons/FlyIcon.vue';
 import StoreDefinition from '@/stores';
-import { Download, Finished, VideoPause, Warning } from '@element-plus/icons-vue';
+import {Download, Finished, VideoPause, Warning} from '@element-plus/icons-vue';
 
 const store = StoreDefinition()
 const menuSelect = (index: string) => {

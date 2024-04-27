@@ -53,8 +53,9 @@ const StoreDefinition =
             // refreshTorrents(data.torrents, fullUpdate)
 
             axios.get('/api/v2/sync/maindata?rid=' + info.rid + "&" + new Date().getTime()).then(resp => {
-                info.incrementRid()
                 const data = resp.data
+                info.rid = data.rid
+                //info.incrementRid()
                 //设置分类和标签
                 store.info.setCategoryAndTags(data.categories, data.tags)
                 //设置全局属性

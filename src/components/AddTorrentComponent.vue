@@ -4,30 +4,32 @@
       <el-tab-pane label="磁链任务" name="first">
         <el-row class="url-input">
           <el-col :span="24">
-            <el-input v-model="data.links" :rows="5" type="textarea" placeholder="每行一个磁链" />
+            <el-input v-model="data.links" :rows="5" type="textarea" placeholder="每行一个磁链"/>
           </el-col>
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="种子任务" name="second">
         <el-row>
           <el-col :span="24">
-
-            <el-upload drag action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15">
+            <el-upload drag :before-upload="beforeUp" :limit="1"
+                       action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15">
               <el-icon class="filled-icon">
-                <upload-filled />
+                <upload-filled/>
               </el-icon>
-              <div>
-                拖拽Torrent文件至此或 <el-text type="primary">点击上传 </el-text>
+              <div v-if="!data.torrentAdd">
+                拖拽Torrent文件至此或
+                <el-text type="primary">点击上传</el-text>
               </div>
+              <div v-if="data.torrentAdd">
+                <el-text size="large" type="primary">{{ data.torrentFile?.name }}</el-text>
+              </div>
+
               <template #tip>
                 <div>
                   Torrent文件大小不得超过10MB
                 </div>
               </template>
             </el-upload>
-
-
-
           </el-col>
         </el-row>
 
@@ -75,17 +77,48 @@
 </template>
 <script setup lang="ts">
 import SpeedInputComponent from "@/components/SpeedInputComponent.vue";
-import { axios } from "@/requests";
+import {axios} from "@/requests";
 import StoreDefinition from "@/stores";
-import { UploadFilled } from "@element-plus/icons-vue";
-import { ElButton, ElCol, ElDialog, ElIcon, ElInput, ElMessage, ElOption, ElRow, ElSelect, ElSwitch, ElTabPane, ElTabs, ElUpload } from "element-plus";
-import { reactive } from "vue";
+import {UploadFilled} from "@element-plus/icons-vue";
+import {reactive} from 'vue'
+import type {UploadFile} from 'element-plus'
+import {
+  ElButton,
+  ElCol,
+  ElDialog,
+  ElIcon,
+  ElInput,
+  ElMessage,
+  ElOption,
+  ElRow,
+  ElSelect,
+  ElSwitch,
+  ElTabPane,
+  ElTabs,
+  ElUpload
+} from "element-plus";
 
 const store = StoreDefinition()
 
-const data = reactive({
+interface TorrentData {
+  links: string;
+  torrentFile: UploadFile | null;
+  autoTMM: boolean;
+  skip_checking: boolean;
+  cookie: string;
+  rename: string;
+  category: string;
+  paused: boolean;
+  contentLayout: 'Original';
+  upLimit: number;
+  dlLimit: number;
+  activeTab: 'first' | 'second';
+  torrentAdd: boolean;
+}
+
+const data = reactive<TorrentData>({
   links: '',
-  torrentFiles: null,
+  torrentFile: null,
   autoTMM: true,
   skip_checking: false,
   cookie: '',
@@ -96,44 +129,65 @@ const data = reactive({
   upLimit: 0,
   dlLimit: 0,
   activeTab: 'first',
+  torrentAdd: false
 })
 
+const beforeUp = async (uploadFile: UploadFile) => {
+  console.log("uploadFile", uploadFile)
+  if (uploadFile.size!! > 1 * 1048576) {
+    ElMessage.error("选择的Torrent本身（不是下载的内容）大小不得超出10MB")
+    return false
+  }
+  data.torrentFile = uploadFile
+  data.torrentAdd = true
+  return false
+}
+
 const submit = () => {
+  const fromValue = new FormData()
+  fromValue.set("cookie", data.cookie)
+  fromValue.set("skip_checking", String(data.skip_checking))
+  fromValue.set("category", data.category)
+  fromValue.set("rename", data.rename)
+  fromValue.set("upLimit", String(data.upLimit))
+  fromValue.set("dlLimit", String(data.dlLimit))
+  fromValue.set("autoTMM", String(data.autoTMM))
+  fromValue.set("paused", 'false')
+  fromValue.set("contentLayout", data.contentLayout)
   if (data.activeTab == 'first') {
-    console.log("addLinks")
-    const fromValue = new FormData()
+    //校验 links是否为空
+    if (data.links.trim() == '') {
+      ElMessage.error("磁链不能为空")
+      return
+    }
     fromValue.set("urls", data.links)
-    fromValue.set("cookie", data.cookie)
-    fromValue.set("skip_checking", String(data.skip_checking))
-    fromValue.set("category", data.category)
-    fromValue.set("rename", data.rename)
-    fromValue.set("upLimit", String(data.upLimit))
-    fromValue.set("dlLimit", String(data.dlLimit))
-    fromValue.set("autoTMM", String(data.autoTMM))
-    fromValue.set("paused", 'false')
-    fromValue.set("contentLayout", data.contentLayout)
-
-    axios({
-      url: '/api/v2/torrents/add',
-      method: "POST",
-      data: fromValue,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }).then(resp => {
-      console.log(resp.data)
-      if (resp.data == 'Ok.') {
-        store.globalInfo.rid = 0
-        ElMessage.success("添加成功")
-        store.globalInfo.showTorrentAddView = false
-      } else {
-        ElMessage.error("添加失败")
-      }
-    }).catch(error => {
-      ElMessage.error("添加失败" + error)
-    })
-
-  } else { /* empty */ }
+  } else {
+    //校验 torrentFile是否为空
+    if (data.torrentFile == null) {
+      ElMessage.error("请选择Torrent文件")
+      return
+    }
+    fromValue.append("torrents", data.torrentFile)
+  }
+  axios({
+    url: '/api/v2/torrents/add',
+    method: "POST",
+    data: fromValue,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }).then(resp => {
+    console.log(resp.data)
+    if (resp.data == 'Ok.') {
+      store.globalInfo.rid = 0
+      ElMessage.success("添加成功")
+      store.globalInfo.showTorrentAddView = false
+    } else {
+      ElMessage.error("添加失败")
+    }
+  }).catch(error => {
+    ElMessage.error("添加失败" + error)
+  })
 }
 
 

@@ -1,3 +1,6 @@
+import {axios} from "@/requests";
+import {ElMessage} from "element-plus";
+
 class TorrentSetting {
     public savePath = ''
     public downloadLimit = 0
@@ -182,10 +185,7 @@ class GlobalInfo {
     public write_cache_overload = "0"
 
     public loginShow: boolean = true
-    public intervalId: number | null = null
-    public rid = 0
-    public refresh_interval = 1500
-    public currentMenu = "downloading"  //当前目录选择
+    public currentMenu = "downloading"    //当前目录选择
 
     public showTorrentAddView = false
     public showDetail = false
@@ -193,6 +193,12 @@ class GlobalInfo {
     public setting: TorrentSetting = new TorrentSetting()
     public files: TorrentFile[] = []
     public trackers: Tracker[] = []
+
+    //本次定时任务批次的编码，
+    public rid = 0
+    public intervalId: number = 0 //定时任务的批次号
+    public isRequesting: boolean = false;
+    public refresh_interval = 3000
 
     /**
      * setCurrentTorrent
@@ -292,9 +298,6 @@ class GlobalInfo {
         mergeObj(this, ts)
     }
 
-    public incrementRid() {
-        this.rid++
-    }
 
 }
 
@@ -718,9 +721,69 @@ class Preference {
         '/home/user/Downloads/incoming/games': 0,
         '/home/user/Downloads/incoming/movies': 1
     }
+}
 
+
+function scheduleMaindata(intervalId: number, info: GlobalInfo, torrents: TorrentInfo[]) {
+    //检查当前批次是否还存在
+    if (intervalId !== info.intervalId) {
+        return
+    }
+
+    // const data = initData
+    // const fullUpdate = data.full_update ? data.full_update : false
+    // store.info.refresh(data.server_state)
+    // refreshTorrents(data.torrents, fullUpdate)
+
+    axios.get('/api/v2/sync/maindata?rid=' + info.rid + "&" + new Date().getTime()).then(resp => {
+        const data = resp.data
+        if (info.rid !== 0) {
+            info.rid = data.rid
+        } else {
+            info.rid = 1
+        }
+        //设置分类和标签
+        info.setCategoryAndTags(data.categories, data.tags)
+        //设置全局属性
+        info.refresh(data.server_state)
+        //设置各个torrent属性
+        const fullUpdate = data.full_update ? data.full_update : false
+        refreshTorrents(torrents, data.torrents, fullUpdate)
+        setTimeout(() => {
+            scheduleMaindata(intervalId, info, torrents)
+        }, info.refresh_interval)
+    }).catch(err => {
+        console.error(err)
+        ElMessage.error('/api/v2/sync/maindata error' + err)
+        setTimeout(() => {
+            scheduleMaindata(intervalId, info, torrents)
+        }, info.refresh_interval)
+    })
 
 }
+
+/**
+ * 更新 torrents列表信息
+ * @param ts
+ * @param fullUpdate  是否全量替换
+ */
+const refreshTorrents = (torrents: TorrentInfo[], ts: any | null, fullUpdate: boolean) => {
+    if (ts == null) {
+        return
+    }
+    if (fullUpdate) {
+        //第一步清空
+        torrents.length = 0
+        //转换装载对象
+        Object.keys(ts)
+            .map(key => new TorrentInfo(key).refresh(ts[key]))
+            .sort((a, b) => b.properties.addition_date - a.properties.addition_date)
+            .forEach(it => torrents.push(it))
+    } else {
+        torrents.forEach(it => it.refresh(ts[it.hash]))
+    }
+}
+
 
 export {
     ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo, TorrentProperties, TorrentSetting, Tracker, mergeObj
