@@ -5,7 +5,7 @@ The sleekest looking WebUI for qBittorrent made with Vue.js!
 
 ![qbtui](readme_assets/favicon.ico)
 
-![Vue](https://img.shields.io/badge/Vue-%5E3.4.20-brightgreen) ![Vuetify](https://img.shields.io/badge/Vuetify-%5E3.5.6-brightgreen)
+![Vue](https://img.shields.io/badge/Vue-%5E3.4.20-brightgreen)  
 ![qBittorrent](https://img.shields.io/badge/qBittorrent-4.4%2B-brightgreen)
 
 ![stars](https://img.shields.io/github/stars/blanexie/qbtui) ![Forks](https://img.shields.io/github/forks/blanexie/qbtui)
