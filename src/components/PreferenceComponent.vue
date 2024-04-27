@@ -155,6 +155,12 @@
           </el-col>
         </el-row>
         <el-row>
+          <el-col :span="6">WEBUI备用地址:</el-col>
+          <el-col :span="10">
+            <el-input v-model="preference.temp.alternative_webui_path" type="string" size="small"></el-input>
+          </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="6">WEBUI是否启用UPnP:</el-col>
           <el-col :span="10">
             <el-switch v-model="preference.temp.web_ui_upnp" type="number" size="small"></el-switch>
@@ -246,6 +252,15 @@ const update = () => {
   if (isEmptyObject(req)) {
     return
   }
+
+  if (req.alternative_webui_path != null && req.alternative_webui_path.trim() !== '') {
+    req.alternative_webui_enabled = true
+    preference.temp.alternative_webui_enabled = true
+  } else {
+    req.alternative_webui_enabled = false
+    preference.temp.alternative_webui_enabled = false
+  }
+
   const reqStr = JSON.stringify(req)
   const data = "json=" + encodeURIComponent(reqStr)
   console.log("update3", data)

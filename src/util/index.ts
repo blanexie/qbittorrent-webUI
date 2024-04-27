@@ -580,7 +580,7 @@ class Preference {
     public temp_path_enabled = false
 
     public alternative_webui_enabled = false
-    public alternative_webui_path = '/home/user/Documents/qbit-webui'
+    public alternative_webui_path = ''
 
     public dyndns_domain = 'changeme.dyndns.org'
     public dyndns_enabled = false

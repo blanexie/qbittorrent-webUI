@@ -16,8 +16,11 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
+    build: {
+        outDir: 'dist/public',
+    },
     server: {
-        // 设置反向代理，跨域
+        //设置反向代理，跨域
         // proxy: {
         //     '/api': {
         //         // 后台地址
