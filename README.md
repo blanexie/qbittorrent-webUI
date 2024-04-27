@@ -1,4 +1,4 @@
-# Qbtui
+# QbtUI
 
 The sleekest looking WebUI for qBittorrent made with Vue.js!
 使用Vue3 开发的一个Qbittorrent WebUI界面, 参考了Motrix的界面。
