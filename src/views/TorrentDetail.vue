@@ -5,7 +5,7 @@
       {{ globalInfo.currentTorrent?.name }}
     </el-text>
 
-    <el-tabs :before-leave="beforeLeave" v-model="active">
+    <el-tabs @tab-change="beforeLeave" v-model="active">
       <el-tab-pane label="Props" name="Props">
         <TorrentPropsComponent></TorrentPropsComponent>
       </el-tab-pane>
@@ -41,16 +41,16 @@ const store = StoreDefinition()
 const globalInfo = store.globalInfo
 const active = ref("Props")
 
-const beforeLeave = (activeName: string) => {
-  if (activeName == "Files") {
+const beforeLeave = ( ) => {
+  if (active.value == "Files") {
     // const tfiles = files2.map(it => it as TorrentFile)
     // globalInfo.refreshFiles(tfiles)
     scheduleRefreshFiles()
   }
-  if (activeName == "Setting") {
+  if (active.value == "Setting") {
     fetchTagsAndCategory()
   }
-  if (activeName == 'Trackers') {
+  if (active.value == 'Trackers') {
     fetchTracker()
   }
 }
