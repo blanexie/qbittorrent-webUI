@@ -18,16 +18,16 @@ export default defineConfig({
     },
     server: {
         // 设置反向代理，跨域
-        proxy: {
-            '/api': {
-                // 后台地址
-                target: 'http://192.168.1.6:8080/',
-                changeOrigin: true,
-                rewrite: (path: any) => {
-                    return path;
-                }
-            }
-        }
+        // proxy: {
+        //     '/api': {
+        //         // 后台地址
+        //         target: 'http://192.168.1.6:8080/',
+        //         changeOrigin: true,
+        //         rewrite: (path: any) => {
+        //             return path;
+        //         }
+        //     }
+        // }
     }
 })
 
