@@ -32,6 +32,7 @@ jobs:
       with:
         # An optional flag which indicates if we should update a release if it already exists. Defaults to false.
         allowUpdates: true
+        tag: $(git describe --tags --abbrev=0)
         # An optional body for the release.
         body: dist
         name: v0.1.1
