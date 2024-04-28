@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -28,14 +28,16 @@ jobs:
         cache: 'npm'
     - run: npm install 
     - run: npm run build-only
-    - uses: ncipollo/release-action@v1.14.0
+    - name: Compress project into a zip file
+      run: zip -r dist.zip dist/
+    - name: Upload zip file to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        # An optional flag which indicates if we should update a release if it already exists. Defaults to false.
-        allowUpdates: true
-        tag: $(git describe --tags --abbrev=0)
-        # An optional body for the release.
-        body: dist
-        name: v0.1.1
+        upload_url: https://uploads.github.com/repos/blanexie/qbtui/releases/tag/${{ github.event.release.tag }}/assets?name=dist.zip
+        asset_path: dist.zip
+   
   
 
   
