@@ -37,6 +37,7 @@ jobs:
       with:
         upload_url: https://uploads.github.com/repos/blanexie/qbtui/releases/tag/${{ github.event.release.tag }}/assets?name=dist.zip
         asset_path: dist.zip
+        asset_name: ${{ github.event.release.tag }}
    
   
 
