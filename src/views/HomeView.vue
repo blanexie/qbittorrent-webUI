@@ -23,9 +23,11 @@ import StoreDefinition from '@/stores';
 import TorrentList from '@/views/TorrentList.vue';
 
 const store = StoreDefinition()
-store.scheduleSyncMainData(true)
+//全局配置加载
+//分类和标签加载
+//定时任务获取
 
-console.log("torrentInfos", store.torrentInfos)
+
 
 </script>
 

@@ -1,5 +1,34 @@
-import {axios} from "@/requests";
-import {ElMessage} from "element-plus";
+import { format } from 'date-fns';
+
+function mergeObj(base: any, src: any) {
+    if (src) { /* empty */
+    } else {
+        return base
+    }
+    const keysb = Object.keys(base)
+    const keyss = Object.keys(src)
+    for (const k of keyss) {
+        const index = keysb.indexOf(k)
+        if (index >= 0) {
+            base[k] = src[k]
+        }
+    }
+    return base
+}
+
+interface ByteUnit {
+    name: string,
+    size: number
+}
+
+const units: ByteUnit[] = [
+    { name: 'B', size: 1 },
+    { name: 'KB', size: 1024 },
+    { name: 'MB', size: 1024 * 1024 },
+    { name: 'GB', size: 1024 * 1024 * 1024 },
+    { name: 'TB', size: 1024 * 1024 * 1024 * 1024 },
+    { name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024 }
+]
 
 class TorrentSetting {
     public savePath = ''
@@ -25,10 +54,6 @@ class Tracker {
     public tier = -1
     public status = 2
     public url = ''
-
-    public statusText =
-        this.status === 0 ? 'disabled' : this.status === 1 ? 'contacted' : this.status === 2 ? 'working' : this.status === 3 ? 'updating' : 'not working'
-
 }
 
 class TorrentFile {
@@ -57,111 +82,187 @@ class TorrentFile {
             this.name = prefix + "/" + label
         }
     }
+}
+
+
+class Torrent {
+
+    show: boolean = false
+    isActive: boolean = false
+
+    /***********************************************/
+    setting: TorrentSetting = new TorrentSetting()
+    trackers: Tracker[] = []
+    file: TorrentFile | null = null
+    /***********************************************/
+
+    hash: string = ''
+    name: string = ''
+    size: number = 0
+    total_size: number = 0
+    dlspeed: number = 0
+    dl_limit: number = 0
+    completed: number = 0
+    downloaded: number = 0
+    upspeed: number = 0
+    up_limit: number = 0
+    progress: number = 0
+    seeding_time: number = 0
+    eta: number = 0
+    f_l_piece_prio: boolean = false
+    force_start: boolean = false
+    category: string = ''
+    tags: string[] = []
+    num_complete: number = 0
+    num_incomplete: number = 0
+    num_leechs: number = 0
+    num_seeds: number = 0
+    priority: number = 0
+    ratio: number = 0
+    seq_dl: boolean = false
+    state: string = 'downloading'
+    super_seeding: boolean = false
+    magnet_uri: string = ''
+    content_path: string = ''
+    added_on: number = 0
+    last_activity: number = 0
+    time_active: number = 0
+    tracker: string = ''
+    save_path: string = ''
+
+    addition_date = 1438429165
+    comment = 'Debian CD from cdimage.debian.org'
+    completion_date = 1438429234
+    created_by = ''
+    creation_date = 1433605214
+    dl_speed = 0
+    dl_speed_avg = 9736015
+    last_seen = 1438430354
+    nb_connections = 3
+    nb_connections_limit = 250
+    peers = 1
+    peers_total = 89
+    piece_size = 524288
+    pieces_have = 1254
+    pieces_num = 1254
+    reannounce = 672
+    seeds = 1
+    seeds_total = 254
+    share_ratio = 0.00072121022562178299
+    time_elapsed = 1197
+    total_downloaded = 681521119
+    total_downloaded_session = 681521119
+    total_uploaded = 491520
+    total_uploaded_session = 491520
+    total_wasted = 23481724
+    up_speed = 0
+    up_speed_avg = 410
+
+    private readonly stateMap = {
+        'downloading': [
+            "allocating", //开启磁盘空间，马上就下载， 所以算在下载中
+            "downloading",
+            "metaDL",  //开始下载了，正在获取种子的metadata
+            "stalledDL",  //开始下载了，但是无连接
+            "checkingDL", //校验中，校验完成立即下载
+            "forcedDL",//强制下载， 忽略队列限制
+        ],
+        'upload': [
+            "uploading",
+            "pausedUP",  //已经下载完成了，但是暂停上传中
+            "quenedUP", //在队列中等待上传，应该已经下载完成了 ？？？
+            "stalledUP",  //开始做种了，但是无连接
+            "checkingUP", //校验中， 是下载完成后的校验
+            "forcedUP",//强制上传， 应该已经下载完成了 ？？？
+        ],
+        'quene': [
+            "quenedDL", //在队列中等待下载
+        ],
+        'error': [
+            "pausedDL",
+            "error",
+            "missingFiles",
+            "checkingResumeData",
+            "moving",
+            "unknown"
+        ]
+    }
+
+    public refresh(obj: any) {
+        mergeObj(this, obj)
+    }
+
+    public getShowState(): string {
+        return this.stateMap.downloading.includes(this.state) ? 'downloading' :
+            this.stateMap.upload.includes(this.state) ? 'upload' :
+                this.stateMap.quene.includes(this.state) ? 'quene' :
+                    this.stateMap.error.includes(this.state) ? 'error' : 'unknown'
+    }
+
+    public getProgress(): number {
+        return Math.floor(this.progress * 100) / 100
+    }
+
+    public getEtaStr() {
+        if (this.getProgress() == 1) {
+            return '0'
+        }
+        const time = this.eta
+        if (time > 24 * 3600) {
+            const d = Math.floor(time / (3600 * 24))
+            const h = Math.floor((time - (3600 * 24 * d)) / 3600)
+            return d + 'd ' + h + 'h'
+        } else if (time > 3600) {
+            const h = Math.floor(time / 3600)
+            const m = Math.floor((time - (3600 * h)) / 60)
+            return h + 'h ' + m + 'm '
+        } else if (time > 60) {
+            const m = Math.floor(time / 60)
+            const s = time - (m * 60)
+            return m + 'm ' + s + 's'
+        } else {
+            return time + 's'
+        }
+    }
+
+    public getAddOnStr(ft = 'yyyy-MM-dd HH:mm:ss'): string {
+        return format(new Date(this.added_on * 1000), ft)
+    }
+
+    public getLastActivityStr(ft = 'yyyy-MM-dd HH:mm:ss'): string {
+        return format(new Date(this.last_activity * 1000), ft)
+    }
 
 }
 
-class ByteData {
-    /**
-     *
-     * @param bytes  字节数
-     */
-    constructor(bytes: number) {
-        this.bytes = bytes
-    }
 
-    bytes: number
+class Preference {
+    public show = false
 
-    private readonly KB = 1024
-    private readonly MB = 1024 * 1024
-    private readonly GB = 1024 * 1024 * 1024
-    private readonly TB = 1024 * 1024 * 1024 * 1024
+    public loginShow: boolean = true
+    public currentMenu = "downloading"    //当前目录选择
 
-    public setBytes(bytes: number) {
-        this.bytes = bytes
-    }
+    public showTorrentAddView = false
+    public showDetail = false
+    public currentTorrent: Torrent | null = null
 
-    public getSpeedStr(): string {
-        return this.getSize() + this.getSpeedUnit()
-    }
+    //本次定时任务批次的编码，
+    public rid = 0
+    public intervalId: number = 0 //定时任务的批次号
+    public isRequesting: boolean = false;
+    public refresh_interval = 3000
 
-    public getSizeStr(): string {
-        return this.getSize() + this.getSizeUnit()
-    }
+    public torrents: Torrent[] = []
+    /**********************************************************************/
 
-    public getSpeedUnit(): string {
-        if (this.bytes < this.KB) {
-            return 'B/s'
-        }
-        if (this.bytes < this.MB) {
-            return 'KB/s'
-        }
-        if (this.bytes < this.GB) {
-            return 'MB/s'
-        }
-        if (this.bytes < this.TB) {
-            return 'GB/s'
-        }
-        return 'TB/s'
-    }
-
-    public getUnit(): number {
-        if (this.bytes < this.KB) {
-            return 1
-        }
-        if (this.bytes < this.MB) {
-            return this.KB
-        }
-        if (this.bytes < this.GB) {
-            return this.MB
-        }
-        if (this.bytes < this.TB) {
-            return this.GB
-        }
-        return this.TB
-    }
-
-    public getSizeUnit(): string {
-        if (this.bytes < this.KB) {
-            return 'B'
-        }
-        if (this.bytes < this.MB) {
-            return 'KB'
-        }
-        if (this.bytes < this.GB) {
-            return 'MB'
-        }
-        if (this.bytes < this.TB) {
-            return 'GB'
-        }
-        return 'TB'
-    }
-
-    public getSize(): number {
-        if (this.bytes < this.KB) {
-            return this.bytes
-        }
-        if (this.bytes < this.MB) {
-            return Math.round((this.bytes / this.KB) * 10) / 10
-        }
-        if (this.bytes < this.GB) {
-            return Math.round((this.bytes / this.MB) * 10) / 10
-        }
-        if (this.bytes < this.TB) {
-            return Math.round((this.bytes / this.GB) * 100) / 100
-        }
-        return Math.round((this.bytes / this.TB) * 100) / 100
-    }
-}
-
-class GlobalInfo {
     public connection_status = 'connected'
     public dht_nodes = 0
-    public dl_info_data = new ByteData(421)
-    public dl_info_speed = new ByteData(13)
-    public dl_rate_limit = new ByteData(13)
-    public up_info_data = new ByteData(1223)
-    public up_info_speed = new ByteData(1631)
-    public up_rate_limit = new ByteData(13)
+    public dl_info_data = 0
+    public dl_info_speed = 0
+    public dl_rate_limit = 0
+    public up_info_data = 0
+    public up_info_speed = 0
+    public up_rate_limit = 0
 
     public categories: string[] = []
     public tags: string[] = []
@@ -184,382 +285,7 @@ class GlobalInfo {
     public use_alt_speed_limits = false
     public write_cache_overload = "0"
 
-    public loginShow: boolean = true
-    public currentMenu = "downloading"    //当前目录选择
-
-    public showTorrentAddView = false
-    public showDetail = false
-    public currentTorrent: TorrentInfo | null = null
-    public setting: TorrentSetting = new TorrentSetting()
-    public files: TorrentFile[] = []
-    public trackers: Tracker[] = []
-
-    //本次定时任务批次的编码，
-    public rid = 0
-    public intervalId: number = 0 //定时任务的批次号
-    public isRequesting: boolean = false;
-    public refresh_interval = 3000
-
-    /**
-     * setCurrentTorrent
-     */
-    public setCurrentTorrent(torrent: TorrentInfo) {
-        this.currentTorrent = torrent
-        this.setting = new TorrentSetting()
-
-        this.setting.torrentName = torrent.name
-        this.setting.savePath = torrent.save_path
-        this.setting.downloadLimit = torrent.dl_limit.getSize()
-        this.setting.downloadLimitUnit = torrent.dl_limit.getUnit()
-        this.setting.uploadLimit = torrent.up_limit.getSize()
-        this.setting.uploadLimitUnit = torrent.up_limit.getUnit()
-        this.setting.category = torrent.category
-        this.setting.tags = torrent.getTags()
-        this.setting.sequential = torrent.seq_dl
-        this.setting.superSeed = torrent.super_seeding
-        this.setting.f_l_piece_prio = torrent.f_l_piece_prio
-
-        if (this.setting.downloadLimit === 0) {
-            this.setting.downloadLimitUnit = 1024
-        }
-        if (this.setting.uploadLimit === 0) {
-            this.setting.uploadLimitUnit = 1024
-        }
-
-        this.showDetail = true
-    }
-
-    /**
-     * refreshFiles
-     */
-    public refreshFiles(tFiles: TorrentFile[]) {
-        this.files.length = 0
-        const fileMap = new Map<string, TorrentFile>()
-        tFiles.forEach(it => {
-            it.isLeaf = true
-            const [p, l] = this.splitPrefix(it.name)
-            it.prefix = p
-            it.label = l
-            fileMap.set(it.name, it)
-            const parent = this.findMapFile(p, fileMap)
-            parent?.children.push(it)
-        });
-        //获取一级目录
-        fileMap.forEach((it) => {
-            if (it.prefix == '') {
-                this.files.push(it)
-            }
-        })
-    }
-
-
-    private findMapFile(name: string, fileMap: Map<string, TorrentFile>) {
-        if (name == '') {
-            return null
-        }
-        let file = fileMap.get(name)
-        if (file) {
-            return file
-        } else {
-            const [p, l] = this.splitPrefix(name)
-            file = new TorrentFile(p, l)
-            fileMap.set(file.name, file)
-            const parent = this.findMapFile(p, fileMap)
-            parent?.children.push(file)
-            return file
-        }
-    }
-
-    private splitPrefix = (name: string) => {
-        const paths = name.split("/")
-        if (paths.length == 1) {
-            return ['', name]
-        }
-        if (paths.length == 2) {
-            return [paths[0], paths[1]]
-        }
-        const last = paths[paths.length - 1]
-        paths.length = paths.length - 1
-        const prefix = paths.join("/")
-        return [prefix, last]
-    }
-
-    public setCategoryAndTags(category: any | null, tags: string[] | null) {
-        if (category) {
-            this.categories.length = 0
-            Object.keys(category).forEach(it => this.categories.push(it))
-        }
-        if (tags) {
-            this.tags = tags
-        }
-    }
-
-    public refresh(ts: any) {
-        mergeObj(this, ts)
-    }
-
-
-}
-
-
-class TorrentInfo {
-    public hash = '8c212779b4abde7c6bc608063a0d008b7e40ce32'
-    public name = 'debian-8.1.0-amd64-CD-1.iso'
-    public size: ByteData = new ByteData(657457152)
-    public total_size: ByteData = new ByteData(657457152)
-    public progress = 0.16108787059783936
-    public dlspeed = new ByteData(9681262)
-    public dl_limit = new ByteData(9681262)
-    public completed = new ByteData(0)
-    public downloaded = new ByteData(9681262)
-    public upspeed = new ByteData(4507841)
-    public up_limit = new ByteData(4507841)
-    public seeding_time: number = 3 * 60 * 60 + 69
-    public eta = 87
-    public f_l_piece_prio = false
-    public force_start = false
-    public category = ''
-    public tags = ''
-    public num_complete = -1
-    public num_incomplete = -1
-    public num_leechs = 2
-    public num_seeds = 54
-    public priority = 1
-    public ratio = 0
-    public seq_dl = false
-    public state = 'downloading'
-    public super_seeding = false
-    public magnet_uri = ""
-    public content_path = ''
-    public added_on = 0
-    public last_activity = 0
-    public time_active = 0
-    public tracker = ''
-    public save_path = '/Downloads/debian-8.1.0-amd64-CD-1.iso'
-
-    public show: boolean = false
-    public isActive: boolean = false
-
-    public properties = new TorrentProperties()
-
-    public constructor(hash: string) {
-        this.hash = hash
-    }
-
-    private dl = [
-        "allocating", //开启磁盘空间，马上就下载， 所以算在下载中
-        "downloading",
-        "metaDL",  //开始下载了，正在获取种子的metadata
-        "stalledDL",  //开始下载了，但是无连接
-        "checkingDL", //校验中，校验完成立即下载
-        "forcedDL",//强制下载， 忽略队列限制
-    ]
-
-    private flinsh = [
-        "uploading",
-        "pausedUP",  //已经下载完成了，但是暂停上传中
-        "quenedUP", //在队列中等待上传，应该已经下载完成了 ？？？
-        "stalledUP",  //开始做种了，但是无连接
-        "checkingUP", //校验中， 是下载完成后的校验
-        "forcedUP",//强制上传， 应该已经下载完成了 ？？？
-    ]
-    private quene = [
-        "quenedDL", //在队列中等待下载
-    ]
-
-    private error = [
-        "pausedDL",
-        "error",
-        "missingFiles",
-        "checkingResumeData",
-        "moving",
-        "unknown"
-    ]
-
-    public getCState() {
-        if (this.dl.includes(this.state)) {
-            return "downloading"
-        }
-        if (this.flinsh.includes(this.state)) {
-            return "finish"
-        }
-        if (this.quene.includes(this.state)) {
-            return "quene"
-        }
-        if (this.error.includes(this.state)) {
-            return "error"
-        }
-    }
-
-    public getProgress(): number {
-        return Math.floor(this.progress * 100)
-    }
-
-    public getDownloadSizeStr(): string {
-        return this.getProgress() + '% (' + this.completed.getSizeStr() + '/' + this.total_size.getSizeStr() + ')'
-    }
-
-    public getTags() {
-        return this.tags == '' ? [] : this.tags.split(',')
-    }
-
-    public getEtaStr() {
-        if (this.getProgress() == 100) {
-            return '0'
-        }
-        const time = this.eta
-        if (time > 24 * 3600) {
-            const d = Math.floor(time / (3600 * 24))
-            const h = Math.floor((time - (3600 * 24 * d)) / 3600)
-            return d + 'd ' + h + 'h'
-        } else if (time > 3600) {
-            const h = Math.floor(time / 3600)
-            const m = Math.floor((time - (3600 * h)) / 60)
-            return h + 'h ' + m + 'm '
-        } else {
-            const m = Math.floor(time / 60)
-            const s = time - (m * 60)
-            return m + 'm ' + s + 's'
-        }
-    }
-
-    public refresh(ts: any): TorrentInfo {
-        mergeObj(this, ts)
-        return this
-    }
-
-    public getTimeStr(key: string) {
-        if (key == "added_on") {
-            return timeS(this.added_on)
-        }
-        if (key == "last_activity") {
-            return timeS(this.last_activity + this.time_active)
-        }
-        return ''
-    }
-
-}
-
-
-class TorrentProperties {
-    public addition_date = 1438429165
-    public comment = 'Debian CD from cdimage.debian.org'
-    public completion_date = 1438429234
-    public created_by = ''
-    public creation_date = 1433605214
-    public dl_limit = -1
-    public dl_speed = 0
-    public dl_speed_avg = 9736015
-    public eta = 8640000
-    public last_seen = 1438430354
-    public nb_connections = 3
-    public nb_connections_limit = 250
-    public peers = 1
-    public peers_total = 89
-    public piece_size = 524288
-    public pieces_have = 1254
-    public pieces_num = 1254
-    public reannounce = 672
-    public save_path = '/Downloads/debian-8.1.0-amd64-CD-1.iso'
-    public seeding_time = 1128
-    public seeds = 1
-    public seeds_total = 254
-    public share_ratio = 0.00072121022562178299
-    public time_elapsed = 1197
-    public total_downloaded = 681521119
-    public total_downloaded_session = 681521119
-    public total_size = 657457152
-    public total_uploaded = 491520
-    public total_uploaded_session = 491520
-    public total_wasted = 23481724
-    public up_limit = -1
-    public up_speed = 0
-    public up_speed_avg = 410
-}
-
-function time(time = +new Date(), type: string = 'yyyy-MM-dd hh:mm:ss') {
-    // 前端开发过程中，常常需要将时间戳转化为标准时间格式供用户浏览
-    // 不借助方法库的情况下，如何又快又好的实现呢？
-    // 下面介绍两种方法
-    const date = new Date(time);
-    const Year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const Month = month >= 10 ? month : '0' + month;
-    const day = date.getDate();
-    const Day = day >= 10 ? day : '0' + day;
-    const Hour1 = date.getHours();
-    const Hour = Hour1 < 10 ? '0' + Hour1 : Hour1;
-    const Minute1 = date.getMinutes();
-    const Minute = Minute1 < 10 ? '0' + Minute1 : Minute1;
-    const Second1 = date.getSeconds();
-    const Second = Second1 < 10 ? '0' + Second1 : Second1;
-
-    if (type === 'yyyy-MM-dd') {
-        return Year + '-' + Month + '-' + Day;
-        ;
-    } else if (type === 'yyyy-MM-dd hh:mm:ss') {
-        return Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Second;
-    } else if (type === 'hh:mm:ss') {
-        return Hour + ':' + Minute + ':' + Second;
-    } else {
-        return 'error time type!';
-    }
-}
-
-
-function timeS(time: number, type: string = 'yyyy-MM-dd hh:mm:ss') {
-    // 前端开发过程中，常常需要将时间戳转化为标准时间格式供用户浏览
-    // 不借助方法库的情况下，如何又快又好的实现呢？
-    // 下面介绍两种方法
-    const date = new Date(time * 1000);
-    const Year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const Month = month >= 10 ? month : '0' + month;
-    const day = date.getDate();
-    const Day = day >= 10 ? day : '0' + day;
-    const Hour1 = date.getHours();
-    const Hour = Hour1 < 10 ? '0' + Hour1 : Hour1;
-    const Minute1 = date.getMinutes();
-    const Minute = Minute1 < 10 ? '0' + Minute1 : Minute1;
-    const Second1 = date.getSeconds();
-    const Second = Second1 < 10 ? '0' + Second1 : Second1;
-
-    if (type === 'yyyy-MM-dd') {
-        return Year + '-' + Month + '-' + Day;
-        ;
-    } else if (type === 'yyyy-MM-dd hh:mm:ss') {
-        return Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Second;
-    } else if (type === 'hh:mm:ss') {
-        return Hour + ':' + Minute + ':' + Second;
-    } else {
-        return 'error time type!';
-    }
-}
-
-function mergeObj(base: any, src: any) {
-    if (src) { /* empty */
-    } else {
-        return base
-    }
-    const keysb = Object.keys(base)
-    const keyss = Object.keys(src)
-    for (const k of keyss) {
-        const index = keysb.indexOf(k)
-        if (index >= 0) {
-            if (base[k] instanceof ByteData) {
-                base[k].setBytes(src[k])
-            } else {
-                base[k] = src[k]
-            }
-        }
-    }
-    return base
-}
-
-
-class Preference {
-
-    public show = false
+    /**************************************************************************/
 
     public random_port = false
     public listen_port = 58925
@@ -663,7 +389,6 @@ class Preference {
     public proxy_type = 0
     public proxy_username = ''
 
-
     public recheck_completed_torrents = false
     public resolve_peer_countries = true
     public rss_auto_downloading_enabled = true
@@ -717,76 +442,58 @@ class Preference {
     public web_ui_use_custom_http_headers_enabled = false
     public web_ui_username = 'admin'
     public web_ui_password = ''
-    public scan_dirs = {
-        '/home/user/Downloads/incoming/games': 0,
-        '/home/user/Downloads/incoming/movies': 1
+    public scan_dirs = {}
+
+    public refresh(obj: any) {
+        mergeObj(this, obj)
     }
-}
-
-
-function scheduleMaindata(intervalId: number, info: GlobalInfo, torrents: TorrentInfo[]) {
-    //检查当前批次是否还存在
-    if (intervalId !== info.intervalId) {
-        return
-    }
-
-    // const data = initData
-    // const fullUpdate = data.full_update ? data.full_update : false
-    // store.info.refresh(data.server_state)
-    // refreshTorrents(data.torrents, fullUpdate)
-
-    axios.get('/api/v2/sync/maindata?rid=' + info.rid + "&" + new Date().getTime()).then(resp => {
-        const data = resp.data
-        if (info.rid !== 0) {
-            info.rid = data.rid
-        } else {
-            info.rid = 1
+    /**
+    * 更新 torrents列表信息
+    * @param ts
+    * @param fullUpdate  是否全量替换
+    */
+    public setTorrents(ts: any | null, fullUpdate: boolean) {
+        if (ts == null) {
+            return
         }
-        //设置分类和标签
-        info.setCategoryAndTags(data.categories, data.tags)
-        //设置全局属性
-        info.refresh(data.server_state)
-        //设置各个torrent属性
-        const fullUpdate = data.full_update ? data.full_update : false
-        refreshTorrents(torrents, data.torrents, fullUpdate)
-        setTimeout(() => {
-            scheduleMaindata(intervalId, info, torrents)
-        }, info.refresh_interval)
-    }).catch(err => {
-        console.error(err)
-        ElMessage.error('/api/v2/sync/maindata error' + err)
-        setTimeout(() => {
-            scheduleMaindata(intervalId, info, torrents)
-        }, info.refresh_interval)
-    })
-
-}
-
-/**
- * 更新 torrents列表信息
- * @param ts
- * @param fullUpdate  是否全量替换
- */
-const refreshTorrents = (torrents: TorrentInfo[], ts: any | null, fullUpdate: boolean) => {
-    if (ts == null) {
-        return
+        const torrents = this.torrents
+        if (fullUpdate) {
+            //第一步清空
+            torrents.length = 0
+            //转换装载对象
+            Object.keys(ts)
+                .map(key => new TorrentInfo(key).refresh(ts[key]))
+                .sort((a, b) => b.properties.addition_date - a.properties.addition_date)
+                .forEach(it => torrents.push(it))
+        } else {
+            torrents.forEach(it => it.refresh(ts[it.hash]))
+        }
     }
-    if (fullUpdate) {
-        //第一步清空
-        torrents.length = 0
-        //转换装载对象
-        Object.keys(ts)
-            .map(key => new TorrentInfo(key).refresh(ts[key]))
-            .sort((a, b) => b.properties.addition_date - a.properties.addition_date)
-            .forEach(it => torrents.push(it))
-    } else {
-        torrents.forEach(it => it.refresh(ts[it.hash]))
+
+
+    
+
+    public setCategory(category: string[] | null) {
+        if (category == null) {
+            return
+        }
+        this.categories.length = 0
+        category.forEach(it => {
+            this.categories.push(it)
+        })
     }
+
+    public setTags(tags: string[] | null) {
+        if (tags == null) {
+            return
+        }
+        this.tags.length = 0
+        tags.forEach(it => {
+            this.tags.push(it)
+        })
+    }
+
 }
 
-
-export {
-    ByteData, GlobalInfo, Preference, TorrentFile, TorrentInfo, TorrentProperties, TorrentSetting, Tracker, mergeObj
-}
-
+export { Preference, Torrent, TorrentFile, TorrentSetting, Tracker, units, type ByteUnit };
 
