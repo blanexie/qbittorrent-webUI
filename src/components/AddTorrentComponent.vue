@@ -76,7 +76,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import SpeedInputComponent from "@/components/SpeedInputComponent.vue";
+import SpeedInputComponent from "@/components/SpeedInput.vue";
 import {axios} from "@/requests";
 import StoreDefinition from "@/stores";
 import {UploadFilled} from "@element-plus/icons-vue";

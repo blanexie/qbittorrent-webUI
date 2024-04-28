@@ -9,7 +9,7 @@
       </el-header>
       <el-main>
         <el-scrollbar>
-          <TorrentList />
+          <TorrentList/>
         </el-scrollbar>
       </el-main>
     </el-container>
@@ -24,11 +24,11 @@ import TorrentList from '@/views/TorrentList.vue';
 
 const store = StoreDefinition()
 //全局配置加载
+store.fetchPreference()
 //分类和标签加载
+store.fetchCategoryAndTags()
 //定时任务获取
-
-
-
+store.scheduleMaindata()
 </script>
 
 <style scoped>

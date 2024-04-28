@@ -4,13 +4,17 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">下载速度</p>
-          <p class="speed-limit-content">{{ globalInfo.dl_info_speed.getSpeedStr() }}</p>
+          <p class="speed-limit-content">
+            <speed-text v-model="preference.dl_info_speed"></speed-text>
+          </p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">上传速度</p>
-          <p class="speed-limit-content">{{ globalInfo.up_info_speed.getSpeedStr() }}</p>
+          <p class="speed-limit-content">
+            <speed-text v-model="preference.up_info_speed"></speed-text>
+          </p>
         </div>
       </el-col>
     </el-row>
@@ -19,13 +23,17 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">下载量</p>
-          <p class="speed-limit-content">{{ globalInfo.dl_info_data.getSizeStr() }}</p>
+          <p class="speed-limit-content">
+            <size-text v-model="preference.dl_info_data"></size-text>
+          </p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">上传量</p>
-          <p class="speed-limit-content">{{ globalInfo.up_info_data.getSizeStr() }}</p>
+          <p class="speed-limit-content">
+            <size-text v-model="preference.up_info_data"></size-text>
+          </p>
         </div>
       </el-col>
     </el-row>
@@ -34,18 +42,18 @@
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">DHT节点数</p>
-          <p class="speed-limit-content">{{ globalInfo.dht_nodes }}</p>
+          <p class="speed-limit-content">{{ preference.dht_nodes }}</p>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="speed-limit">
           <p class="speed-limit-header">限速</p>
           <p class=" speed-set">
-            <el-switch v-model=" globalInfo.use_alt_speed_limits" :loading="data.toggleSpeedLimitsModeLoad"
-                       @change="toggleSpeedLimitsMode" />&nbsp;&nbsp;
+            <el-switch v-model=" preference.use_alt_speed_limits" :loading="data.toggleSpeedLimitsModeLoad"
+                       @change="toggleSpeedLimitsMode"/>&nbsp;&nbsp;
             <el-tooltip content="全局限速设置" effect="light">
               <el-icon @click="openLimitDialog">
-                <Operation />
+                <Operation/>
               </el-icon>
             </el-tooltip>
           </p>
@@ -56,30 +64,12 @@
     <el-dialog v-model="data.dialogVisible" title="全局限速设置" width="400">
       <el-form label-position="right" label-width="auto">
         <el-form-item label="下载限速">
-          <el-input v-model="data.dlLimit" placeholder="Please input" class="input-with-select">
-            <template #append>
-              <el-select v-model="data.dlLimitUnit" style="width: 80px">
-                <el-option label="B/s" :value="1" />
-                <el-option label="KB/s" :value="1024" />
-                <el-option label="MB/s" :value="1048576" />
-                <el-option label="GB/s" :value="1073741824" />
-              </el-select>
-            </template>
-          </el-input>
+          <speed-input-component v-model="data.dlLimit"></speed-input-component>
+
 
         </el-form-item>
         <el-form-item label="上传限速">
-          <el-input v-model="data.upLimt" placeholder="Please input" class="input-with-select">
-            <template #append>
-              <el-select v-model="data.upLimitUnit" style="width: 80px">
-                <el-option label="B/s" :value="1" />
-                <el-option label="KB/s" :value="1024" />
-                <el-option label="MB/s" :value="1048576" />
-                <el-option label="GB/s" :value="1073741824" />
-              </el-select>
-            </template>
-          </el-input>
-
+          <speed-input-component v-model="data.upLimt"></speed-input-component>
         </el-form-item>
       </el-form>
 
@@ -96,39 +86,31 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { axios } from '@/requests'
+import {axios} from '@/requests'
 import StoreDefinition from '@/stores'
-import { Operation } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
-import { reactive } from 'vue'
+import {Operation} from '@element-plus/icons-vue'
+import {ElMessage} from 'element-plus'
+import {reactive} from 'vue'
+import SpeedText from "@/components/SpeedText.vue";
+import SizeText from "@/components/SizeText.vue";
+import SpeedInputComponent from "@/components/SpeedInput.vue";
 
 const store = StoreDefinition()
-const globalInfo = store.globalInfo
+const preference = store.globalPreference
 
 const data = reactive({
   dialogVisible: false,
   toggleSpeedLimitsModeLoad: false,
   setLoading: false,
-  upLimt: globalInfo.up_rate_limit.getSize(),
-  upLimitUnit: globalInfo.up_rate_limit.getUnit(),
-  dlLimit: globalInfo.dl_rate_limit.getSize(),
-  dlLimitUnit: globalInfo.dl_rate_limit.getUnit()
+  upLimt: preference.up_rate_limit,
+  dlLimit: preference.dl_rate_limit,
 })
 
 const openLimitDialog = () => {
   //初始化限速值
-  data.upLimt = globalInfo.up_rate_limit.getSize()
-  data.upLimitUnit = globalInfo.up_rate_limit.getUnit()
-  data.dlLimit = globalInfo.dl_rate_limit.getSize()
-  data.dlLimitUnit = globalInfo.dl_rate_limit.getUnit()
+  data.upLimt = preference.up_rate_limit
+  data.dlLimit = preference.dl_rate_limit
   data.toggleSpeedLimitsModeLoad = false
-  //特殊参数，特殊处理  
-  if (data.upLimt == 0) {
-    data.upLimitUnit = 1024 * 1024
-  }
-  if (data.dlLimit == 0) {
-    data.dlLimitUnit = 1024 * 1024
-  }
   //开启弹窗
   data.dialogVisible = true
 }

@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="globalInfo.trackers">
+  <el-table :data="preference.currentTorrent!.trackers">
     <el-table-column prop="url" label="Url"/>
     <el-table-column prop="statusText" label="status"/>
     <el-table-column prop="num_peers" label="peers"/>
@@ -12,7 +12,7 @@ import {ElTable, ElTableColumn} from 'element-plus';
 import StoreDefinition from "@/stores";
 
 const store = StoreDefinition();
-const globalInfo = store.globalInfo;
+const preference = store.globalPreference;
 
 </script>
 <style scoped></style>

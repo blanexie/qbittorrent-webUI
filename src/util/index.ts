@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 
 function mergeObj(base: any, src: any) {
     if (src) { /* empty */
@@ -18,17 +18,36 @@ function mergeObj(base: any, src: any) {
 
 interface ByteUnit {
     name: string,
-    size: number
+    size: number,
+    value: number,
 }
 
 const units: ByteUnit[] = [
-    { name: 'B', size: 1 },
-    { name: 'KB', size: 1024 },
-    { name: 'MB', size: 1024 * 1024 },
-    { name: 'GB', size: 1024 * 1024 * 1024 },
-    { name: 'TB', size: 1024 * 1024 * 1024 * 1024 },
-    { name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024 }
+    {name: 'B', size: 1, value: 1},
+    {name: 'KB', size: 1024, value: 1},
+    {name: 'MB', size: 1024 * 1024, value: 1},
+    {name: 'GB', size: 1024 * 1024 * 1024, value: 1},
+    {name: 'TB', size: 1024 * 1024 * 1024 * 1024, value: 1},
+    {name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024, value: 1},
 ]
+
+function findUnit(size: number): ByteUnit {
+    let unit: ByteUnit | null = null
+    for (let i = 0; i < units.length; i++) {
+        const c = units[i]
+        if (size < c.size) {
+            unit = units[i - 1]
+            break
+        }
+    }
+    unit = units[0]
+    return {
+        name: unit.name,
+        size: unit.size,
+        value: Math.round((size * 10) / unit.size) / 10
+    }
+}
+
 
 class TorrentSetting {
     public savePath = ''
@@ -93,7 +112,7 @@ class Torrent {
     /***********************************************/
     setting: TorrentSetting = new TorrentSetting()
     trackers: Tracker[] = []
-    file: TorrentFile | null = null
+    files: TorrentFile[] = []
     /***********************************************/
 
     hash: string = ''
@@ -188,8 +207,82 @@ class Torrent {
         ]
     }
 
-    public refresh(obj: any) {
+    /**
+     * refreshFiles
+     */
+    public refreshFiles(tFiles: TorrentFile[]) {
+        this.files.length = 0
+        const fileMap = new Map<string, TorrentFile>()
+        tFiles.forEach(it => {
+            it.isLeaf = true
+            const [p, l] = this.splitPrefix(it.name)
+            it.prefix = p
+            it.label = l
+            fileMap.set(it.name, it)
+            const parent = this.findMapFile(p, fileMap)
+            parent?.children.push(it)
+        });
+        //获取一级目录
+        fileMap.forEach((it) => {
+            if (it.prefix == '') {
+                this.files.push(it)
+            }
+        })
+    }
+
+
+    private findMapFile(name: string, fileMap: Map<string, TorrentFile>) {
+        if (name == '') {
+            return null
+        }
+        let file = fileMap.get(name)
+        if (file) {
+            return file
+        } else {
+            const [p, l] = this.splitPrefix(name)
+            file = new TorrentFile(p, l)
+            fileMap.set(file.name, file)
+            const parent = this.findMapFile(p, fileMap)
+            parent?.children.push(file)
+            return file
+        }
+    }
+
+    private splitPrefix = (name: string) => {
+        const paths = name.split("/")
+        if (paths.length == 1) {
+            return ['', name]
+        }
+        if (paths.length == 2) {
+            return [paths[0], paths[1]]
+        }
+        const last = paths[paths.length - 1]
+        paths.length = paths.length - 1
+        const prefix = paths.join("/")
+        return [prefix, last]
+    }
+
+    public refreshTracker(data: any) {
+        this.trackers.forEach((it: Tracker) => {
+            const resp = data.find((it2: any) => it2.url == it.url)
+            if (resp) {
+                mergeObj(it, resp)
+                it.msg = resp.msg
+                it.num_peers = resp.num_peers
+                it.num_downloaded = resp.num_downloaded
+                it.num_leeches = resp.num_leeches
+                it.num_seeds = resp.num_seeds
+            }
+        })
+    }
+
+    constructor(hash: string) {
+        this.hash = hash
+    }
+
+    public refresh(obj: any): Torrent {
         mergeObj(this, obj)
+        return this
     }
 
     public getShowState(): string {
@@ -247,10 +340,11 @@ class Preference {
     public currentTorrent: Torrent | null = null
 
     //本次定时任务批次的编码，
+    public resetRid = false
     public rid = 0
     public intervalId: number = 0 //定时任务的批次号
     public isRequesting: boolean = false;
-    public refresh_interval = 3000
+    public refresh_interval = 2000
 
     public torrents: Torrent[] = []
     /**********************************************************************/
@@ -447,12 +541,13 @@ class Preference {
     public refresh(obj: any) {
         mergeObj(this, obj)
     }
+
     /**
-    * 更新 torrents列表信息
-    * @param ts
-    * @param fullUpdate  是否全量替换
-    */
-    public setTorrents(ts: any | null, fullUpdate: boolean) {
+     * 更新 torrents列表信息
+     * @param ts
+     * @param fullUpdate  是否全量替换
+     */
+    public refreshTorrents(ts: any | null, fullUpdate: boolean) {
         if (ts == null) {
             return
         }
@@ -462,16 +557,13 @@ class Preference {
             torrents.length = 0
             //转换装载对象
             Object.keys(ts)
-                .map(key => new TorrentInfo(key).refresh(ts[key]))
-                .sort((a, b) => b.properties.addition_date - a.properties.addition_date)
+                .map(key => new Torrent(key).refresh(ts[key]))
+                .sort((a: Torrent, b: Torrent) => b.addition_date - a.addition_date)
                 .forEach(it => torrents.push(it))
         } else {
             torrents.forEach(it => it.refresh(ts[it.hash]))
         }
     }
-
-
-    
 
     public setCategory(category: string[] | null) {
         if (category == null) {
@@ -495,5 +587,5 @@ class Preference {
 
 }
 
-export { Preference, Torrent, TorrentFile, TorrentSetting, Tracker, units, type ByteUnit };
+export {Preference, Torrent, TorrentFile, TorrentSetting, Tracker, findUnit, units, type ByteUnit};
 

@@ -51,7 +51,7 @@ import {Download, Finished, VideoPause, Warning} from '@element-plus/icons-vue';
 
 const store = StoreDefinition()
 const menuSelect = (index: string) => {
-  store.globalInfo.currentMenu = index
+  store.globalPreference.currentMenu = index
 }
 </script>
 <style scoped>

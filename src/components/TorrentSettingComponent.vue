@@ -3,55 +3,37 @@
   <el-row>
     <el-col :span="6">名称:</el-col>
     <el-col :span="17">
-      <el-input v-model="globalInfo.setting.torrentName"></el-input>
+      <el-input v-model="preference.currentTorrent!.setting.torrentName"></el-input>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">保存路径:</el-col>
     <el-col :span="17">
-      <el-input v-model="globalInfo.setting.savePath"></el-input>
+      <el-input v-model="preference.currentTorrent!.setting.savePath"></el-input>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">下载限速:</el-col>
     <el-col :span="17">
-      <el-input v-model="globalInfo.setting.downloadLimit" placeholder="Please input" class="input-with-select">
-        <template #append>
-          <el-select v-model="globalInfo.setting.downloadLimitUnit" style="width: 80px">
-            <el-option label="B/s" :value="1"/>
-            <el-option label="KB/s" :value="1024"/>
-            <el-option label="MB/s" :value="1048576"/>
-            <el-option label="GB/s" :value="1073741824"/>
-          </el-select>
-        </template>
-      </el-input>
+      <speed-input v-model="preference.currentTorrent!.setting.downloadLimit"></speed-input>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">上传限速:</el-col>
     <el-col :span="17">
-      <el-input v-model="globalInfo.setting.uploadLimit" placeholder="Please input" class="input-with-select">
-        <template #append>
-          <el-select v-model="globalInfo.setting.uploadLimitUnit" style="width: 80px">
-            <el-option label="B/s" :value="1"/>
-            <el-option label="KB/s" :value="1024"/>
-            <el-option label="MB/s" :value="1048576"/>
-            <el-option label="GB/s" :value="1073741824"/>
-          </el-select>
-        </template>
-      </el-input>
+      <speed-input v-model="preference.currentTorrent!.setting.uploadLimit"></speed-input>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">分类:</el-col>
     <el-col :span="17">
-      <el-select v-model="globalInfo.setting.category" :reserve-keyword="false" filterable allow-create
+      <el-select v-model="preference.currentTorrent!.setting.category" :reserve-keyword="false" filterable allow-create
                  placeholder="分类">
-        <el-option v-for="item in globalInfo.categories" :key="item" :label="item" :value="item"/>
+        <el-option v-for="item in preference.categories" :key="item" :label="item" :value="item"/>
       </el-select>
     </el-col>
   </el-row>
@@ -59,9 +41,10 @@
   <el-row>
     <el-col :span="6">标签:</el-col>
     <el-col :span="17">
-      <el-select v-model="globalInfo.setting.tags" :reserve-keyword="false" multiple allow-create filterable
+      <el-select v-model="preference.currentTorrent!.setting.tags" :reserve-keyword="false" multiple allow-create
+                 filterable
                  placeholder="标签 ">
-        <el-option v-for="(item ,index) in globalInfo.tags" :key="index" :label="item" :value="item"/>
+        <el-option v-for="(item ,index) in preference.tags" :key="index" :label="item" :value="item"/>
       </el-select>
     </el-col>
   </el-row>
@@ -69,31 +52,27 @@
   <el-row>
     <el-col :span="6">顺序下载:</el-col>
     <el-col :span="17">
-      <el-switch v-model="globalInfo.setting.sequential"/>
+      <el-switch v-model="preference.currentTorrent!.setting.sequential"/>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">超级种子:</el-col>
     <el-col :span="17">
-      <el-switch v-model="globalInfo.setting.superSeed"/>
+      <el-switch v-model="preference.currentTorrent!.setting.superSeed"/>
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">优先下载首尾:</el-col>
     <el-col :span="17">
-      <el-switch v-model="globalInfo.setting.f_l_piece_prio"/>
+      <el-switch v-model="preference.currentTorrent!.setting.f_l_piece_prio"/>
     </el-col>
   </el-row>
 
-  <el-row>
-    <el-col> &nbsp;
-    </el-col>
-    <el-col>
-      <el-button @click="update" :loading="loading" type="primary">修改</el-button>
-    </el-col>
-  </el-row>
+  <div>
+    <el-button @click="update" :loading="loading" type="primary">修改</el-button>
+  </div>
 
 </template>
 <script lang="ts" setup>
@@ -101,41 +80,40 @@ import {axios} from "@/requests";
 import StoreDefinition from "@/stores";
 import {ElButton, ElCol, ElInput, ElMessage, ElNotification, ElOption, ElRow, ElSelect, ElSwitch} from 'element-plus';
 import {ref} from "vue";
+import SpeedInput from "@/components/SpeedInput.vue";
 
 const store = StoreDefinition()
-const globalInfo = store.globalInfo
+const preference = store.globalPreference
 
 const loading = ref(false)
-const update = async () => {
-  const torrent = store.globalInfo.currentTorrent
-  const setting = store.globalInfo.setting
-  if (!setting || !torrent) {
-    ElMessage.error("页面加载数据失败，无法修改");
-    loading.value = false;
-    return;
-  }
 
+const sendRequest = (url: string, data: FormData) => {
+  return axios.post(url, data)
+      .then(resp => {
+        console.log(resp);
+        ElMessage.success("设置成功");
+      })
+      .catch(error => {
+        console.error(`设置失败: ${error}`);
+        ElMessage.error(`设置失败，${error}`);
+      });
+}
+
+const update = async () => {
+  const torrent = preference.currentTorrent
+  if (torrent == null) {
+    return
+  }
+  loading.value = true
+  const setting = torrent.setting
   try {
     const updatePromises = [];
-    // 提取重复代码至单独函数
-    const sendRequest = (url: string, data: FormData) => {
-      return axios.post(url, data)
-          .then(resp => {
-            console.log(resp);
-            ElMessage.success("设置成功");
-          })
-          .catch(error => {
-            console.error(`设置失败: ${error}`);
-            ElMessage.error(`设置失败，${error}`);
-          });
-    };
-
     //标签
     //1. 获取新增的标签
-    const tTags = torrent.getTags()
+    const tTags = torrent.tags
     const addTags = setting.tags.filter(tag => !tTags.includes(tag)).filter(tag => tag != "")
     //2. 判断需要新增的标签中那些是不存在的
-    const newTags = addTags.filter(tag => !globalInfo.tags.includes(tag)).filter(tag => tag != "")
+    const newTags = addTags.filter(tag => !preference.tags.includes(tag)).filter(tag => tag != "")
     //3. 创建不存在的标签
     if (newTags.length > 0) {
       const from = new FormData();
@@ -161,8 +139,8 @@ const update = async () => {
     }
 
     //判断当前分类 如果不存在， 则新增
-    console.log(globalInfo.categories)
-    if (setting.category != '' && !globalInfo.categories.includes(setting.category)) {
+    console.log(preference.categories)
+    if (setting.category != '' && !preference.categories.includes(setting.category)) {
       const from = new FormData();
       from.set("savePath", '');
       from.set("category", setting.category);
@@ -214,21 +192,19 @@ const update = async () => {
     }
 
     // 下载限速
-    const dlLimit = setting.downloadLimit * setting.downloadLimitUnit;
-    if (dlLimit !== torrent.dl_limit.bytes) {
+    if (setting.downloadLimit !== torrent.dl_limit) {
       const from = new FormData();
       from.set("hashes", torrent.hash);
-      from.set("limit", dlLimit + "");
+      from.set("limit", setting.downloadLimit + "");
       const url = '/api/v2/torrents/setDownloadLimit';
       updatePromises.push(sendRequest(url, from));
     }
 
     // 上传限速
-    const upLimit = setting.uploadLimit * setting.uploadLimitUnit;
-    if (upLimit !== torrent.up_limit.bytes) {
+    if (setting.uploadLimit !== torrent.up_limit) {
       const from = new FormData();
       from.set("hashes", torrent.hash);
-      from.set("limit", upLimit + "");
+      from.set("limit", setting.uploadLimit + "");
       const url = '/api/v2/torrents/setUploadLimit';
       updatePromises.push(sendRequest(url, from));
     }
@@ -245,6 +221,7 @@ const update = async () => {
       type: 'error',
     });
   }
+
 }
 
 </script>

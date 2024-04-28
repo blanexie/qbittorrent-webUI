@@ -1,5 +1,5 @@
 <template>
-  <el-tree :data="globalInfo.files" node-key="name" :props="defaultProps">
+  <el-tree :data="preference.currentTorrent!.files" node-key="name" :props="defaultProps">
     <template #default="{ node, data }">
       <p class="custom-tree-node">
         <!--  叶子节点，同时下载完成-->
@@ -26,17 +26,18 @@
 <script lang="ts" setup>
 import StoreDefinition from '@/stores';
 import {ElText, ElTree} from 'element-plus';
-import {ByteData} from "@/util";
+import {findUnit} from "@/util";
 
 const store = StoreDefinition()
-const globalInfo = store.globalInfo
+const preference = store.globalPreference
 
 const defaultProps = {
   children: 'children',
   label: 'label',
 }
 const getTopTip = (data: any) => {
-  return String(Math.floor(data.progress * 100) + '% ( ' + new ByteData(data.size).getSizeStr() + ' )')
+  const unit = findUnit(data.size)
+  return String((data.getProgress() * 100) + '% ( ' + unit.value + unit.name + ' )')
 }
 </script>
 <style scoped></style>

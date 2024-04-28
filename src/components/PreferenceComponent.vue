@@ -206,7 +206,7 @@
   </el-dialog>
 </template>
 <script lang="ts" setup>
-import SpeedInputComponent from "@/components/SpeedInputComponent.vue";
+import SpeedInputComponent from "@/components/SpeedInput.vue";
 import {axios} from '@/requests';
 import StoreDefinition from "@/stores";
 import {mergeObj, Preference} from "@/util";
