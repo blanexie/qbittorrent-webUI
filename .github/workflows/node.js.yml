@@ -30,13 +30,20 @@ jobs:
     - run: npm run build-only
     - name: Compress project into a zip file
       run: zip -r dist.zip dist/
-    - name: Upload to release
-      uses: JasonEtco/upload-to-release@master
+    - name: Upload to Release Action
+      # You may pin to the exact commit or the version.
+      # uses: Shopify/upload-to-release@c77c9b3e5d288adaef98a7007bf92340ec6ce03b
+      uses: Shopify/upload-to-release@v2.0.0
       with:
-        args: dist.zip application/zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+        # Artifact name
+        name: v.1.1
+        # Path to the file to upload
+        path: dist.zip
+        # Content type for the file
+        content-type: application/octet-stream
+        # secrets.GITHUB_TOKEN
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+      
     
  
 
