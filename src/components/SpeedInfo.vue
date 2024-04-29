@@ -49,11 +49,11 @@
         <div class="speed-limit">
           <p class="speed-limit-header">限速</p>
           <p class=" speed-set">
-            <el-switch v-model=" preference.use_alt_speed_limits" :loading="data.toggleSpeedLimitsModeLoad"
-                       @change="toggleSpeedLimitsMode"/>&nbsp;&nbsp;
+            <el-switch v-model="preference.use_alt_speed_limits" :loading="data.toggleSpeedLimitsModeLoad"
+              @change="toggleSpeedLimitsMode" />&nbsp;&nbsp;
             <el-tooltip content="全局限速设置" effect="light">
               <el-icon @click="openLimitDialog">
-                <Operation/>
+                <Operation />
               </el-icon>
             </el-tooltip>
           </p>
@@ -65,8 +65,6 @@
       <el-form label-position="right" label-width="auto">
         <el-form-item label="下载限速">
           <speed-input-component v-model="data.dlLimit"></speed-input-component>
-
-
         </el-form-item>
         <el-form-item label="上传限速">
           <speed-input-component v-model="data.upLimt"></speed-input-component>
@@ -86,14 +84,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {axios} from '@/requests'
+import SizeText from "@/components/SizeText.vue"
+import SpeedInputComponent from "@/components/SpeedInput.vue"
+import SpeedText from "@/components/SpeedText.vue"
+import { axios } from '@/requests'
 import StoreDefinition from '@/stores'
-import {Operation} from '@element-plus/icons-vue'
-import {ElMessage} from 'element-plus'
-import {reactive} from 'vue'
-import SpeedText from "@/components/SpeedText.vue";
-import SizeText from "@/components/SizeText.vue";
-import SpeedInputComponent from "@/components/SpeedInput.vue";
+import { Operation } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { reactive } from 'vue'
 
 const store = StoreDefinition()
 const preference = store.globalPreference
@@ -115,7 +113,6 @@ const openLimitDialog = () => {
   data.dialogVisible = true
 }
 
-
 /**
  * 设置全局限速
  */
@@ -124,17 +121,18 @@ const setLimit = () => {
   data.setLoading = true
   const url = '/api/v2/transfer/setDownloadLimit'
   const fromData = new FormData()
-  fromData.set('limit', '' + (data.dlLimit * data.dlLimitUnit))
+  fromData.set('limit', '' + (data.dlLimit))
   const dl = axios.post(url, fromData)
   //设置上传速度
   const url2 = '/api/v2/transfer/setUploadLimit'
   const fromData2 = new FormData()
-  fromData2.set('limit', '' + (data.upLimitUnit * data.upLimt))
+  fromData2.set('limit', '' + (data.upLimt))
   const up = axios.post(url2, fromData2)
   Promise.all([dl, up]).then(resp => {
     data.setLoading = false
     data.dialogVisible = false
   }).catch(err => {
+    console.log('setLimit', err)
     data.setLoading = false
   })
 }

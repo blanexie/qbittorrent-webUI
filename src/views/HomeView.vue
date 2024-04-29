@@ -9,7 +9,7 @@
       </el-header>
       <el-main>
         <el-scrollbar>
-          <TorrentList/>
+          <TorrentList></TorrentList>
         </el-scrollbar>
       </el-main>
     </el-container>
@@ -20,7 +20,7 @@
 import AsideComponent from '@/components/AsideComponent.vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import StoreDefinition from '@/stores';
-import TorrentList from '@/views/TorrentList.vue';
+import TorrentList from './TorrentList.vue';
 
 const store = StoreDefinition()
 //全局配置加载
@@ -29,6 +29,7 @@ store.fetchPreference()
 store.fetchCategoryAndTags()
 //定时任务获取
 store.scheduleMaindata()
+
 </script>
 
 <style scoped>

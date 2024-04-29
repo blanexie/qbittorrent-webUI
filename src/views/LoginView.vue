@@ -22,7 +22,8 @@ import FlyIcon from '@/components/icons/FlyIcon.vue';
 import { axios } from '@/requests';
 import { ElMessage } from 'element-plus';
 import { reactive } from 'vue';
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const fromValue = reactive({
   name: '',
@@ -53,7 +54,7 @@ const login = () => {
         ElMessage.error('用户名或者密码错误')
       } else {
         sessionStorage.setItem("loginOk", "ok")
-        location.reload()
+        router.push("/all")
       }
     })
     .catch(error => {

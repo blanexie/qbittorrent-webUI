@@ -1,4 +1,4 @@
-import {format} from 'date-fns';
+import { format } from 'date-fns';
 
 function mergeObj(base: any, src: any) {
     if (src) { /* empty */
@@ -23,12 +23,12 @@ interface ByteUnit {
 }
 
 const units: ByteUnit[] = [
-    {name: 'B', size: 1, value: 1},
-    {name: 'KB', size: 1024, value: 1},
-    {name: 'MB', size: 1024 * 1024, value: 1},
-    {name: 'GB', size: 1024 * 1024 * 1024, value: 1},
-    {name: 'TB', size: 1024 * 1024 * 1024 * 1024, value: 1},
-    {name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024, value: 1},
+    { name: 'B', size: 1, value: 1 },
+    { name: 'KB', size: 1024, value: 1 },
+    { name: 'MB', size: 1024 * 1024, value: 1 },
+    { name: 'GB', size: 1024 * 1024 * 1024, value: 1 },
+    { name: 'TB', size: 1024 * 1024 * 1024 * 1024, value: 1 },
+    { name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024, value: 1 },
 ]
 
 function findUnit(size: number): ByteUnit {
@@ -40,7 +40,9 @@ function findUnit(size: number): ByteUnit {
             break
         }
     }
-    unit = units[0]
+    if (unit == null) {
+        unit = units[0]
+    }
     return {
         name: unit.name,
         size: unit.size,
@@ -287,7 +289,7 @@ class Torrent {
 
     public getShowState(): string {
         return this.stateMap.downloading.includes(this.state) ? 'downloading' :
-            this.stateMap.upload.includes(this.state) ? 'upload' :
+            this.stateMap.upload.includes(this.state) ? 'finish' :
                 this.stateMap.quene.includes(this.state) ? 'quene' :
                     this.stateMap.error.includes(this.state) ? 'error' : 'unknown'
     }
@@ -333,8 +335,8 @@ class Preference {
     public show = false
 
     public loginShow: boolean = true
-    public currentMenu = "downloading"    //当前目录选择
 
+    public currentMenu = 'all'
     public showTorrentAddView = false
     public showDetail = false
     public currentTorrent: Torrent | null = null
@@ -542,6 +544,24 @@ class Preference {
         mergeObj(this, obj)
     }
 
+
+    public getTorrents(category: string = 'all') {
+        switch (category) {
+            case 'all':
+                return this.torrents
+            case 'downloading':
+                return this.torrents.filter(t => t.getShowState() == 'downloading')
+            case 'finish':
+                return this.torrents.filter(t => t.getShowState() == 'finish')
+            case 'quene':
+                return this.torrents.filter(t => t.getShowState() == 'quene')
+            case 'error':
+                return this.torrents.filter(t => t.getShowState() == 'error')
+        }
+        return this.torrents
+    }
+
+
     /**
      * 更新 torrents列表信息
      * @param ts
@@ -565,12 +585,12 @@ class Preference {
         }
     }
 
-    public setCategory(category: string[] | null) {
+    public setCategory(category: any | null) {
         if (category == null) {
             return
         }
         this.categories.length = 0
-        category.forEach(it => {
+        Object.keys(category).forEach(it => {
             this.categories.push(it)
         })
     }
@@ -587,5 +607,5 @@ class Preference {
 
 }
 
-export {Preference, Torrent, TorrentFile, TorrentSetting, Tracker, findUnit, units, type ByteUnit};
+export { Preference, Torrent, TorrentFile, TorrentSetting, Tracker, findUnit, units, type ByteUnit };
 

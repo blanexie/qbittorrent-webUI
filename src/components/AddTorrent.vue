@@ -1,10 +1,10 @@
 <template>
-  <el-dialog v-model="store.globalInfo.showTorrentAddView" @open="openInit" width="600">
+  <el-dialog v-model="preference.showTorrentAddView" @open="openInit" width="600">
     <el-tabs v-model="data.activeTab">
       <el-tab-pane label="磁链任务" name="first">
         <el-row class="url-input">
           <el-col :span="24">
-            <el-input v-model="data.links" :rows="5" type="textarea" placeholder="每行一个磁链"/>
+            <el-input v-model="data.links" :rows="5" type="textarea" placeholder="每行一个磁链" />
           </el-col>
         </el-row>
       </el-tab-pane>
@@ -12,9 +12,9 @@
         <el-row>
           <el-col :span="24">
             <el-upload drag :before-upload="beforeUp" :limit="1"
-                       action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15">
+              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15">
               <el-icon class="filled-icon">
-                <upload-filled/>
+                <upload-filled />
               </el-icon>
               <div v-if="!data.torrentAdd">
                 拖拽Torrent文件至此或
@@ -38,7 +38,7 @@
         <el-col :span="5">分类:</el-col>
         <el-col :span="17">
           <el-select v-model="data.category" size="small" placeholder="请选择分类">
-            <el-option v-for="item in store.globalInfo.categories" :key="item" :label="item" :value="item"></el-option>
+            <el-option v-for="item in preference.categories" :key="item" :label="item" :value="item"></el-option>
           </el-select>
         </el-col>
       </el-row>
@@ -70,35 +70,24 @@
       </el-row>
       <div class="but">
         <el-button type="primary" @click="submit">确定</el-button>
-        <el-button type="primary" @clikc="store.globalInfo.showTorrentAddView=false">取消</el-button>
+        <el-button type="primary" @clikc="preference.showTorrentAddView = false">取消</el-button>
       </div>
     </el-tabs>
   </el-dialog>
 </template>
 <script setup lang="ts">
 import SpeedInputComponent from "@/components/SpeedInput.vue";
-import {axios} from "@/requests";
+import { axios } from "@/requests";
 import StoreDefinition from "@/stores";
-import {UploadFilled} from "@element-plus/icons-vue";
-import {reactive} from 'vue'
-import type {UploadFile} from 'element-plus'
-import {
-  ElButton,
-  ElCol,
-  ElDialog,
-  ElIcon,
-  ElInput,
-  ElMessage,
-  ElOption,
-  ElRow,
-  ElSelect,
-  ElSwitch,
-  ElTabPane,
-  ElTabs,
-  ElUpload
-} from "element-plus";
+import { UploadFilled } from "@element-plus/icons-vue";
+import type { UploadFile } from 'element-plus';
+import { ElButton, ElDialog, ElInput, ElMessage, ElOption, ElSelect, ElSwitch, ElTabPane, ElTabs, ElUpload } from "element-plus";
+import { reactive } from 'vue';
+
 
 const store = StoreDefinition()
+const preference = store.globalPreference
+
 
 interface TorrentData {
   links: string;
@@ -179,9 +168,9 @@ const submit = () => {
   }).then(resp => {
     console.log(resp.data)
     if (resp.data == 'Ok.') {
-      store.globalInfo.rid = 0
+      preference.rid = 0
       ElMessage.success("添加成功")
-      store.globalInfo.showTorrentAddView = false
+      preference.showTorrentAddView = false
     } else {
       ElMessage.error("添加失败")
     }
@@ -191,21 +180,10 @@ const submit = () => {
 }
 
 
-const openInit = async () => {
-  await fetchTagsAndCategory()
+const openInit = () => {
+  store.fetchCategoryAndTags()
 }
 
-const fetchTagsAndCategory = async () => {
-  axios.get('/api/v2/torrents/categories').then(resp => {
-    store.globalInfo.categories.length = 0
-    const keys = Object.keys(resp.data)
-    keys.forEach(it => {
-      store.globalInfo.categories.push(it)
-    })
-  }).catch(error => {
-    ElMessage.error("获取分类失败" + error)
-  })
-}
 
 </script>
 <style scoped>

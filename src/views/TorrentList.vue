@@ -1,7 +1,7 @@
 <template>
   <ul>
-    <li v-for="t in preference.torrents " v-bind:key="t.hash" @click="active(t as Torrent)"
-        :class="{ 'border-color': t.isActive }">
+    <li v-for="t in store.showTorrents" v-bind:key="t.hash" @click="active(t as Torrent)"
+      :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
         <span class="li-left">
@@ -10,27 +10,27 @@
         <span class="li-right">
           <el-tooltip content="删除" effect="light">
             <el-icon @click="showRemoveDialog(t as Torrent)">
-              <Close/>
+              <Close />
             </el-icon>
           </el-tooltip>
           <el-tooltip content="开始" v-if="t.getShowState() !== 'downloading'" effect="light">
             <el-icon @click="resume(t as Torrent)">
-              <VideoPlay/>
+              <VideoPlay />
             </el-icon>
           </el-tooltip>
           <el-tooltip content="暂停" v-if="t.getShowState() == 'downloading'" effect="light">
             <el-icon @click="pause(t as Torrent)">
-              <VideoPause/>
+              <VideoPause />
             </el-icon>
           </el-tooltip>
           <el-tooltip content="复制磁链" effect="light">
             <el-icon @click="copyLink(t as Torrent)">
-              <Connection/>
+              <Connection />
             </el-icon>
           </el-tooltip>
           <el-tooltip content="详情" effect="light">
             <el-icon @click="showDetail(t as Torrent)">
-              <Warning/>
+              <Warning />
             </el-icon>
           </el-tooltip>
         </span>
@@ -52,8 +52,8 @@
           &nbsp;&nbsp; 状态：{{ t.state }}
         </span>
         <span class="li-right">
-          <span class='icon'>↓</span>  <speed-text v-model="t.dlspeed"></speed-text> &nbsp;&nbsp;
-          <span class='icon'>↑</span>  <speed-text v-model="t.upspeed"></speed-text>  &nbsp;&nbsp;&nbsp;&nbsp;
+          <span class='icon'>↓</span> <speed-text v-model="t.dlspeed"></speed-text> &nbsp;&nbsp;
+          <span class='icon'>↑</span> <speed-text v-model="t.upspeed"></speed-text> &nbsp;&nbsp;&nbsp;&nbsp;
           剩余时间：{{ t.getEtaStr() }}&nbsp;&nbsp;&nbsp;&nbsp;
           做种：{{ t.num_seeds }}&nbsp;&nbsp;&nbsp;&nbsp;
           吸血：{{ t.num_leechs }}
@@ -62,10 +62,10 @@
     </li>
   </ul>
 
-  <TorrentDetail/>
+  <TorrentDetail />
 
   <el-dialog v-model="deleteDialog.visible" title="" width="500">
-    &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteDialog.deleteFiles"/>
+    &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteDialog.deleteFiles" />
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="deleteDialog.visible = false">取消</el-button>
@@ -80,14 +80,13 @@
 <script setup lang="ts">
 import SizeText from "@/components/SizeText.vue";
 import SpeedText from "@/components/SpeedText.vue";
-import TorrentDetail from '@/views/TorrentDetail.vue'
-import {axios} from '@/requests'
-import {reactive} from 'vue'
-import {ElMessage} from 'element-plus'
-import {Close, Connection, VideoPause, VideoPlay, Warning} from '@element-plus/icons-vue'
-
-import StoreDefinition from '@/stores'
-import type {Torrent} from "@/util";
+import { axios } from '@/requests';
+import StoreDefinition from '@/stores';
+import type { Torrent } from "@/util";
+import TorrentDetail from '@/views/TorrentDetail.vue';
+import { Close, Connection, VideoPause, VideoPlay, Warning } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
+import { reactive } from 'vue';
 
 const store = StoreDefinition()
 const preference = store.globalPreference
@@ -120,7 +119,7 @@ const getProgressState = (t: Torrent): string => {
     return 'warning'
   }
   if (t.getShowState() == 'error') {
-    return 'exception'
+    return 'error'
   }
   return ''
 }
@@ -131,10 +130,9 @@ const copyLink = (t: Torrent) => {
     navigator.clipboard.writeText(t.magnet_uri)
     ElMessage.success('磁力链接已经写入剪切板')
   } else {
-    console.error('浏览器不支持 Clipboard API。')
+    ElMessage.error('浏览器不支持 Clipboard API。')
   }
 }
-
 
 const showRemoveDialog = (t: Torrent) => {
   deleteDialog.visible = true
@@ -146,29 +144,29 @@ const remove = () => {
   from.set('hashes', deleteDialog.hash)
   from.set('deleteFiles', String(deleteDialog.deleteFiles))
   axios.post('/api/v2/torrents/delete', from)
-      .then(() => {
-        deleteDialog.visible = false
-        deleteDialog.hash = ''
-        preference.rid = 0
-      })
+    .then(() => {
+      deleteDialog.visible = false
+      deleteDialog.hash = ''
+      preference.rid = 0
+    })
 }
 
 const resume = (t: Torrent) => {
   const from = new FormData()
   from.set('hashes', t.hash)
   axios.post('/api/v2/torrents/resume', from)
-      .then(resp => {
-        console.log("resume torrent  " + t.name, resp)
-      })
+    .then(resp => {
+      console.log("resume torrent  " + t.name, resp)
+    })
 }
 
 const pause = (t: Torrent) => {
   const from = new FormData()
   from.set('hashes', t.hash)
   axios.post('/api/v2/torrents/pause', from)
-      .then(resp => {
-        console.log("pause torrent  " + t.name, resp)
-      })
+    .then(resp => {
+      console.log("pause torrent  " + t.name, resp)
+    })
 }
 
 </script>

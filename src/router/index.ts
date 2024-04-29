@@ -1,13 +1,33 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import TorrentList from '@/views/TorrentList.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: HomeView
+      path: '/all',
+      name: 'all',
+      component: TorrentList
+    },
+    {
+      path: '/quene',
+      name: 'quene',
+      component: TorrentList
+    },
+    {
+      path: '/error',
+      name: 'error',
+      component: TorrentList
+    },
+    {
+      path: '/finish',
+      name: 'finish',
+      component: TorrentList
+    },
+    {
+      path: '/downloading',
+      name: 'downloading',
+      component: TorrentList
     },
     {
       path: '/about',

@@ -27,10 +27,10 @@
 </template>
 
 <script setup lang="ts">
-import TorrentContentComponent from '@/components/TorrentContentComponent.vue';
-import TorrentPropsComponent from '@/components/TorrentPropsComponent.vue';
-import TorrentSettingComponent from '@/components/TorrentSettingComponent.vue';
-import TorrentTrackerComponent from '@/components/TorrentTrackerComponent.vue';
+import TorrentContentComponent from '@/components/TorrentContent.vue';
+import TorrentPropsComponent from '@/components/TorrentProps.vue';
+import TorrentSettingComponent from '@/components/TorrentSetting.vue';
+import TorrentTrackerComponent from '@/components/TorrentTracker.vue';
 import StoreDefinition from '@/stores';
 import {ref} from 'vue';
 import {Torrent} from "@/util";
