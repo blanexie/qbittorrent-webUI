@@ -57,29 +57,19 @@ const addDownload = () => {
 
 const playOrStop = (p: string) => {
   const from = new FormData()
-  if (route.path == 'all') {
-    const hashs = preference.torrents
-      .map(it => it.hash).join("|")
-    from.set("hashes", hashs)
-  } else {
-    const hashs = preference.torrents
-      .filter(it => it.getShowState() == route.path)
-      .map(it => it.hash).join("|")
-    from.set("hashes", hashs)
-  }
+  const hashs = store.showTorrents.map(it => it.hash).join("|")
 
+  from.set("hashes", hashs)
   if (p == 'start') {
     axios.post('/api/v2/torrents/resume', from)
       .then(resp => {
         console.log("playOrStop", resp)
-        router.push("/all")
       })
   }
   if (p == 'stop') {
     axios.post('/api/v2/torrents/pause', from)
       .then(resp => {
         console.log("playOrStop", resp)
-        router.push("/all")
       })
   }
 }
