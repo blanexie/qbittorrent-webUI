@@ -50,10 +50,10 @@
           <p class="speed-limit-header">限速</p>
           <p class=" speed-set">
             <el-switch v-model="preference.use_alt_speed_limits" :loading="data.toggleSpeedLimitsModeLoad"
-              @change="toggleSpeedLimitsMode" />&nbsp;&nbsp;
+                       @change="toggleSpeedLimitsMode"/>&nbsp;&nbsp;
             <el-tooltip content="全局限速设置" effect="light">
               <el-icon @click="openLimitDialog">
-                <Operation />
+                <Operation/>
               </el-icon>
             </el-tooltip>
           </p>
@@ -64,10 +64,10 @@
     <el-dialog v-model="data.dialogVisible" title="全局限速设置" width="400">
       <el-form label-position="right" label-width="auto">
         <el-form-item label="下载限速">
-          <speed-input-component v-model="data.dlLimit"></speed-input-component>
+          <speed-input v-model="data.dlLimit"></speed-input>
         </el-form-item>
         <el-form-item label="上传限速">
-          <speed-input-component v-model="data.upLimt"></speed-input-component>
+          <speed-input v-model="data.upLimt"></speed-input>
         </el-form-item>
       </el-form>
 
@@ -85,13 +85,13 @@
 </template>
 <script lang="ts" setup>
 import SizeText from "@/components/SizeText.vue"
-import SpeedInputComponent from "@/components/SpeedInput.vue"
+import SpeedInput from "@/components/SpeedInput.vue"
 import SpeedText from "@/components/SpeedText.vue"
-import { axios } from '@/requests'
+import {axios} from '@/requests'
 import StoreDefinition from '@/stores'
-import { Operation } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
-import { reactive } from 'vue'
+import {Operation} from '@element-plus/icons-vue'
+import {ElMessage} from 'element-plus'
+import {reactive} from 'vue'
 
 const store = StoreDefinition()
 const preference = store.globalPreference
@@ -100,8 +100,8 @@ const data = reactive({
   dialogVisible: false,
   toggleSpeedLimitsModeLoad: false,
   setLoading: false,
-  upLimt: preference.up_rate_limit,
-  dlLimit: preference.dl_rate_limit,
+  upLimt: null,
+  dlLimit: null
 })
 
 const openLimitDialog = () => {

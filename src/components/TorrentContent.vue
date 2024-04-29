@@ -1,5 +1,5 @@
 <template>
-  <el-tree :data="preference.currentTorrent!.files" node-key="name" :props="defaultProps">
+  <el-tree :data="preference.currentTorrent!.files" default-expand-all node-key="name" :props="defaultProps">
     <template #default="{ node, data }">
       <p class="custom-tree-node">
         <!--  叶子节点，同时下载完成-->
@@ -37,7 +37,7 @@ const defaultProps = {
 }
 const getTopTip = (data: any) => {
   const unit = findUnit(data.size)
-  return String((data.getProgress() * 100) + '% ( ' + unit.value + unit.name + ' )')
+  return String((data.progress * 100) + '% ( ' + unit.value + unit.name + ' )')
 }
 </script>
 <style scoped></style>

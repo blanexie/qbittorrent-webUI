@@ -1,55 +1,117 @@
 <template>
-  <ul>
 
-    <li><span>InfoHash:</span><span>{{ preference.currentTorrent?.hash }}</span></li>
-    <li><span>添加时间:</span><span>{{ preference.currentTorrent?.getAddOnStr() }}</span></li>
-    <li><span>剩余时间:</span><span>{{ preference.currentTorrent?.getEtaStr() }}</span></li>
-    <li><span>存储路径:</span><span>{{ preference.currentTorrent?.content_path }}</span></li>
-    <li><span>状态:</span><span>{{ preference.currentTorrent?.state }}</span></li>
-    <li><span>进度:</span><span>{{ preference.currentTorrent!.getProgress() * 100 }}%
-      (
+  <el-row>
+    <el-col :span="5">InfoHash :</el-col>
+    <el-col :span="18">{{ preference.currentTorrent?.hash }}</el-col>
+  </el-row>
+
+  <el-row>
+    <el-col :span="5">添加时间 :</el-col>
+    <el-col :span="18">{{ preference.currentTorrent?.getAddOnStr() }}</el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">剩余时间 :</el-col>
+    <el-col :span="18">{{ preference.currentTorrent?.getEtaStr() }}</el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">存储路径 :</el-col>
+    <el-col :span="18">{{ preference.currentTorrent?.content_path }}</el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">状态 :</el-col>
+    <el-col :span="18">{{ preference.currentTorrent?.state }}</el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">进度 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent!.getProgress() * 100 }} % (
       <size-text v-model="preference.currentTorrent!.completed"></size-text>
       /
-      <size-text v-model="preference.currentTorrent!.total_size"></size-text>
+      <size-text
+          v-model="preference.currentTorrent!.total_size"></size-text>
       )
-    </span></li>
-    <li><span>速度:</span>
-      <span>
-        <el-icon>
-          <Bottom/>
-        </el-icon>
-        <speed-text v-model="preference.currentTorrent!.dlspeed"></speed-text>
-        <el-icon>
-          <Top/>
-        </el-icon>
-           <speed-text v-model="preference.currentTorrent!.upspeed"></speed-text>
-      </span>
-    </li>
-    <li><span>限速:</span>
-      <span>
-        <el-icon>
-          <Download/>
-        </el-icon>
-         <speed-text v-model="preference.currentTorrent!.dl_limit"></speed-text>
-         &nbsp;&nbsp;&nbsp;&nbsp;
-        <el-icon>
-          <Upload/>
-        </el-icon>
-          <speed-text v-model="preference.currentTorrent!.up_limit"></speed-text>
-       &nbsp;&nbsp;&nbsp;&nbsp;
-      </span>
-    </li>
-    <li><span>分享率:</span><span>{{ preference.currentTorrent?.ratio }}</span></li>
-    <li><span>种子数:</span><span>{{ preference.currentTorrent?.num_seeds }}</span></li>
-    <li><span>吸血数:</span><span>{{ preference.currentTorrent?.num_leechs }}</span></li>
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">速度 :</el-col>
+    <el-col :span="18">
+      <el-icon>
+        <Bottom/>
+      </el-icon>
+      <speed-text v-model="preference.currentTorrent!.dlspeed"></speed-text>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <el-icon>
+        <Top/>
+      </el-icon>
+      <speed-text v-model="preference.currentTorrent!.upspeed"></speed-text>
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">限速 :</el-col>
+    <el-col :span="18">
+      <el-icon>
+        <Download/>
+      </el-icon>
+      <speed-text v-model="preference.currentTorrent!.dl_limit"></speed-text>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <el-icon>
+        <Upload/>
+      </el-icon>
+      <speed-text v-model="preference.currentTorrent!.up_limit"></speed-text>
+    </el-col>
+  </el-row>
 
-    <li><span>顺序下载:</span><span>{{ preference.currentTorrent?.seq_dl }}</span></li>
-    <li><span>超级种子:</span><span>{{ preference.currentTorrent?.super_seeding }}</span></li>
-    <li><span>优先级:</span><span>{{ preference.currentTorrent?.priority }}</span></li>
+  <el-row>
+    <el-col :span="5">分享率 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent?.ratio.toFixed(2) }}
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">种子数 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent?.num_seeds }}
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">吸血数 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent?.num_leechs }}
+    </el-col>
+  </el-row>
 
-    <li><span>分类:</span><span>{{ preference.currentTorrent?.category }}</span></li>
-    <li><span>标签:</span><span>{{ preference.currentTorrent?.tags }}</span></li>
-  </ul>
+  <el-row>
+    <el-col :span="5">顺序下载 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent?.seq_dl }}
+    </el-col>
+  </el-row>
+
+  <el-row>
+    <el-col :span="5">超级种子 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent?.super_seeding }}
+    </el-col>
+  </el-row>
+
+  <el-row>
+    <el-col :span="5">优先级 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent?.priority }}
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">分类 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent?.category }}
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="5">标签 :</el-col>
+    <el-col :span="18">
+      {{ preference.currentTorrent?.tags }}
+    </el-col>
+  </el-row>
 </template>
 <script lang="ts" setup>
 import StoreDefinition from '@/stores';
@@ -62,20 +124,12 @@ const preference = store.globalPreference
 
 </script>
 <style scoped>
-ul {
-  padding: 0;
-  list-style-type: none;
-}
+.el-row {
+  margin-top: 5px;
 
-li {
-  height: 30px;
-
-  span:first-child {
-    display: inline-block;
-    margin-right: 10px;
-    width: 100px;
+  .el-col:first-child {
     text-align: right;
+    padding-right: 10px;
   }
-
 }
 </style>

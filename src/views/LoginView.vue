@@ -2,13 +2,15 @@
   <div class="body-div">
     <el-form label-width="auto" :model="fromValue" style="max-width: 600px" class="from-card">
       <h1>
-        <FlyIcon class="fly"></FlyIcon> Qbittorrent
-      </h1> <br>
+        <FlyIcon class="fly"></FlyIcon>
+        Qbittorrent
+      </h1>
+      <br>
       <el-form-item label="用户名">
-        <el-input v-model="fromValue.name" placeholder="admin" />
+        <el-input v-model="fromValue.name" placeholder="admin"/>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin" />
+        <el-input v-model="fromValue.password" type="password" placeholder="adminadmin"/>
       </el-form-item>
       <el-form-item label=" ">
         <el-button type="primary" @click="login">登录</el-button>
@@ -19,10 +21,11 @@
 
 <script setup lang="ts">
 import FlyIcon from '@/components/icons/FlyIcon.vue';
-import { axios } from '@/requests';
-import { ElMessage } from 'element-plus';
-import { reactive } from 'vue';
-import { useRouter } from 'vue-router';
+import {axios} from '@/requests';
+import {ElMessage} from 'element-plus';
+import {reactive} from 'vue';
+import {useRouter} from 'vue-router';
+
 const router = useRouter();
 
 const fromValue = reactive({
@@ -48,19 +51,19 @@ const login = () => {
   from.set("username", fromValue.name)
   from.set("password", fromValue.password)
   axios.post('/api/v2/auth/login', from)
-    .then(resp => {
-      console.log(resp)
-      if (resp.data == 'Fails.') {
-        ElMessage.error('用户名或者密码错误')
-      } else {
-        sessionStorage.setItem("loginOk", "ok")
-        router.push("/all")
-      }
-    })
-    .catch(error => {
-      ElMessage.error('登录失败，' + error)
-      sessionStorage.removeItem("loginOk")
-    })
+      .then(resp => {
+        console.log(resp)
+        if (resp.data == 'Fails.') {
+          ElMessage.error('用户名或者密码错误')
+        } else {
+          sessionStorage.setItem("loginOk", "ok")
+          window.location.reload()
+        }
+      })
+      .catch(error => {
+        ElMessage.error('登录失败，' + error)
+        sessionStorage.removeItem("loginOk")
+      })
 }
 
 </script>

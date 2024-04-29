@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 
 function mergeObj(base: any, src: any) {
     if (src) { /* empty */
@@ -8,8 +8,7 @@ function mergeObj(base: any, src: any) {
     const keysb = Object.keys(base)
     const keyss = Object.keys(src)
     for (const k of keyss) {
-        const index = keysb.indexOf(k)
-        if (index >= 0) {
+        if (keysb.includes(k)) {
             base[k] = src[k]
         }
     }
@@ -23,15 +22,15 @@ interface ByteUnit {
 }
 
 const units: ByteUnit[] = [
-    { name: 'B', size: 1, value: 1 },
-    { name: 'KB', size: 1024, value: 1 },
-    { name: 'MB', size: 1024 * 1024, value: 1 },
-    { name: 'GB', size: 1024 * 1024 * 1024, value: 1 },
-    { name: 'TB', size: 1024 * 1024 * 1024 * 1024, value: 1 },
-    { name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024, value: 1 },
+    {name: 'B', size: 1, value: 1},
+    {name: 'KB', size: 1024, value: 1},
+    {name: 'MB', size: 1024 * 1024, value: 1},
+    {name: 'GB', size: 1024 * 1024 * 1024, value: 1},
+    {name: 'TB', size: 1024 * 1024 * 1024 * 1024, value: 1},
+    {name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024, value: 1},
 ]
 
-function findUnit(size: number): ByteUnit {
+function findUnit(size: number, fixed: number = 1): ByteUnit {
     let unit: ByteUnit | null = null
     for (let i = 0; i < units.length; i++) {
         const c = units[i]
@@ -46,7 +45,7 @@ function findUnit(size: number): ByteUnit {
     return {
         name: unit.name,
         size: unit.size,
-        value: Math.round((size * 10) / unit.size) / 10
+        value: (size / unit.size).toFixed(fixed)
     }
 }
 
@@ -215,7 +214,7 @@ class Torrent {
     public refreshFiles(tFiles: TorrentFile[]) {
         this.files.length = 0
         const fileMap = new Map<string, TorrentFile>()
-        tFiles.forEach(it => {
+        tFiles.map(it => it as TorrentFile).forEach(it => {
             it.isLeaf = true
             const [p, l] = this.splitPrefix(it.name)
             it.prefix = p
@@ -230,6 +229,7 @@ class Torrent {
                 this.files.push(it)
             }
         })
+        console.log('files', this.files)
     }
 
 
@@ -298,6 +298,10 @@ class Torrent {
         return Math.floor(this.progress * 100) / 100
     }
 
+    public getPercentageProgress() {
+        return Math.floor(this.progress * 100)
+    }
+
     public getEtaStr() {
         if (this.getProgress() == 1) {
             return '0'
@@ -363,7 +367,7 @@ class Preference {
     public categories: string[] = []
     public tags: string[] = []
 
-    public alltime_d = 224357181908
+    public alltime_dl = 224357181908
     public alltime_ul = 1481274895225
     public average_time_queue = 3273
 
@@ -607,5 +611,5 @@ class Preference {
 
 }
 
-export { Preference, Torrent, TorrentFile, TorrentSetting, Tracker, findUnit, units, type ByteUnit };
+export {Preference, Torrent, TorrentFile, TorrentSetting, Tracker, findUnit, units, type ByteUnit};
 

@@ -1,11 +1,11 @@
 <template>
-  <el-drawer v-model="preference.showDetail" :with-header="false" @open="beforeLeave" direction="rtl" size="600">
+  <el-drawer v-model="preference.showDetail" :with-header="false" @open="openInit" direction="rtl" size="600">
 
     <el-text size="large" truncated>
       {{ preference.currentTorrent?.name }}
     </el-text>
 
-    <el-tabs @tab-change="beforeLeave" v-model="active">
+    <el-tabs v-model="active">
       <el-tab-pane label="Props" name="Props">
         <TorrentPropsComponent></TorrentPropsComponent>
       </el-tab-pane>
@@ -21,7 +21,6 @@
       <el-tab-pane label="Trackers" name="Trackers">
         <TorrentTrackerComponent></TorrentTrackerComponent>
       </el-tab-pane>
-
     </el-tabs>
   </el-drawer>
 </template>
@@ -39,7 +38,7 @@ const store = StoreDefinition()
 const preference = store.globalPreference
 const active = ref("Props")
 
-const beforeLeave = () => {
+const openInit = () => {
   const torrent = preference.currentTorrent
   if (torrent == null) {
     return
@@ -48,15 +47,10 @@ const beforeLeave = () => {
   } else {
     return;
   }
-  if (active.value == "Files") {
-    store.fetchFiles(torrent)
-  }
-  if (active.value == "Setting") {
-    store.fetchCategoryAndTags()
-  }
-  if (active.value == 'Trackers') {
-    store.fetchTracker(torrent)
-  }
+
+  store.fetchFiles(torrent)
+  store.fetchCategoryAndTags()
+  store.fetchTracker(torrent)
 }
 
 

@@ -1,7 +1,7 @@
 <template>
   <ul>
     <li v-for="t in store.showTorrents" v-bind:key="t.hash" @click="active(t as Torrent)"
-      :class="{ 'border-color': t.isActive }">
+        :class="{ 'border-color': t.isActive }">
 
       <div class="p1">
         <span class="li-left">
@@ -10,40 +10,41 @@
         <span class="li-right">
           <el-tooltip content="删除" effect="light">
             <el-icon @click="showRemoveDialog(t as Torrent)">
-              <Close />
+              <Close/>
             </el-icon>
           </el-tooltip>
           <el-tooltip content="开始" v-if="t.getShowState() !== 'downloading'" effect="light">
             <el-icon @click="resume(t as Torrent)">
-              <VideoPlay />
+              <VideoPlay/>
             </el-icon>
           </el-tooltip>
           <el-tooltip content="暂停" v-if="t.getShowState() == 'downloading'" effect="light">
             <el-icon @click="pause(t as Torrent)">
-              <VideoPause />
+              <VideoPause/>
             </el-icon>
           </el-tooltip>
           <el-tooltip content="复制磁链" effect="light">
             <el-icon @click="copyLink(t as Torrent)">
-              <Connection />
+              <Connection/>
             </el-icon>
           </el-tooltip>
           <el-tooltip content="详情" effect="light">
             <el-icon @click="showDetail(t as Torrent)">
-              <Warning />
+              <Warning/>
             </el-icon>
           </el-tooltip>
         </span>
       </div>
 
       <div class="p2">
-        <el-progress :percentage="t.getProgress()" :text-inside="true" :status="getProgressState(t as Torrent)">
+        <el-progress :percentage="t.getPercentageProgress() " :text-inside="true"
+                     :status="getProgressState(t as Torrent)">
           <span> </span>
         </el-progress>
       </div>
 
       <div class="p3">
-        <span class="li-left">{{ t.getProgress() * 100 }}%
+        <span class="li-left">{{ t.getPercentageProgress() }}%
           (
           <size-text v-model="t.completed"></size-text>
           /
@@ -62,10 +63,10 @@
     </li>
   </ul>
 
-  <TorrentDetail />
+  <TorrentDetail/>
 
   <el-dialog v-model="deleteDialog.visible" title="" width="500">
-    &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteDialog.deleteFiles" />
+    &nbsp;&nbsp; 同时删除已下载的文件: &nbsp;<el-switch v-model="deleteDialog.deleteFiles"/>
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="deleteDialog.visible = false">取消</el-button>
@@ -80,13 +81,13 @@
 <script setup lang="ts">
 import SizeText from "@/components/SizeText.vue";
 import SpeedText from "@/components/SpeedText.vue";
-import { axios } from '@/requests';
+import {axios} from '@/requests';
 import StoreDefinition from '@/stores';
-import type { Torrent } from "@/util";
+import type {Torrent} from "@/util";
 import TorrentDetail from '@/views/TorrentDetail.vue';
-import { Close, Connection, VideoPause, VideoPlay, Warning } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
-import { reactive } from 'vue';
+import {Close, Connection, VideoPause, VideoPlay, Warning} from '@element-plus/icons-vue';
+import {ElMessage} from 'element-plus';
+import {reactive} from 'vue';
 
 const store = StoreDefinition()
 const preference = store.globalPreference
@@ -144,29 +145,29 @@ const remove = () => {
   from.set('hashes', deleteDialog.hash)
   from.set('deleteFiles', String(deleteDialog.deleteFiles))
   axios.post('/api/v2/torrents/delete', from)
-    .then(() => {
-      deleteDialog.visible = false
-      deleteDialog.hash = ''
-      preference.rid = 0
-    })
+      .then(() => {
+        deleteDialog.visible = false
+        deleteDialog.hash = ''
+        preference.rid = 0
+      })
 }
 
 const resume = (t: Torrent) => {
   const from = new FormData()
   from.set('hashes', t.hash)
   axios.post('/api/v2/torrents/resume', from)
-    .then(resp => {
-      console.log("resume torrent  " + t.name, resp)
-    })
+      .then(resp => {
+        console.log("resume torrent  " + t.name, resp)
+      })
 }
 
 const pause = (t: Torrent) => {
   const from = new FormData()
   from.set('hashes', t.hash)
   axios.post('/api/v2/torrents/pause', from)
-    .then(resp => {
-      console.log("pause torrent  " + t.name, resp)
-    })
+      .then(resp => {
+        console.log("pause torrent  " + t.name, resp)
+      })
 }
 
 </script>

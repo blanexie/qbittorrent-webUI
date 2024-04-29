@@ -1,9 +1,8 @@
-import { axios } from '@/requests';
-import { Preference, Torrent } from '@/util';
-import { initData } from '@/util/test';
-import { ElMessage } from 'element-plus';
-import { defineStore } from 'pinia';
-import { computed, reactive } from 'vue';
+import {axios} from '@/requests';
+import {Preference, Torrent} from '@/util';
+import {ElMessage} from 'element-plus';
+import {defineStore} from 'pinia';
+import {computed, reactive} from 'vue';
 
 const StoreDefinition =
     defineStore('preference', () => {
@@ -20,21 +19,14 @@ const StoreDefinition =
         const globalPreference = computed(() => store.preference)
 
         const showTorrents = computed(() => {
-            return store.torrents
+            const menu = store.preference.currentMenu
+            return store.preference.getTorrents(menu)
         })
-
-        const setShowTorrents = (item: string) => {
-            store.torrents.length = 0
-            const ts = store.preference.getTorrents(item)
-            ts.forEach(it => {
-                store.torrents.push(it)
-            })
-        }
 
         const fetchFiles = async (torrent: Torrent) => {
             const hash = torrent.hash
             const url = '/api/v2/torrents/files?hash=' + hash + '&' + new Date().getTime()
-            axios.get(url).then(resp => {
+            return axios.get(url).then(resp => {
                 torrent.refreshFiles(resp.data)
             }).catch(error => {
                 ElMessage.error("获取内容信息失败" + error)
@@ -43,7 +35,7 @@ const StoreDefinition =
 
         const fetchTracker = async (torrent: Torrent) => {
             const url = '/api/v2/torrents/trackers?hash=' + torrent.hash
-            axios.get(url).then(resp => {
+            return axios.get(url).then(resp => {
                 torrent.refreshTracker(resp.data)
             }).catch(err => {
                 ElMessage.error("获取内容信息失败" + err)
@@ -99,40 +91,39 @@ const StoreDefinition =
                 preference.resetRid = false
             }
 
-            const data = initData
-            preference.setCategory(data.categories)
-            preference.setTags(data.tags)
-            //设置部分全局属性
-            preference.refresh(data.server_state)
-            //设置各个torrent属性
-            const fullUpdate = data.full_update ? data.full_update : false
-            preference.refreshTorrents(data.torrents, fullUpdate)
-            preference.isRequesting = false
+            // const data = initData
+            // preference.setCategory(data.categories)
+            // preference.setTags(data.tags)
+            // //设置部分全局属性
+            // preference.refresh(data.server_state)
+            // //设置各个torrent属性
+            // const fullUpdate = data.full_update ? data.full_update : false
+            // preference.refreshTorrents(data.torrents, fullUpdate)
+            // preference.isRequesting = false
 
-
-            // axios.get('/api/v2/sync/maindata?rid=' + rid + "&" + new Date().getTime()).then(resp => {
-            //     const data = resp.data
-            //     preference.rid = data.rid
-            //     //设置分类和标签
-            //     preference.setCategory(data.categories)
-            //     preference.setTags(data.tags)
-            //     //设置部分全局属性
-            //     preference.refresh(data.server_state)
-            //     //设置各个torrent属性
-            //     const fullUpdate = data.full_update ? data.full_update : false
-            //     preference.refreshTorrents(data.torrents, fullUpdate)
-            //     preference.isRequesting = false
-            //     //继续下载请求
-            //     setTimeout(scheduleMaindata, preference.refresh_interval)
-            // }).catch(err => {
-            //     ElMessage.error('/api/v2/sync/maindata error' + err)
-            //     preference.isRequesting = false
-            //     setTimeout(scheduleMaindata, preference.refresh_interval)
-            // })
+            axios.get('/api/v2/sync/maindata?rid=' + rid + "&" + new Date().getTime()).then(resp => {
+                const data = resp.data
+                preference.rid = data.rid
+                //设置分类和标签
+                preference.setCategory(data.categories)
+                preference.setTags(data.tags)
+                //设置部分全局属性
+                preference.refresh(data.server_state)
+                //设置各个torrent属性
+                const fullUpdate = data.full_update ? data.full_update : false
+                preference.refreshTorrents(data.torrents, fullUpdate)
+                preference.isRequesting = false
+                //继续下载请求
+                setTimeout(scheduleMaindata, preference.refresh_interval)
+            }).catch(err => {
+                ElMessage.error('/api/v2/sync/maindata error' + err)
+                preference.isRequesting = false
+                setTimeout(scheduleMaindata, preference.refresh_interval)
+            })
         }
 
         return {
-            globalPreference, setShowTorrents, showTorrents, fetchFiles, fetchTracker, fetchPreference, fetchCategoryAndTags, scheduleMaindata
+            globalPreference, showTorrents, fetchFiles, fetchTracker, fetchPreference, fetchCategoryAndTags, scheduleMaindata
         }
     })
 

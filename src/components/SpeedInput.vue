@@ -1,7 +1,7 @@
 <template>
-  <el-input v-model="su.speed" placeholder="Please input" @change="change" size="small">
+  <el-input v-model="show.value" @change="changeValue" placeholder="Please input" size="small">
     <template #append>
-      <el-select v-model="su.unit" @change="change" style="width: 80px" size="small">
+      <el-select v-model="show.size" @change="changeValue" style="width: 80px" size="small">
         <el-option v-for="u in units" v-bind:key="u.name" :label="u.name" :value="u.size"/>
       </el-select>
     </template>
@@ -9,23 +9,18 @@
 </template>
 <script setup lang="ts">
 import {ElInput, ElOption, ElSelect} from "element-plus";
+import {findUnit, units} from "@/util";
 import {reactive} from "vue";
-import {units} from "@/util";
 
-const speed = defineModel<number>("speed")
+const speed = defineModel<number>()
+const unit = findUnit(speed.value)
 
-const su = reactive({
-  unit: 1024,
-  speed: 0,
+const show = reactive({
+  value: unit.value,
+  size: unit.size
 })
-
-if (speed.value == null) {
-  speed.value = 0
-}
-
-su.speed = Math.floor((speed.value!!) / su.unit)
-const change = () => {
-  return speed.value = su.speed * su.unit
+const changeValue = () => {
+  speed.value = show.size * show.value
 }
 
 </script>
