@@ -42,9 +42,6 @@ import { axios } from "@/requests";
 import StoreDefinition from "@/stores";
 import { Plus, Refresh, Setting, SwitchButton, VideoPause, VideoPlay } from "@element-plus/icons-vue";
 import { ElIcon, ElMessage, ElTooltip } from "element-plus";
-import { useRoute, useRouter } from "vue-router";
-const route = useRoute();
-const router = useRouter();
 const store = StoreDefinition()
 const preference = store.globalPreference
 

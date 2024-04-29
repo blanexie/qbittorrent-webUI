@@ -11,29 +11,24 @@
       <el-tab-pane label="种子任务" name="second">
         <el-row>
           <el-col :span="24">
-            <el-upload drag :before-upload="beforeUp" :limit="1"
-              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15">
+            <div class="file-input" @click="handleFileInputClick" @drop="handleDrop" @dragover="handleDropOver">
+              <el-input type="file" :value="data.torrentFile" ref="torrentFileInput"></el-input>
               <el-icon class="filled-icon">
                 <upload-filled />
               </el-icon>
-              <div v-if="!data.torrentAdd">
-                拖拽Torrent文件至此或
+              <div v-if="data.torrentFile == null">
+                <el-text> 拖拽Torrent文件至此或</el-text>
                 <el-text type="primary">点击上传</el-text>
               </div>
-              <div v-if="data.torrentAdd">
-                <el-text size="large" type="primary">{{ data.torrentFile?.name }}</el-text>
+              <div v-if="data.torrentFile != null">
+                <el-text size="large" type="primary">{{ data.torrentFile.name }}</el-text>
               </div>
-
-              <template #tip>
-                <div>
-                  Torrent文件大小不得超过10MB
-                </div>
-              </template>
-            </el-upload>
+            </div>
           </el-col>
         </el-row>
 
       </el-tab-pane>
+
       <el-row>
         <el-col :span="5">分类:</el-col>
         <el-col :span="17">
@@ -80,18 +75,15 @@ import SpeedInputComponent from "@/components/SpeedInput.vue";
 import { axios } from "@/requests";
 import StoreDefinition from "@/stores";
 import { UploadFilled } from "@element-plus/icons-vue";
-import type { UploadFile } from 'element-plus';
-import { ElButton, ElDialog, ElInput, ElMessage, ElOption, ElSelect, ElSwitch, ElTabPane, ElTabs, ElUpload } from "element-plus";
-import { reactive } from 'vue';
-
+import { ElDialog, ElInput, ElMessage, ElOption, ElSelect, ElSwitch, ElTabPane, ElTabs } from "element-plus";
+import { reactive, ref } from 'vue';
 
 const store = StoreDefinition()
 const preference = store.globalPreference
 
-
 interface TorrentData {
   links: string;
-  torrentFile: UploadFile | null;
+  torrentFile: File | null;
   autoTMM: boolean;
   skip_checking: boolean;
   cookie: string;
@@ -102,7 +94,6 @@ interface TorrentData {
   upLimit: number;
   dlLimit: number;
   activeTab: 'first' | 'second';
-  torrentAdd: boolean;
 }
 
 const data = reactive<TorrentData>({
@@ -117,19 +108,46 @@ const data = reactive<TorrentData>({
   contentLayout: 'Original',
   upLimit: 0,
   dlLimit: 0,
-  activeTab: 'first',
-  torrentAdd: false
+  activeTab: 'first'
 })
 
-const beforeUp = async (uploadFile: UploadFile) => {
-  console.log("uploadFile", uploadFile)
-  if (uploadFile.size!! > 10 * 1048576) {
-    ElMessage.error("选择的Torrent本身（不是下载的内容）大小不得超出10MB")
-    return false
+
+const torrentFileInput = ref(null);
+
+const handleFileInputClick = () => {
+  console.log("sss", torrentFileInput.value?.click())
+}
+
+
+const handleDrop = (event: DragEvent) => {
+  // 阻止事件冒泡
+  event.stopPropagation();
+  event.preventDefault()
+  const files = event.dataTransfer?.files
+  if (files == null) {
+    return
   }
-  data.torrentFile = uploadFile
-  data.torrentAdd = true
-  return false
+  if (files.length != 1) {
+    ElMessage.error("只能选择一个文件")
+    return
+  }
+  const file = files.item(0)
+  if (file?.type != 'application/x-bittorrent') {
+    ElMessage.error("只能选择一个Torrent文件")
+    return
+  }
+
+  if (file.size > 10 * 1048576) {
+    ElMessage.error("选择的Torrent本身（不是下载的内容）大小不得超出10MB")
+    return
+  }
+  data.torrentFile = file
+}
+
+const handleDropOver = (event: DragEvent) => {
+  // 阻止事件冒泡
+  event.stopPropagation();
+  event.preventDefault()
 }
 
 const submit = () => {
@@ -156,7 +174,7 @@ const submit = () => {
       ElMessage.error("请选择Torrent文件")
       return
     }
-    fromValue.append("torrents", data.torrentFile)
+    fromValue.append("torrents", data.torrentFile! as File)
   }
   axios({
     url: '/api/v2/torrents/add',
@@ -195,6 +213,19 @@ const openInit = () => {
   padding: 10px;
 }
 
+.file-input {
+  /* 设置边框为虚线 */
+  border: 1px dashed #ccc;
+  border-radius: 7px;
+  /** 设置内部内容 上下左右居中 */
+  text-align: center;
+  vertical-align: middle;
+  padding: 15px 0px;
+  margin: 10px 0px;
+  height: 100px;
+  cursor: pointer;
+
+}
 
 .but {
   padding-top: 15px;
