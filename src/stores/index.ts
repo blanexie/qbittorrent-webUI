@@ -1,8 +1,11 @@
-import {axios} from '@/requests';
-import {Preference, Torrent} from '@/util';
-import {ElMessage} from 'element-plus';
-import {defineStore} from 'pinia';
-import {computed, reactive} from 'vue';
+import { axios } from '@/requests';
+import { Preference, Torrent, TorrentFile } from '@/util';
+import { Tags, catogry, files2, initData, preferenece, trackers } from '@/util/test';
+import { ElMessage } from 'element-plus';
+import { defineStore } from 'pinia';
+import { computed, reactive } from 'vue';
+
+const test = true
 
 const StoreDefinition =
     defineStore('preference', () => {
@@ -12,7 +15,7 @@ const StoreDefinition =
             torrents: Torrent[];
         }>({
             preference: new Preference(),
-            torrents: []
+            torrents: [],
         })
 
         //get方法
@@ -24,6 +27,12 @@ const StoreDefinition =
         })
 
         const fetchFiles = async (torrent: Torrent) => {
+            if (test) {
+                const data = files2
+                torrent.refreshFiles(data.map(it => it as TorrentFile))
+                return
+            }
+
             const hash = torrent.hash
             const url = '/api/v2/torrents/files?hash=' + hash + '&' + new Date().getTime()
             return axios.get(url).then(resp => {
@@ -34,6 +43,11 @@ const StoreDefinition =
         }
 
         const fetchTracker = async (torrent: Torrent) => {
+            if (test) {
+                const data = trackers
+                torrent.refreshTracker(data)
+                return
+            }
             const url = '/api/v2/torrents/trackers?hash=' + torrent.hash
             return axios.get(url).then(resp => {
                 torrent.refreshTracker(resp.data)
@@ -43,6 +57,13 @@ const StoreDefinition =
         }
 
         const fetchPreference = async () => {
+            if (test) {
+                const data = preferenece
+                console.log("store.preference", data)
+                store.preference.refresh(data)
+                console.log("store.preference", data)
+                return
+            }
             return axios.get('/api/v2/app/preferences')
                 .then(resp => {
                     console.log("store.preference", resp.data)
@@ -57,6 +78,13 @@ const StoreDefinition =
 
         const fetchCategoryAndTags = async () => {
             const preference = store.preference
+
+            if (test) {
+                preference.setTags(Tags)
+                preference.setCategory(catogry)
+                return
+            }
+
             const categories = axios.get('/api/v2/torrents/categories').then(resp => {
                 preference.setCategory(resp.data)
             }).catch(error => {
@@ -91,16 +119,19 @@ const StoreDefinition =
                 preference.resetRid = false
             }
 
-            // const data = initData
-            // preference.setCategory(data.categories)
-            // preference.setTags(data.tags)
-            // //设置部分全局属性
-            // preference.refresh(data.server_state)
-            // //设置各个torrent属性
-            // const fullUpdate = data.full_update ? data.full_update : false
-            // preference.refreshTorrents(data.torrents, fullUpdate)
-            // preference.isRequesting = false
-
+            if (test) {
+                const data = initData
+                preference.setCategory(data.categories)
+                preference.setTags(data.tags)
+                //设置部分全局属性
+                preference.refresh(data.server_state)
+                //设置各个torrent属性
+                const fullUpdate = data.full_update ? data.full_update : false
+                preference.refreshTorrents(data.torrents, fullUpdate)
+                preference.isRequesting = false
+                return
+            }
+            
             axios.get('/api/v2/sync/maindata?rid=' + rid + "&" + new Date().getTime()).then(resp => {
                 const data = resp.data
                 preference.rid = data.rid

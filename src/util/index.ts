@@ -1,4 +1,4 @@
-import {format} from 'date-fns';
+import { format } from 'date-fns';
 
 function mergeObj(base: any, src: any) {
     if (src) { /* empty */
@@ -22,12 +22,12 @@ interface ByteUnit {
 }
 
 const units: ByteUnit[] = [
-    {name: 'B', size: 1, value: 1},
-    {name: 'KB', size: 1024, value: 1},
-    {name: 'MB', size: 1024 * 1024, value: 1},
-    {name: 'GB', size: 1024 * 1024 * 1024, value: 1},
-    {name: 'TB', size: 1024 * 1024 * 1024 * 1024, value: 1},
-    {name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024, value: 1},
+    { name: 'B', size: 1, value: 1 },
+    { name: 'KB', size: 1024, value: 1 },
+    { name: 'MB', size: 1024 * 1024, value: 1 },
+    { name: 'GB', size: 1024 * 1024 * 1024, value: 1 },
+    { name: 'TB', size: 1024 * 1024 * 1024 * 1024, value: 1 },
+    { name: 'PB', size: 1024 * 1024 * 1024 * 1024 * 1024, value: 1 },
 ]
 
 function findUnit(size: number, fixed: number = 1): ByteUnit {
@@ -45,7 +45,7 @@ function findUnit(size: number, fixed: number = 1): ByteUnit {
     return {
         name: unit.name,
         size: unit.size,
-        value: (size / unit.size).toFixed(fixed)
+        value: Number((size / unit.size).toFixed(fixed))
     }
 }
 
@@ -53,9 +53,7 @@ function findUnit(size: number, fixed: number = 1): ByteUnit {
 class TorrentSetting {
     public savePath = ''
     public downloadLimit = 0
-    public downloadLimitUnit = 1
     public uploadLimit = 0
-    public uploadLimitUnit = 1
     public torrentName = ''
     public category = ''
     public tags: string[] = []
@@ -208,6 +206,23 @@ class Torrent {
         ]
     }
 
+
+    /**
+     * 设置配置值
+     */
+
+    public initSetting() {
+        this.setting.torrentName = this.name
+        this.setting.savePath = this.save_path
+        this.setting.downloadLimit = this.dl_limit
+        this.setting.uploadLimit = this.up_limit
+        this.setting.category = this.category
+        this.setting.tags = this.tags
+        this.setting.sequential = this.seq_dl
+        this.setting.superSeed = this.super_seeding
+        this.setting.f_l_piece_prio = this.f_l_piece_prio
+    }
+
     /**
      * refreshFiles
      */
@@ -265,16 +280,9 @@ class Torrent {
     }
 
     public refreshTracker(data: any) {
-        this.trackers.forEach((it: Tracker) => {
-            const resp = data.find((it2: any) => it2.url == it.url)
-            if (resp) {
-                mergeObj(it, resp)
-                it.msg = resp.msg
-                it.num_peers = resp.num_peers
-                it.num_downloaded = resp.num_downloaded
-                it.num_leeches = resp.num_leeches
-                it.num_seeds = resp.num_seeds
-            }
+        this.trackers.length = 0
+        data.forEach((it: any) => {
+            this.trackers.push(it)
         })
     }
 
@@ -282,10 +290,16 @@ class Torrent {
         this.hash = hash
     }
 
-    public refresh(obj: any): Torrent {
+    public refresh(obj: any) {
+        //关于标签的数据，需要特殊处理
+        const tags = obj.tags
+        if (tags instanceof String || typeof tags == 'string') {
+            obj.tags = tags.split(',').filter(it => it != '')
+        }
         mergeObj(this, obj)
         return this
     }
+
 
     public getShowState(): string {
         return this.stateMap.downloading.includes(this.state) ? 'downloading' :
@@ -545,6 +559,11 @@ class Preference {
     public scan_dirs = {}
 
     public refresh(obj: any) {
+        //关于标签的数据，需要特殊处理
+        const tags = obj.tags
+        if (tags instanceof String || typeof tags == 'string') {
+            obj.tags = tags.split(',').filter(it => it != '')
+        }
         mergeObj(this, obj)
     }
 
@@ -599,17 +618,28 @@ class Preference {
         })
     }
 
-    public setTags(tags: string[] | null) {
+    public setTags(tags: string[] | String | null) {
         if (tags == null) {
             return
         }
-        this.tags.length = 0
-        tags.forEach(it => {
-            this.tags.push(it)
-        })
+        if (tags instanceof String) {
+            this.tags.length = 0
+            tags.split(",").forEach(it => {
+                this.tags.push(it)
+            })
+            return
+        }
+
+        if (Array.isArray(tags)) {
+            this.tags.length = 0
+            tags.forEach(it => {
+                this.tags.push(it)
+            })
+            return
+        }
     }
 
 }
 
-export {Preference, Torrent, TorrentFile, TorrentSetting, Tracker, findUnit, units, type ByteUnit};
+export { Preference, Torrent, TorrentFile, TorrentSetting, Tracker, findUnit, units, type ByteUnit };
 

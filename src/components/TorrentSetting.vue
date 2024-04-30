@@ -32,8 +32,8 @@
     <el-col :span="6">分类:</el-col>
     <el-col :span="17">
       <el-select v-model="preference.currentTorrent!.setting.category" :reserve-keyword="false" filterable allow-create
-                 placeholder="分类">
-        <el-option v-for="item in preference.categories" :key="item" :label="item" :value="item"/>
+        placeholder="分类">
+        <el-option v-for="item in preference.categories" :key="item" :label="item" :value="item" />
       </el-select>
     </el-col>
   </el-row>
@@ -42,9 +42,8 @@
     <el-col :span="6">标签:</el-col>
     <el-col :span="17">
       <el-select v-model="preference.currentTorrent!.setting.tags" :reserve-keyword="false" multiple allow-create
-                 filterable
-                 placeholder="标签 ">
-        <el-option v-for="(item ,index) in preference.tags" :key="index" :label="item" :value="item"/>
+        filterable placeholder="标签 ">
+        <el-option v-for="(item, index) in preference.tags" :key="index" :label="item" :value="item" />
       </el-select>
     </el-col>
   </el-row>
@@ -52,36 +51,35 @@
   <el-row>
     <el-col :span="6">顺序下载:</el-col>
     <el-col :span="17">
-      <el-switch v-model="preference.currentTorrent!.setting.sequential"/>
+      <el-switch v-model="preference.currentTorrent!.setting.sequential" />
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">超级种子:</el-col>
     <el-col :span="17">
-      <el-switch v-model="preference.currentTorrent!.setting.superSeed"/>
+      <el-switch v-model="preference.currentTorrent!.setting.superSeed" />
     </el-col>
   </el-row>
 
   <el-row>
     <el-col :span="6">优先下载首尾:</el-col>
     <el-col :span="17">
-      <el-switch v-model="preference.currentTorrent!.setting.f_l_piece_prio"/>
+      <el-switch v-model="preference.currentTorrent!.setting.f_l_piece_prio" />
     </el-col>
   </el-row>
 
-  <div>
+  <div class="submit">
     <el-button @click="update" :loading="loading" type="primary">修改</el-button>
   </div>
 
 </template>
 <script lang="ts" setup>
-import {axios} from "@/requests";
-import StoreDefinition from "@/stores";
-import {ElButton, ElCol, ElInput, ElMessage, ElNotification, ElOption, ElRow, ElSelect, ElSwitch} from 'element-plus';
-import {ref} from "vue";
 import SpeedInput from "@/components/SpeedInput.vue";
-
+import { axios } from "@/requests";
+import StoreDefinition from "@/stores";
+import { ElButton, ElCol, ElInput, ElMessage, ElNotification, ElOption, ElRow, ElSelect, ElSwitch } from 'element-plus';
+import { ref } from "vue";
 const store = StoreDefinition()
 const preference = store.globalPreference
 
@@ -89,14 +87,14 @@ const loading = ref(false)
 
 const sendRequest = (url: string, data: FormData) => {
   return axios.post(url, data)
-      .then(resp => {
-        console.log(resp);
-        ElMessage.success("设置成功");
-      })
-      .catch(error => {
-        console.error(`设置失败: ${error}`);
-        ElMessage.error(`设置失败，${error}`);
-      });
+    .then(resp => {
+      console.log(resp);
+      ElMessage.success("设置成功");
+    })
+    .catch(error => {
+      console.error(`设置失败: ${error}`);
+      ElMessage.error(`设置失败，${error}`);
+    });
 }
 
 const update = async () => {
@@ -111,7 +109,11 @@ const update = async () => {
     //标签
     //1. 获取新增的标签
     const tTags = torrent.tags
-    const addTags = setting.tags.filter(tag => !tTags.includes(tag)).filter(tag => tag != "")
+    let addTags: string[] = []
+    if (setting.tags != null) {
+      addTags = setting.tags.filter(tag => !tTags.includes(tag)).filter(tag => tag != "")
+    }
+
     //2. 判断需要新增的标签中那些是不存在的
     const newTags = addTags.filter(tag => !preference.tags.includes(tag)).filter(tag => tag != "")
     //3. 创建不存在的标签
@@ -226,6 +228,10 @@ const update = async () => {
 
 </script>
 <style scoped>
+.submit {
+  text-align: center;
+}
+
 .el-row {
   margin-top: 10px;
 

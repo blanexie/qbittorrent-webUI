@@ -12,7 +12,7 @@
         <el-row>
           <el-col :span="24">
             <div class="file-input" @click="handleFileInputClick" @drop="handleDrop" @dragover="handleDropOver">
-              <el-input type="file" :value="data.torrentFile" ref="torrentFileInput"></el-input>
+              <input type="file" ref="torrentFileInput" style="display: none" />
               <el-icon class="filled-icon">
                 <upload-filled />
               </el-icon>
@@ -53,14 +53,14 @@
       <el-row>
         <el-col :span="5">下载限速:</el-col>
         <el-col :span="17">
-          <SpeedInputComponent v-model:speed="data.dlLimit"></SpeedInputComponent>
+          <speed-input v-model="data.dlLimit"></speed-input>
         </el-col>
       </el-row>
 
       <el-row>
         <el-col :span="5">上传限速:</el-col>
         <el-col :span="17">
-          <SpeedInputComponent v-model:speed="data.upLimit"></SpeedInputComponent>
+          <speed-input v-model="data.upLimit"></speed-input>
         </el-col>
       </el-row>
       <div class="but">
@@ -71,7 +71,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import SpeedInputComponent from "@/components/SpeedInput.vue";
+import SpeedInput from "@/components/SpeedInput.vue";
 import { axios } from "@/requests";
 import StoreDefinition from "@/stores";
 import { UploadFilled } from "@element-plus/icons-vue";
@@ -111,13 +111,14 @@ const data = reactive<TorrentData>({
   activeTab: 'first'
 })
 
-
 const torrentFileInput = ref(null);
 
 const handleFileInputClick = () => {
-  console.log("sss", torrentFileInput.value?.click())
+  if (torrentFileInput.value == null) {
+    return
+  }
+  (torrentFileInput.value as HTMLInputElement).click()
 }
-
 
 const handleDrop = (event: DragEvent) => {
   // 阻止事件冒泡
@@ -127,21 +128,21 @@ const handleDrop = (event: DragEvent) => {
   if (files == null) {
     return
   }
-  if (files.length != 1) {
+  console.log("files", files, files.length, files.length < 1)
+  if (files.length < 1) {
     ElMessage.error("只能选择一个文件")
     return
   }
-  const file = files.item(0)
-  if (file?.type != 'application/x-bittorrent') {
-    ElMessage.error("只能选择一个Torrent文件")
+  const file = files.item(files.length - 1)
+  if (file == null) {
     return
   }
-
   if (file.size > 10 * 1048576) {
     ElMessage.error("选择的Torrent本身（不是下载的内容）大小不得超出10MB")
     return
   }
   data.torrentFile = file
+  console.log("data", data)
 }
 
 const handleDropOver = (event: DragEvent) => {
@@ -197,11 +198,9 @@ const submit = () => {
   })
 }
 
-
 const openInit = () => {
   store.fetchCategoryAndTags()
 }
-
 
 </script>
 <style scoped>

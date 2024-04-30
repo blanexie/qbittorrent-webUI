@@ -4,7 +4,7 @@ import {ElMessage} from 'element-plus'
 
 const service = axios.create({
     //  baseURL: "http://192.168.1.6:8080",
-    timeout: 10000,// request timeout
+    timeout: 5000,// request timeout
     // withCredentials:true
 })
 

@@ -48,6 +48,7 @@ const openInit = () => {
     return;
   }
 
+  torrent.initSetting()
   store.fetchFiles(torrent)
   store.fetchCategoryAndTags()
   store.fetchTracker(torrent)
