@@ -27,8 +27,7 @@
       {{ preference.currentTorrent!.getProgress() * 100 }} % (
       <size-text v-model="preference.currentTorrent!.completed"></size-text>
       /
-      <size-text
-          v-model="preference.currentTorrent!.total_size"></size-text>
+      <size-text v-model="preference.currentTorrent!.total_size"></size-text>
       )
     </el-col>
   </el-row>
@@ -36,12 +35,12 @@
     <el-col :span="5">速度 :</el-col>
     <el-col :span="18">
       <el-icon>
-        <Bottom/>
+        <Bottom />
       </el-icon>
       <speed-text v-model="preference.currentTorrent!.dlspeed"></speed-text>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <el-icon>
-        <Top/>
+        <Top />
       </el-icon>
       <speed-text v-model="preference.currentTorrent!.upspeed"></speed-text>
     </el-col>
@@ -50,12 +49,12 @@
     <el-col :span="5">限速 :</el-col>
     <el-col :span="18">
       <el-icon>
-        <Download/>
+        <Download />
       </el-icon>
       <speed-text v-model="preference.currentTorrent!.dl_limit"></speed-text>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <el-icon>
-        <Upload/>
+        <Upload />
       </el-icon>
       <speed-text v-model="preference.currentTorrent!.up_limit"></speed-text>
     </el-col>
@@ -109,15 +108,15 @@
   <el-row>
     <el-col :span="5">标签 :</el-col>
     <el-col :span="18">
-      {{ preference.currentTorrent?.tags }}
+      <el-tag v-for="tag in preference.currentTorrent?.tags" :key="tag" size="small" type="primary">{{ tag }}</el-tag>
     </el-col>
   </el-row>
 </template>
 <script lang="ts" setup>
-import StoreDefinition from '@/stores';
-import {Bottom, Download, Top, Upload} from '@element-plus/icons-vue';
 import SizeText from "@/components/SizeText.vue";
 import SpeedText from "@/components/SpeedText.vue";
+import StoreDefinition from '@/stores';
+import { Bottom, Download, Top, Upload } from '@element-plus/icons-vue';
 
 const store = StoreDefinition()
 const preference = store.globalPreference
